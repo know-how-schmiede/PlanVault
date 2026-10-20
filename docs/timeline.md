@@ -2,6 +2,21 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.20 – Anfängeranleitung und Wochentagsabgleich
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.20` gesetzt; Footer bezieht sie weiterhin daraus.
+- Erstinstallation und Update mit Container-Konsole, aktuellem wget-Aufruf, Eingaben, Erfolgskontrolle und häufigen Fehlern erklärt. Kurzfassung unter scripts synchronisiert.
+- Nächsten Baustein zur Import-Vollständigkeit umgesetzt: Schema 5 vergleicht sichtbare Tagesüberschriften und lokale Termintage, zählt blockierte Details separat und behauptet keine Wochenend-Vollständigkeit.
+- Erfolgreichen Betrieb nach V0.0.19 durch den User festgehalten. Offene Bemerkungen bleiben blockiert; kein Archiv veröffentlicht.
+
+**Prüfung:** 279 lokale Python-Tests und 14 isolierte Skript-Eingabetests erfolgreich. Sieben dokumentierte Bash-Blöcke sowie beide Skripte auf Syntax geprüft; git diff --check ohne Fehler. Begrenzte Quellenprüfung ohne ausreichenden neuen Beleg zur Freigabe der offenen Bemerkungen. Kein Deployment und kein vollständiger Live-Semesterlauf für diese Version.
+
+**Commit-Kurzbeschreibung:** Version 0.0.20 mit Anfängeranleitung und Wochentagsabgleich ergänzen
+
 ## V0.0.19 – Kompaktes Logo und nächste Schritte auf der Startseite
 
 **Datum:** 2026-10-20

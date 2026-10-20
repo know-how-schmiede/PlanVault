@@ -1,6 +1,7 @@
 """Begrenzte Bestandsaufnahme zusätzlicher Semesteransichten."""
 
 from dataclasses import dataclass, field
+from datetime import date
 
 from backend.importer.structure import COURSE_BLOCK_SELECTOR
 from backend.importer.details import (
@@ -17,6 +18,26 @@ VIEWS = (
     ("semester", "Semesteransicht"),
     ("special_dates", "Semesterzeitansicht nur Block/Einzeltermine"),
 )
+
+
+def weekday_coverage(views, sample=None):
+    """Beobachtete Tage zählen, ohne aus fehlenden Terminen Leerbestand abzuleiten."""
+    visible = set().union(*(set(v.visible_weekdays) for v in views))
+    counts = [0] * 7
+    if sample is not None:
+        for detail in sample.details:
+            if detail.preview is not None:
+                for event in detail.preview.occurrences:
+                    counts[date.fromisoformat(event.local_date).weekday()] += 1
+    return {
+        "visible_weekdays": sorted(visible),
+        "unobserved_weekdays": sorted(set(range(7)) - visible),
+        "occurrences_by_weekday": counts,
+        "occurrence_weekdays_outside_views": [day for day in range(7) if counts[day] and day not in visible],
+        "details_checked": sample is not None and sample.unchecked_count == 0,
+        "blocked_details": None if sample is None else sum(d.preview is None for d in sample.details),
+        "weekend_coverage_verified": False,
+    }
 
 
 def validate_semester_details(semester, study_key, regulations_key, budget):

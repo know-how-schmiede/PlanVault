@@ -143,7 +143,10 @@ def test_cli_report_is_private_and_never_published(monkeypatch, fail):
     assert result.exit_code == 1
     report = json.loads(result.output)
     assert report["status"] == ("failed" if fail else "needs_review")
-    assert report["schema_version"] == 4
+    assert report["schema_version"] == 5
+    assert report["weekday_coverage"]["unobserved_weekdays"] == list(range(7))
+    assert report["weekday_coverage"]["blocked_details"] is None
+    assert not report["weekday_coverage"]["weekend_coverage_verified"]
     if not fail:
         assert all(v["block_count"] == 1 and v["visible_weekdays"] == [] for v in report["views"])
     assert not report["complete"] and not report["published"]
@@ -163,3 +166,41 @@ def test_alternative_blocks_are_not_empty_and_weekdays_are_only_observed(session
     expected = tuple(("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag").index(d) for d in days)
     assert all(v.status == "observed" and v.reference_count == 1 for v in results)
     assert all(v.visible_weekdays == expected for v in results)
+@pytest.mark.parametrize("visible", [(), (0, 1, 2, 3, 4), tuple(range(7))])
+def test_weekday_headers_never_prove_weekend_completeness(visible):
+    from backend.importer.semester import SemesterViewResult, weekday_coverage
+    views = (SemesterViewResult("semester", "observed", 0, 0, (), visible),)
+    result = weekday_coverage(views)
+    assert result["unobserved_weekdays"] == sorted(set(range(7)) - set(visible))
+    assert result["blocked_details"] is None
+    assert not result["details_checked"]
+    assert not result["weekend_coverage_verified"]
+
+
+def test_weekday_audit_uses_local_date_and_preserves_blocked_details():
+    from backend.importer.semester import SemesterViewResult, weekday_coverage
+    from backend.importer.details import DetailResult, DetailSample
+    from backend.parser.normalize import CalendarPreview, Occurrence
+    # Sunday locally, Saturday in UTC: count by the source's local calendar date.
+    event = Occurrence("demo", 0, "2026-10-24T22:15:00+00:00", "2026-10-24T22:45:00+00:00",
+                       "2026-10-25", 2026, 43, None, None)
+    preview = CalendarPreview("demo", "Fiktiv", "Demo", (event,), ())
+    sample = DetailSample(2, 2, (DetailResult("demo", 1, "preview", preview),
+                                DetailResult("blocked", 1, "needs_review", None)))
+    views = (SemesterViewResult("semester", "observed", 2, 0, (), (0, 1, 2, 3, 4)),)
+    result = weekday_coverage(views, sample)
+    assert result["occurrences_by_weekday"] == [0, 0, 0, 0, 0, 0, 1]
+    assert result["occurrence_weekdays_outside_views"] == [6]
+    assert result["blocked_details"] == 1
+    assert result["details_checked"]
+    assert not result["weekend_coverage_verified"]
+    assert "Fiktiv" not in json.dumps(result)
+
+
+def test_partial_detail_sample_cannot_claim_all_details_checked():
+    from backend.importer.semester import weekday_coverage
+    from backend.importer.details import DetailSample
+    result = weekday_coverage((), DetailSample(2, 2, ()))
+    assert not result["details_checked"]
+    assert result["occurrences_by_weekday"] == [0] * 7
+    assert not result["weekend_coverage_verified"]

@@ -170,3 +170,15 @@ Beide Ansichten zeigen Montag bis Freitag. Im untersuchten Auswahlformular wurde
 Das bestehende Logo wird lokal und responsiv im gemeinsamen Seitenkopf angezeigt. Installations- und Update-Skript benötigen kein curl mehr: wget dient im Schnellstart zum Download; lokale Gesundheitsprüfungen verwenden Python ohne Proxy und mit Timeout, Größenlimit und exakter Versionsprüfung beim Update. Die neue Skriptfassung ist lokal getestet, noch nicht im Ziel-LXC ausgeführt.
 
 Die zwei offenen Normalisierungsfälle wurden untersucht. Eine Einzelterminserie enthält einen eindeutigen Klausurzeit-Hinweis innerhalb des größeren Tabellenzeitraums. Diese eng begrenzte Form wird nun übernommen; Originalzeiten, Hinweis und fachlicher Prüfstatus bleiben erhalten. Die Begrüßungs-/Einführungsbemerkungen der anderen Veranstaltung bleiben blockierend und intern erhalten. Abschließender gezielter Live-Test: zwei Details, eine Vorschau mit Klausurzeit-Annotation und ein ungeklärtes Detail, zehn HTTP-Anfragen. Kein erneuter vollständiger Lauf nach der Änderung. Wochenenden und vollständiger Semesterumfang bleiben separat nachzuweisen.
+
+## Ergänzung V0.0.20
+
+Eine begrenzte erneute Detailprüfung lieferte keinen ausreichenden neuen Beleg,
+um die offenen Bemerkungen allgemein als reine Zusatzinformationen freizugeben.
+Die bisherige Sperre bleibt erhalten; personenbezogene Hinweistexte wurden weder
+in Dateien noch in Berichte übernommen. Kein vollständiger Semesterlauf wiederholt.
+
+Der neue lokale Wochentagsabgleich im Semesterbericht zählt Vorschautermine nach
+lokalem Datum und macht nicht beobachtete Tage sowie Termine außerhalb sichtbarer
+Tagesüberschriften erkennbar. Das ist eine zusätzliche Diagnose, kein Live-Nachweis
+vollständiger Wochenenden. Einzelheiten stehen in der Semesterprüfungs-Anleitung.

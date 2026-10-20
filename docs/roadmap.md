@@ -4,7 +4,7 @@ WI-PlanArchiv wird schrittweise von der Konzeption zur zuverlässig betriebenen 
 
 ## Aktueller Stand
 
-Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.19`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Laut Nutzerprotokoll vom 2026-10-20 bestehen im Debian-13-LXC alle drei Tests; systemd-Einrichtung und lokale HTTP-Prüfung sind erfolgreich. Der User bestätigt nach erneutem Test den laufenden Server und Zugriff im internen Netz. Der erste Live-Quellzugriff für Studiengangsuche, Plan und Wochenwechsel ist verifiziert; ein automatisierter Datenimport ist noch nicht implementiert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Erstinstallation im Zielcontainer ist durch das Nutzerprotokoll bestätigt. Ein separates Update-Skript mit vorbereiteten Releases, Sicherung und Rückkehr zum alten Anwendungsstand liegt vor; der erfolgreiche Update-Praxistest ist durch den User bestätigt; ein absichtlich ausgelöster Fehler mit Rollback wurde im LXC noch nicht nachgewiesen. M0 ist in der [Quellenanalyse](source-analysis.md) begonnen: HTTP-Abruf, Wochenwechsel und zwei Detailseiten sind geprüft. Ein Detailparser mit fiktiver Testgrundlage liegt vor; Sonderfälle, Quellidentität und Semester-Vollständigkeit bleiben offen; M1 bis M5 bleiben offen.
+Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.20`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Laut Nutzerprotokoll vom 2026-10-20 bestehen im Debian-13-LXC alle drei Tests; systemd-Einrichtung und lokale HTTP-Prüfung sind erfolgreich. Der User bestätigt nach erneutem Test den laufenden Server und Zugriff im internen Netz. Der erste Live-Quellzugriff für Studiengangsuche, Plan und Wochenwechsel ist verifiziert; ein automatisierter Datenimport ist noch nicht implementiert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Erstinstallation im Zielcontainer ist durch das Nutzerprotokoll bestätigt. Ein separates Update-Skript mit vorbereiteten Releases, Sicherung und Rückkehr zum alten Anwendungsstand liegt vor; der erfolgreiche Update-Praxistest ist durch den User bestätigt; ein absichtlich ausgelöster Fehler mit Rollback wurde im LXC noch nicht nachgewiesen. M0 ist in der [Quellenanalyse](source-analysis.md) begonnen: HTTP-Abruf, Wochenwechsel und zwei Detailseiten sind geprüft. Ein Detailparser mit fiktiver Testgrundlage liegt vor; Sonderfälle, Quellidentität und Semester-Vollständigkeit bleiben offen; M1 bis M5 bleiben offen.
 
 Die neue Kalendervorschau erzeugt UTC-Termine und prüft Ausfälle; ein separater Wochenabgleich erkennt Lücken und Fehler. Sonderregeln und Quellzuordnung sind technisch vorbereitet, aber noch nicht live verifiziert. M0/M1 bleiben offen. Siehe [Entscheidung zur Kalendervorschau](decisions/002-kalendervorschau.md).
 
@@ -176,3 +176,14 @@ Schritte ausdrücklich als geplante Arbeiten:
 Der User bestätigt das erfolgreiche Server-Update nach V0.0.18. Das ist ein
 Betriebsnachweis des Updates, keine Freigabe des noch unvollständigen Imports.
 V0.0.19 ist lokal vorbereitet und wurde nicht durch Codex auf dem Server installiert.
+## Ergänzung V0.0.20 – Anleitung und Wochentagsabgleich
+
+Installation und Update sind für Anfänger erklärt, einschließlich Container-Konsole,
+aktuellem Download-Aufruf ohne curl, Standardwerten und Versionskontrolle.
+Der User bestätigt den funktionierenden Stand nach V0.0.19.
+
+Der Semesterbericht vergleicht nun sichtbare Tagesüberschriften mit den lokalen
+Wochentagen normalisierter Termine und meldet fehlende Tagesabdeckung ausdrücklich.
+Dieser Baustein zur Vollständigkeitsprüfung ist implementiert; Wochenend-Vollständigkeit
+und die offenen Bemerkungen bleiben ungeklärt. Danach folgen sichere Speicherung
+und die Wochen-/Listenansicht. Es wurde kein Archivstand veröffentlicht.

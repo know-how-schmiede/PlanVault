@@ -129,3 +129,24 @@ Budgets starten keine Detailabrufe. Die Gesamtgrenze von 100 HTTP-Anfragen bleib
 unverändert. Tatsächlich blocklose Ansichten bleiben `empty_unverified`.
 
 **Abschließender Live-Lauf V0.0.17:** 74 HTTP-Anfragen, 66 Details geparst, 64 Vorschauen erzeugt (21 mit fachlichen Prüfhinweisen), zwei neu erfasste Details technisch blockiert. Keine Wochenendtermine in den erzeugten Vorschauen; dies ist kein Nachweis für die Abwesenheit weiterer Wochenendveranstaltungen. Nächster Schritt: die zwei neuen Normalisierungsfälle klären und die verbleibenden Vollständigkeitskriterien absichern.
+
+## V0.0.20 – Wochentagsabgleich (Schema 5)
+
+Der JSON-Bericht enthält zusätzlich `weekday_coverage`. `visible_weekdays` und
+`unobserved_weekdays` vergleichen die Überschriften beider Ansichten mit allen
+sieben Tagen (Montag = 0). `occurrences_by_weekday` zählt die normalisierten
+Termine nach lokalem Datum, nicht nach UTC-Datum. `occurrence_weekdays_outside_views`
+zeigt Tage mit Terminen, die in keiner beobachteten Tagesüberschrift vorkommen.
+
+Ohne abgeschlossene Detailprüfung bleibt `details_checked` false und
+`blocked_details` null. Null ist nicht mit null blockierten Details zu verwechseln.
+Die Terminzähler enthalten ausschließlich Vorschauen; blockierte Details werden
+separat gezählt und nicht als leere Termine behandelt. Ein abgebrochener Abruf
+liefert keine Teilzählung. Die Werte enthalten keine Namen oder Hinweistexte.
+
+`weekend_coverage_verified` bleibt ausdrücklich false: Weder sieben Überschriften
+noch das Fehlen von Wochenendterminen beweisen die vollständige Erfassung.
+Auch `complete` und `published` bleiben false. Der nächste notwendige Nachweis
+ist weiterhin eine belastbare Erfassung aller Semestertage sowie die Klärung
+der offenen Bemerkungen. Der neue Abgleich ist mit fiktiven Daten getestet;
+ein vollständiger Live-Semesterlauf wurde für V0.0.20 nicht wiederholt.

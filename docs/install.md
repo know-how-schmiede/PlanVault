@@ -2,6 +2,17 @@
 
 Diese Anleitung installiert WI-PlanArchiv als systemd-Dienst mit Gunicorn. Aktuell stehen das Flask-Grundgerüst und die Startseite zur Verfügung. Datenimport, Datenbank und Zeitsteuerung folgen gemäß [Roadmap](roadmap.md).
 
+## Zuerst entscheiden: Installation oder Update?
+
+- **Die Anwendung läuft bereits:** direkt zu [Vorhandene Installation aktualisieren](#vorhandene-installation-aktualisieren). Den Installer nicht erneut starten.
+- **Der Container ist neu und die Anwendung fehlt:** die folgenden Installationsschritte verwenden.
+
+Alle Befehle gehören in die **Konsole des Debian-Containers**. In Proxmox links den Container auswählen und „Konsole“ öffnen. Als `root` anmelden. Nicht die Shell des Proxmox-Servers verwenden. Eine Anzeige wie `root@PlanVault:~#` ist die Eingabeaufforderung und wird nicht mitkopiert.
+
+Die Codeblöcke vollständig kopieren, einschließlich der Zeilen mit `\`, und mit Enter ausführen. `&&` bedeutet: Der nächste Befehl läuft nur, wenn der vorherige erfolgreich war. Nach einer Fehlermeldung nicht mit späteren Schritten fortfahren. `curl` wird nicht benötigt.
+
+**Wichtig zum Versionsstand:** Die gewünschte Version muss zuerst im gewählten GitHub-Branch veröffentlicht sein. Änderungen nur auf dem Entwicklungs-PC erreichen den Server noch nicht. `main` ist der übliche Entwicklungszweig; ein Tag bezeichnet einen veröffentlichten, fest benannten Stand.
+
 ## Voraussetzungen
 
 - Bestehender Debian-13-LXC-Container mit systemd, beispielsweise auf Proxmox. Das Skript wird **im Container** als root ausgeführt, nicht auf dem Proxmox-Host.
@@ -15,16 +26,16 @@ Das Skript erstellt keinen Container und verändert keine Proxmox-, Firewall- od
 
 Standardmäßig wird das Repository automatisch von `https://github.com/know-how-schmiede/PlanVault.git` nach `/opt/wi-planarchiv` geklont. Die Skripte liegen anschließend unter `/opt/wi-planarchiv/scripts`. Kein separates Übertragen der Anwendung erforderlich.
 
-## Schnellstart als root im Debian-Container
+## Erstinstallation Schritt für Schritt
 
 Ausgangssituation: Ein frisch erstellter Debian-13-LXC-Container mit systemd, geöffnet in der Proxmox-Konsole und als root angemeldet.
 
 ```bash
-# Download vorbereiten
-apt-get update
+# 1. Download-Werkzeuge vorbereiten
+apt-get update &&
 apt-get install -y --no-install-recommends ca-certificates wget
 
-# Installer herunterladen und vor der Ausführung ansehen
+# 2. Installer herunterladen, anzeigen und starten
 wget --timeout=30 --tries=3 --output-document=/root/install-wi-planarchiv.sh.download \
   https://raw.githubusercontent.com/know-how-schmiede/PlanVault/main/scripts/install-debian13.sh && \
 mv -- /root/install-wi-planarchiv.sh.download /root/install-wi-planarchiv.sh && \
@@ -33,6 +44,10 @@ bash /root/install-wi-planarchiv.sh
 ```
 
 Das Skript wird erst nach erfolgreichem Download aus einer Datei ausgeführt. Die lokal entwickelten Änderungen müssen zuvor auf GitHub verfügbar sein; diese Anleitung veröffentlicht sie nicht automatisch.
+
+### 3. Fragen beantworten
+
+Für eine normale Erstinstallation bei jeder Frage einfach Enter drücken. Während der Paketinstallation und Tests warten, bis die Abschlussmeldung erscheint. Das kann mehrere Minuten dauern.
 
 ### Abfragen und Standardwerte
 
@@ -68,6 +83,10 @@ Das System-Python bleibt von pip-Installationen unberührt; dies entspricht dem 
 | `/etc/systemd/system/wi-planarchiv.service` | Dienstdefinition |
 
 Der Dienst läuft als `wi-planarchiv`, ohne Schreibrechte am Anwendungscode. `NoNewPrivileges` und `StateDirectory` werden gemäß [systemd-Dokumentation](https://www.freedesktop.org/software/systemd/man/256/systemd.exec.html) verwendet. Auf zusätzliche Mount-Namespace-Einschränkungen wird im Grundgerüst für LXC-Kompatibilität verzichtet.
+
+## 4. Webseite nach der Installation öffnen
+
+Die am Ende angezeigte Webadresse im Browser des eigenen PCs öffnen. Das Schema lautet `http://<Container-IP>:8000/`: `<Container-IP>` durch die tatsächliche IP ersetzen und die spitzen Klammern weglassen. Bei einem anderen Port dessen Nummer verwenden. Die IP kann im Container mit `hostname -I` angezeigt werden. Unten auf der Webseite steht die installierte Version. Die aktuelle Startseite zeigt noch keine archivierten Stundenpläne.
 
 ## Zugriff und Konfiguration
 
@@ -116,7 +135,9 @@ Das Skript ist für eine Erstinstallation bestimmt. Existieren Dienstkonto oder 
 
 Leere Eingaben übernehmen `main` beziehungsweise `8000`. Leerzeichen am Rand und Wagenrückläufe aus Terminal-Eingaben werden entfernt. Bei „Ungültiger Git-Stand“ das aktuelle Skript erneut herunterladen; die neue Fehlerausgabe stellt verbleibende Sonderzeichen sichtbar dar. Diese Eingabeprüfung erfolgt vor dem Stoppen des Dienstes.
 
-Den Update-Stand zuerst auf GitHub veröffentlichen. Als root im bestehenden Debian-13-LXC:
+**1. Container-Konsole öffnen:** Als root im Container mit der laufenden Anwendung anmelden. Die folgenden Befehle funktionieren auch, wenn `/root/update-wi-planarchiv.sh` noch nicht existiert. Sie laden jedes Mal die aktuelle Skriptfassung herunter.
+
+**2. Update herunterladen und starten:** Den gesamten Block kopieren. Er zeigt zunächst den Skriptinhalt an und startet danach das Update. Voraussetzung: Der gewünschte Stand ist bereits auf GitHub veröffentlicht.
 
 ```bash
 apt-get update && \
@@ -127,6 +148,12 @@ mv -- /root/update-wi-planarchiv.sh.download /root/update-wi-planarchiv.sh && \
 cat /root/update-wi-planarchiv.sh && \
 bash /root/update-wi-planarchiv.sh
 ```
+
+**3. Abfragen beantworten:** Bei `Git-Branch oder Tag [main]` Enter drücken, wenn der aktuelle Hauptzweig installiert werden soll. Bei der Portfrage Enter drücken, wenn die bisherige Webseite Port 8000 verwendet. Sonst den bisherigen Port eingeben; die Eingabe ändert den Port nicht.
+
+**4. Auf Abschluss warten:** Tests und Sicherung müssen erfolgreich sein. Während der abschließenden Umschaltung ist die Webseite kurz nicht erreichbar. Die Erfolgsmeldung nennt unter anderem den neuen Git-Stand und die Sicherung.
+
+**5. Ergebnis prüfen:** Die bisherige Webadresse erneut öffnen und die Seite neu laden. Nach Veröffentlichung und Update dieser Version soll im Footer **V0.0.20** stehen. Bei Fehlern zuerst die unten beschriebenen Statusbefehle verwenden; nicht mit dem Erstinstaller darüberinstallieren.
 
 Nur nach erfolgreichem Download ausführen. Das Skript erkennt Dienstnutzer und Installationspfad aus dem bestehenden systemd-Dienst. Es fragt Branch oder Tag (Standard `main`) und den aktuellen HTTP-Port (Standard `8000`) ab. Der Dienst muss laufen und über diesen Port lokal erreichbar sein. Der Code muss root gehören; lokale Git-Änderungen sowie `.env` oder `instance/` im Anwendungspfad führen zum Abbruch. Laufzeitdaten gehören nach `/var/lib/wi-planarchiv`, Konfiguration nach `/etc/wi-planarchiv`.
 
@@ -148,3 +175,16 @@ Der Aufbau mit Voraussetzungen, Schnellstart, Eingaben mit Standardwerten, Insta
 
 
 Ab V0.0.18 benötigen Installations- und Update-Skript kein `curl`. Der Schnellstart verwendet `wget` nur zum Download; die Anwendung selbst kommt weiterhin über Git. Lokale HTTP-Prüfungen nutzen Python 3 ohne Proxy, mit Timeout und Größenlimit; das Update prüft zusätzlich die exakte Versionsnummer. Ein nicht erfolgreicher Download wird nicht gestartet. Die bestehende Update-Sicherung und Rückkehr zum alten Code bleiben erhalten. Der User hat das erfolgreiche Update auf dem Server nach V0.0.18 bestätigt. Eine erneute Erstinstallation der curl-freien Fassung wurde nicht separat bestätigt.
+
+## Häufige Fragen beim Start
+
+| Meldung oder Beobachtung | Nächster Schritt |
+| --- | --- |
+| `No such file or directory` beim Update-Aufruf | Den vollständigen Download-und-Start-Block oben ausführen. Ein alleiniger Bash-Aufruf lädt nichts herunter. |
+| Download meldet `404` | Prüfen, ob Skript und gewählter Branch/Tag auf GitHub veröffentlicht sind. Nicht eine alte lokale Datei starten. |
+| Paketquellen oder GitHub nicht erreichbar | Netzwerk/DNS des Containers prüfen. Ein erfolgreicher Ping allein bestätigt keinen HTTP-/HTTPS-Zugriff. |
+| `Ungültiger Git-Stand` | Den aktuellen Update-Block erneut verwenden und bei der Abfrage Enter oder `main` eingeben. |
+| Webseite zeigt noch die alte Version | Browser neu laden, Abschlussmeldung prüfen und sicherstellen, dass die neue Version tatsächlich auf GitHub steht. |
+| Dienst startet nicht | `systemctl status wi-planarchiv --no-pager` zeigt den Zustand; `journalctl -u wi-planarchiv -n 50 --no-pager` zeigt die letzten Meldungen. Vertrauliche Angaben vor Weitergabe entfernen. |
+
+Der User bestätigt den funktionierenden Stand nach V0.0.19. V0.0.20 ist erst nach Veröffentlichung und Ausführung des Updates auf dem Server verfügbar.
