@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.5 – HTTP-Abrufadapter und manueller Quelltest
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.5` gesetzt; Website-Betrieb nach vorherigem Update vom User bestätigt.
+- HTTPS-Abrufadapter mit temporären Cookies, gleichem Quell-Origin für Navigation, Größen- und Anfragelimits, Socket-Timeout und Mindestabstand ergänzt.
+- Begrenzte GET-Wiederholungen bei vorübergehenden Fehlern; keine automatischen Wiederholungen oder Weiterleitungen für Formular-POSTs. Fehlerausgaben enthalten keine Quelladressen oder Antworttexte.
+- Abruf beobachteter Detailseiten mit Parser und Kalendervorschau verbunden; Ergebnisse bleiben unvollständige Vorschauen.
+- Manuellen Flask-Befehl `source-check` und Anleitung für die Prüfung unter dem Dienstkonto ergänzt. Normale Webseitenaufrufe lösen keine Quellabrufe aus.
+- README, Roadmap und Quellenanalyse nachgeführt. Automatische Studiengangs-/Wochennavigation und vollständige Semesterimporte bleiben offen.
+
+**Prüfung:** 83 lokale Tests erfolgreich, einschließlich simulierter HTTP-Fehler, Weiterleitungen, Größenlimits, Abrufbudget, Parser-Anbindung, CLI und Versionsfooter; `git diff --check` ohne Fehler. Keine neuen Live-Abrufe oder Bereitstellung im LXC; Zielcontainer-Test des neuen Clients steht aus.
+
+**Commit-Kurzbeschreibung:** Version 0.0.5 mit begrenztem Quellabruf und manuellem Verbindungstest ergänzen
+
 ## V0.0.4 – Kalendervorschau und Wochenabgleich
 
 **Datum:** 2026-10-20

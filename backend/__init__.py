@@ -15,6 +15,9 @@ def create_app(test_config=None):
     from backend.web import web
 
     app.register_blueprint(web)
+    from backend.cli import register_cli
+
+    register_cli(app)
 
     @app.context_processor
     def application_version():
