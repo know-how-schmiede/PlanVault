@@ -2,6 +2,22 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.6 – Geprüfte Formularnavigation
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.6` gesetzt.
+- Formularauswahl anhand expliziter Feldnamen sowie GET-/POST-Übermittlung über die bestehende HTTP-Sitzung ergänzt.
+- Versteckte und wiederholte Felder, Textbereiche, Auswahlen und explizite Suchschaltflächen unterstützt; unerlaubte Überschreibungen und mehrdeutige Strukturen abgelehnt.
+- Ausschließlich fiktive Formulartests ergänzt; keine realen Navigationsparameter hinterlegt.
+- README, Roadmap und Quellenanalyse um Funktionsumfang und offene Live-Zuordnung ergänzt.
+
+**Prüfung:** 106 lokale Tests erfolgreich, einschließlich Formularnavigation, HTTP-Adapter, Parser und Versionsfooter; `git diff --check` ohne Fehler. Keine Live-Navigation und keine Bereitstellung im LXC durchgeführt; automatischer Semesterimport bleibt offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.6 mit validierter Formularnavigation ergänzen
+
 ## V0.0.5 – HTTP-Abrufadapter und manueller Quelltest
 
 **Datum:** 2026-10-20
