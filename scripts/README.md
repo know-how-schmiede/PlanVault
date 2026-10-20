@@ -21,7 +21,21 @@ bash /root/install-wi-planarchiv.sh
 - Den aktuellen Stand zuerst auf GitHub veröffentlichen. Der Installer installiert den gewählten Remote-Stand, keine unveröffentlichten lokalen Änderungen.
 - Mit Enter die Standardwerte für Dienstnutzer, Installationspfad, Branch oder Tag, Bind-Adresse und Port übernehmen.
 - Das Skript installiert Abhängigkeiten, klont Git, führt Tests aus und richtet Gunicorn als systemd-Dienst ein.
-- Standardmäßig nur unter `127.0.0.1:8000` im Container erreichbar. Vorhandene Installationen werden nicht überschrieben.
-- Dies ist ein Erstinstallationsskript; automatisierte Updates sind noch nicht umgesetzt.
+- Standardmäßig auf `0.0.0.0:8000` gebunden und über die Container-IP im internen Netz erreichbar. Die Abschlussmeldung zeigt die erkannten IPv4-Webadressen mit dem gewählten Port. Mit `127.0.0.1` bleibt der Zugriff auf den Container beschränkt. Vorhandene Installationen werden nicht überschrieben.
+- Für vorhandene Installationen das separate Update-Skript verwenden; Konfiguration und Daten bleiben erhalten.
 
 Die vollständige [Installationsanleitung](../docs/install.md) beschreibt Voraussetzungen, Eingaben, Zugriff, Betriebsbefehle und Fehlerbehandlung.
+
+## Vorhandene Installation aktualisieren
+
+Als root im Container herunterladen, ansehen und nach erfolgreichem Download starten:
+
+```bash
+curl --fail --show-error --location \
+  https://raw.githubusercontent.com/know-how-schmiede/PlanVault/main/scripts/update-debian13.sh \
+  --output /root/update-wi-planarchiv.sh
+cat /root/update-wi-planarchiv.sh
+bash /root/update-wi-planarchiv.sh
+```
+
+Branch oder Tag und bestehenden HTTP-Port angeben. Das Update-Skript erkennt Benutzer und Pfad aus dem Dienst, testet den neuen Stand vor der Umschaltung und sichert die alte Installation. Konfiguration einschließlich Bind-Adresse bleibt erhalten. Bei Fehlern während Neustart oder HTTP-Prüfung wird zum alten Anwendungsstand zurückgekehrt. Sicherungen und Releases werden aufbewahrt. Details und Grenzen stehen in der [Installationsanleitung](../docs/install.md).

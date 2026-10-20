@@ -4,7 +4,7 @@ WI-PlanArchiv wird schrittweise von der Konzeption zur zuverlässig betriebenen 
 
 ## Aktueller Stand
 
-Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.2`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Startanleitung und Tests liegen vor; die Laufzeitprüfung ist offen, da der Python-Befehl in dieser Umgebung nicht startet. Datenimport und Live-Quellzugriff sind noch nicht implementiert bzw. verifiziert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Installation im Zielcontainer ist noch zu prüfen. M0 bis M5 bleiben offen.
+Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.2`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Laut Nutzerprotokoll vom 2026-10-20 bestehen im Debian-13-LXC alle drei Tests; systemd-Einrichtung und lokale HTTP-Prüfung sind erfolgreich. Die Browserdarstellung ist noch zu prüfen. Datenimport und Live-Quellzugriff sind noch nicht implementiert bzw. verifiziert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Erstinstallation im Zielcontainer ist durch das Nutzerprotokoll bestätigt. Ein separates Update-Skript mit vorbereiteten Releases, Sicherung und Rückkehr zum alten Anwendungsstand liegt vor; der Update-Praxistest ist offen. M0 bis M5 bleiben offen.
 
 ## Versionsplanung
 
@@ -96,6 +96,6 @@ Die MVP-Freigabe setzt M0 bis M4 und die unten genannten Betriebskriterien vorau
 
 ## Pflege und nächste Schritte
 
-Als Nächstes werden Installation, Startseite und Tests mit einer verfügbaren Python-Laufzeit geprüft. Die Quellenanalyse folgt, sobald berechtigter Zugriff und geeignete Quelldaten vorliegen. Zeitliche Zusagen werden erst nach Klärung dieser Abhängigkeiten getroffen.
+Als Nächstes wird die Startseite im Browser geprüft und bei Bedarf der Zugriff im berechtigten internen Netz eingerichtet. Die Quellenanalyse folgt, sobald berechtigter Zugriff und geeignete Quelldaten vorliegen. Zeitliche Zusagen werden erst nach Klärung dieser Abhängigkeiten getroffen.
 
 Bei jeder Änderung die [Timeline](timeline.md) mit Version, Beschreibung, Prüfstatus und Commit-Kurzbeschreibung ergänzen. Versionsvorschläge werden anhand des tatsächlich erreichten Stands bewertet; die dritte Stelle bleibt dem User vorbehalten.

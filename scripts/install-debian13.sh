@@ -28,7 +28,7 @@ REPO_URL=https://github.com/know-how-schmiede/PlanVault.git
 APP_USER=wi-planarchiv
 APP_DIR=/opt/wi-planarchiv
 GIT_BRANCH=${GIT_BRANCH:-main}
-LISTEN_HOST=127.0.0.1
+LISTEN_HOST=0.0.0.0
 LISTEN_PORT=8000
 echo '==> WI-PlanArchiv: GitHub-Installation für Debian 13'
 prompt APP_USER 'Dienstnutzer' "$APP_USER"
@@ -149,6 +149,21 @@ if [[ $healthy != true ]]; then
     echo 'HTTP-Prüfung fehlgeschlagen. Dienststatus und Journal lokal prüfen.' >&2
     exit 1
 fi
+WEB_URLS=''
+if [[ $LISTEN_HOST == 0.0.0.0 ]]; then
+    WEB_URLS=$(hostname -I | awk -v port="$LISTEN_PORT" '
+        { for (i = 1; i <= NF; i++) {
+            address = $i
+            if (address ~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/ &&
+                address !~ /^(127\.|169\.254\.|0\.)/ && !seen[address]++)
+                printf "http://%s:%s/\n", address, port
+        } }')
+    if [[ -z $WEB_URLS ]]; then
+        WEB_URLS="Keine Container-IPv4 erkannt; IP mit hostname -I prüfen (Port ${LISTEN_PORT})."
+    fi
+else
+    WEB_URLS="http://127.0.0.1:${LISTEN_PORT}/ (nur im Container; für Fernzugriff SSH-Tunnel verwenden)"
+fi
 cat <<SUMMARY
 
 ============================================================
@@ -159,6 +174,8 @@ Commit:          ${INSTALLED_COMMIT}
 Dienstnutzer:    ${APP_USER}
 Installation:    ${APP_DIR}
 Bind-Adresse:    ${LISTEN_HOST}:${LISTEN_PORT}
+Webadresse:
+${WEB_URLS}
 Konfiguration:   ${CONFIG_DIR}/app.env
 Dienst:          wi-planarchiv.service
 ------------------------------------------------------------
