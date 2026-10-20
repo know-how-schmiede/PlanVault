@@ -13,10 +13,11 @@ Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefas
 - Feldstruktur zweier Veranstaltungsdetailseiten geprüft und eine ausschließlich fiktiv befüllte HTML-Testdatei aus der beobachteten Struktur erstellt.
 - Detailparser mit Beautiful Soup ergänzt: Titel, optionale Metadaten und mehrere Terminserien lesen; unvollständige Seiten ablehnen; ungeprüfte Rhythmen, Ausfälle und fehlende Quellkennungen markieren. Keine ungeprüfte Erzeugung einzelner Kalendertermine.
 - Parserentscheidung, Abhängigkeit und verbleibende Schritte für Sonderfälle und vollständigen Import dokumentiert.
+- Eingabeprüfung von Installation und Update gegen führende/abschließende Leerzeichen und Wagenrückläufe gehärtet; ASCII-Locale festgelegt und ungültigen Git-Stand eindeutig ausgegeben. Der gemeldete Abbruch bei `main` ist mit unveränderter Eingabe lokal nicht reproduzierbar. 14 isolierte Bash-Eingabeprüfungen und beide Syntaxprüfungen erfolgreich; erneuter Zielcontainer-Test offen.
 
 **Prüfung:** Versionswert, zentrale Einbindung im Footer und Dokumentationsangaben abgeglichen; `git diff --check` ohne Fehler. 22 lokale Tests erfolgreich. Detailparser zusätzlich an zwei Live-Seiten erfolgreich geprüft (eine bzw. zwei Terminserien), ohne Quelladressen oder Rohdaten zu speichern. Vollständiger Semesterimport und echte Sonderfälle bleiben offen; Änderungen noch nicht auf dem Server ausgerollt.
 
-**Commit-Kurzbeschreibung:** Version 0.0.3 mit Detailparser und geprüfter Testgrundlage ergänzen
+**Commit-Kurzbeschreibung:** Version 0.0.3 mit Detailparser ergänzen und Skripteingaben härten
 
 ## V0.0.2 – Debian-13-LXC-Installation
 

@@ -99,3 +99,5 @@ Die MVP-Freigabe setzt M0 bis M4 und die unten genannten Betriebskriterien vorau
 Als Nächstes werden anhand der [Quellenanalyse](source-analysis.md) echte Sonderfälle ergänzt und der HTTP-Abrufadapter mit belastbarer Quellidentität und Vollständigkeitsprüfung vorbereitet. Zeitliche Zusagen werden erst nach Klärung dieser Abhängigkeiten getroffen.
 
 Bei jeder Änderung die [Timeline](timeline.md) mit Version, Beschreibung, Prüfstatus und Commit-Kurzbeschreibung ergänzen. Versionsvorschläge werden anhand des tatsächlich erreichten Stands bewertet; die dritte Stelle bleibt dem User vorbehalten.
+
+Die Eingabeprüfung der Installations- und Update-Skripte entfernt jetzt Leerzeichen am Rand und Wagenrückläufe. 14 isolierte Eingabetests bestehen; die erneute Prüfung im Zielcontainer steht aus (siehe [Timeline](timeline.md)).

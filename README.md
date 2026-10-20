@@ -183,3 +183,5 @@ docs/                   Anweisungen, Roadmap und Timeline
 ## Lizenz
 
 Noch festzulegen. Bis eine Lizenzdatei hinzugefügt wurde, wird keine Nutzungslizenz für Dritte eingeräumt. Hochschulinterne Anforderungen und mögliche Rechte an archivierten Inhalten sind vor Veröffentlichung zu klären.
+
+Die Eingabeprüfung der Installations- und Update-Skripte entfernt jetzt Leerzeichen am Rand und Wagenrückläufe. 14 isolierte Eingabetests bestehen; die erneute Prüfung im Zielcontainer steht aus (siehe [Timeline](docs/timeline.md)).

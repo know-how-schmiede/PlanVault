@@ -18,9 +18,17 @@ if [[ ! -d /run/systemd/system ]]; then
     exit 1
 fi
 
+export LC_ALL=C
+normalize_answer() {
+    local value=$1
+    value="${value#"${value%%[![:space:]]*}"}"
+    value="${value%"${value##*[![:space:]]}"}"
+    printf '%s' "$value"
+}
 prompt() {
     local variable=$1 label=$2 default=$3 value
     read -r -p "$label [$default]: " value || value=''
+    value=$(normalize_answer "$value")
     printf -v "$variable" '%s' "${value:-$default}"
 }
 

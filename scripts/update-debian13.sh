@@ -44,12 +44,22 @@ if [[ -e $APP_DIR/instance || -e $APP_DIR/.env ]]; then
     exit 1
 fi
 
+# ASCII-Prüfung unabhängig von der Container-Locale; Terminal-Randzeichen entfernen.
+export LC_ALL=C
+normalize_answer() {
+    local value=$1
+    value="${value#"${value%%[![:space:]]*}"}"
+    value="${value%"${value##*[![:space:]]}"}"
+    printf '%s' "$value"
+}
 GIT_BRANCH=${GIT_BRANCH:-main}
 read -r -p "Git-Branch oder Tag [$GIT_BRANCH]: " answer || answer=''
+answer=$(normalize_answer "$answer")
 GIT_BRANCH=${answer:-$GIT_BRANCH}
-[[ $GIT_BRANCH =~ ^[a-zA-Z0-9][a-zA-Z0-9._/-]*$ ]] || { echo 'Ungültiger Git-Stand.' >&2; exit 1; }
+[[ $GIT_BRANCH =~ ^[a-zA-Z0-9][a-zA-Z0-9._/-]*$ ]] || { printf 'Ungültiger Git-Stand: %q (z. B. main).\n' "$GIT_BRANCH" >&2; exit 1; }
 HEALTH_PORT=8000
 read -r -p "Aktueller HTTP-Port für die Prüfung [$HEALTH_PORT]: " answer || answer=''
+answer=$(normalize_answer "$answer")
 HEALTH_PORT=${answer:-$HEALTH_PORT}
 [[ $HEALTH_PORT =~ ^[1-9][0-9]{0,4}$ ]] && (( HEALTH_PORT >= 1024 && HEALTH_PORT <= 65535 )) || {
     echo 'Ungültiger Port.' >&2; exit 1;

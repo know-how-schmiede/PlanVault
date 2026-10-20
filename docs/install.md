@@ -116,6 +116,8 @@ Das Skript ist für eine Erstinstallation bestimmt. Existieren Dienstkonto oder 
 
 ### Vorhandene Installation aktualisieren
 
+Leere Eingaben übernehmen `main` beziehungsweise `8000`. Leerzeichen am Rand und Wagenrückläufe aus Terminal-Eingaben werden entfernt. Bei „Ungültiger Git-Stand“ das aktuelle Skript erneut herunterladen; die neue Fehlerausgabe stellt verbleibende Sonderzeichen sichtbar dar. Diese Eingabeprüfung erfolgt vor dem Stoppen des Dienstes.
+
 Den Update-Stand zuerst auf GitHub veröffentlichen. Als root im bestehenden Debian-13-LXC:
 
 ```bash
