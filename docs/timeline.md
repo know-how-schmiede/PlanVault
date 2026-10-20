@@ -2,6 +2,22 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.7 – Live-geprüfte Studiengangsnavigation
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.7` gesetzt.
+- Studiengangssuche über sichtbare Feldbeschriftungen, eindeutige Trefferlinks und ausdrücklich benannte Suchschaltflächen implementiert. Keine realen Quellparameter im Code hinterlegt.
+- Normale Fieldsets und gleichwertige doppelte Submit-Schaltflächen unterstützt; schreibgeschützte Studiengangsanzeige mit versteckter Auswahl korrekt erhalten.
+- Manuellen Befehl `source-plan-check` ergänzt; Ergebnisse bleiben reine Navigationsprüfung ohne Archivveröffentlichung.
+- README, Roadmap, Quellenanalyse und Bedienungsanleitung aktualisiert.
+
+**Prüfung:** 122 lokale Tests erfolgreich, einschließlich Versionsfooter und Navigation. Ablauf Einstieg → Suche → Treffer → Auswahlbestätigung → Planantwort für den bereits untersuchten Studiengang live erfolgreich: sechs HTTP-Anfragen einschließlich Weiterleitungen, 53 bekannte Veranstaltungsblöcke. Keine Rohseiten, Quelladressen oder Formularparameter gespeichert. Vorheriger Versuch mit fünf Anfragen wurde erwartungsgemäß vom Budget gestoppt. Kein vollständiger Semesterimport und kein Deployment im LXC; `git diff --check` ohne Fehler.
+
+**Commit-Kurzbeschreibung:** Version 0.0.7 mit live geprüfter Studiengangsnavigation ergänzen
+
 ## V0.0.6 – Geprüfte Formularnavigation
 
 **Datum:** 2026-10-20

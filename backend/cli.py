@@ -8,6 +8,8 @@ from flask import current_app
 from flask.cli import with_appcontext
 
 from backend.importer.http import SourceClient, SourceFetchError
+from backend.importer.forms import FormNavigationError
+from backend.importer.navigation import search_study, follow_named_result, submit_labeled_search
 
 
 @click.command("source-check")
@@ -29,5 +31,30 @@ def source_check():
     click.echo("Kein Import durchgeführt. Studiengang, Semester und Vollständigkeit sind noch ungeprüft.")
 
 
+@click.command("source-plan-check")
+@click.option("--query", required=True, help="Kurzer Suchtext für den Studiengang.")
+@click.option("--title", required=True, help="Exakte Trefferbeschriftung einschließlich Prüfungsordnung.")
+@with_appcontext
+def source_plan_check(query, title):
+    """Studiengangsnavigation prüfen; keinen Archivstand veröffentlichen."""
+    try:
+        with SourceClient(current_app.config.get("LSF_BASE_URL", ""), max_requests=10, retries=0) as client:
+            results = search_study(client, query)
+            selection = follow_named_result(client, results, title=title)
+            plan = submit_labeled_search(client, selection, field_label="Studiengang",
+                                         button_caption="Suche starten")
+        soup = BeautifulSoup(plan.html, "html.parser")
+        if soup.select('input[type="password" i]'):
+            raise FormNavigationError("Anmeldeseite statt Planantwort erhalten.")
+        count = len(soup.select("td.plan5a"))
+        if not count:
+            raise FormNavigationError("Kein bekanntes Veranstaltungsmuster erkannt; keine bestätigte leere Planung.")
+    except (SourceFetchError, FormNavigationError) as error:
+        raise click.ClickException(str(error)) from None
+    click.echo(f"Studiengangsnavigation erfolgreich; {count} bekannte Veranstaltungsblöcke erkannt.")
+    click.echo("Kein Import oder Archivstand erstellt. Semester, Filter und Vollständigkeit bleiben zu prüfen.")
+
+
 def register_cli(app):
     app.cli.add_command(source_check)
+    app.cli.add_command(source_plan_check)

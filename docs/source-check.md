@@ -66,8 +66,36 @@ Detailparser und Normalisierung. Cookies werden nur in der laufenden Sitzung
 gehalten und beim Schließen gelöscht. Der Aufrufer muss verifizierte
 Studiengangs-, Prüfungsordnungs- und Quellkennungen bereitstellen.
 
-Automatische Formularnavigation, Studiengangsauswahl, Wochenabrufe und der
-Abgleich eines gesamten Semesters sind noch nicht implementiert. Die Website
+Die Studiengangsnavigation ist ab V0.0.7 implementiert und für einen Studiengang
+live geprüft. Wochenabrufe und der Abgleich eines gesamten Semesters fehlen. Die Website
 zeigt weiterhin die Startseite; ein normaler Seitenaufruf startet keinen Abruf.
-Der neue Client ist mit simulierten Antworten getestet. Ein Live-Test der neuen
+Der Client ist mit simulierten Antworten und dem Studiengangsablauf live getestet. Ein Live-Test der neuen
 Implementierung im Zielcontainer steht aus.
+
+## Studiengangsnavigation prüfen (ab V0.0.7)
+
+`source-plan-check` verbindet Einstieg, Suche, exakte Trefferwahl und
+Auswahlbestätigung. Suchtext und vollständige Trefferbeschriftung einschließlich
+Prüfungsordnung müssen explizit angegeben werden. Mehrere unterschiedliche Ziele
+mit gleichem Titel führen zum Abbruch. Leerzeichen in der Beschriftung werden
+vereinheitlicht.
+
+Lokal, mit gesetztem `LSF_BASE_URL`:
+
+```bash
+python -m flask --app backend source-plan-check \
+  --query "Fiktiv" --title "Fiktives Studium (DEMO-PO)"
+```
+
+Die Angaben sind **fiktive Platzhalter** und durch die gewünschte, tatsächlich
+sichtbare Auswahl zu ersetzen. Im LXC den oben beschriebenen `systemd-run`-Befehl
+verwenden und dessen abschließendes `source-check` durch
+`source-plan-check --query "SUCHTEXT" --title "EXAKTE TREFFERBESCHRIFTUNG"` ersetzen.
+Vorher Version 0.0.7 auf GitHub veröffentlichen und installieren.
+
+Der Befehl erlaubt höchstens zehn HTTP-Anfragen einschließlich Weiterleitungen,
+ohne automatische Wiederholungen. Er meldet nur die Anzahl erkannter Blöcke des
+bekannten Veranstaltungsmusters und erstellt keinen Import oder Archivstand.
+Eine Antwort ohne bekannte Blöcke wird ausdrücklich nicht als gültiger leerer
+Plan bestätigt. Voreinstellungen für Semester und Filter werden aus der Quelle
+übernommen; deren fachliche Eignung und Vollständigkeit sind damit nicht belegt.

@@ -23,18 +23,30 @@ Auswahlfelder betreffen. Auswahlwerte müssen tatsächlich angeboten worden sein
 Versteckte Felder sind geschützt. GET ersetzt die Query des Formularziels durch
 die Formulardaten; POST erhält die Ziel-Query und sendet die Daten im Body.
 
-Loginfelder, fremde Ziele, mehrdeutige Formulare, Datei-Uploads, Fieldsets,
+Loginfelder, fremde Ziele, mehrdeutige Formulare, Datei-Uploads, deaktivierte Fieldsets,
 extern zugeordnete Controls, abweichende Zeichensätze und erkannte
 JavaScript-Steuerung werden nicht automatisch interpretiert. Diese konservativen
 Grenzen können erst nach Quellenprüfung erweitert werden.
 
 ## Prüfstand und nächster Schritt
 
-Die Implementierung ist mit vollständig fiktiven Formularen getestet.
-Es handelt sich noch nicht um eine automatisch funktionierende LSF-Suche.
-Als Nächstes müssen die tatsächlich verwendeten Formulare, Feldnamen,
-Suchschaltflächen und Trefferlinks im erlaubten Live-Ablauf zugeordnet werden.
-Darauf folgen Studiengangs- und Wochennavigation sowie der Semesterabgleich.
+Die Implementierung ist mit vollständig fiktiven Formularen getestet. In V0.0.7
+wurde zusätzlich der Ablauf Einstieg → Studiengangsuche → exakter Treffer →
+Auswahlbestätigung → Planantwort live geprüft. Die Navigation ermittelt Feldnamen
+über die sichtbare Beschriftung „Studiengang“ und deren `label/for`-Zuordnung.
+Schaltflächen werden über „Auswahl“ beziehungsweise „Suche starten“ gewählt.
+Quellparameter bleiben ausschließlich im Arbeitsspeicher.
+
+Normale Fieldsets werden unterstützt. Nach der Auswahl zeigt die geprüfte Quelle
+ein schreibgeschütztes Anzeigefeld ohne übermittelten Feldnamen; die Auswahl wird
+über versteckte Felder erhalten. Identische Submit-Schaltflächen mit demselben
+Namen und Wert gelten als gleichwertig; unterschiedliche Ziele oder Werte bleiben
+mehrdeutig und werden abgelehnt.
+
+Der geprüfte Ablauf benötigte sechs HTTP-Anfragen einschließlich Weiterleitungen.
+53 Blöcke des bekannten Veranstaltungsmusters wurden erkannt. Das ist weder eine
+Anzahl eindeutiger Veranstaltungen noch ein Nachweis der Semester-Vollständigkeit.
+Wochenwechsel, Filterprüfung und vollständige Erfassung bleiben offen.
 
 Die Website bleibt unverändert bei der Startseite mit Versionsfooter; normale
 Seitenaufrufe starten keine Navigation. Der manuelle

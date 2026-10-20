@@ -46,7 +46,7 @@ class SearchForm:
                 raise FormNavigationError("Auswahlwert wurde von der Quelle nicht angeboten.")
         if button is None and self.buttons:
             raise FormNavigationError("Eine beobachtete Suchschaltfläche muss explizit gewählt werden.")
-        if button is not None and self.buttons.count(button) != 1:
+        if button is not None and button not in self.buttons:
             raise FormNavigationError("Suchschaltfläche fehlt oder ist mehrdeutig.")
         pairs = [(control.name, value) for control in self.controls
                  for value in values.get(control.name, control.values)]
@@ -88,7 +88,7 @@ def read_search_form(document: SourceDocument, *, required_fields: set[str]) -> 
             form.get("enctype", "application/x-www-form-urlencoded").lower() != "application/x-www-form-urlencoded" or
             form.get("accept-charset", "utf-8").lower() != "utf-8"):
         raise FormNavigationError("Formularmethode oder Kodierung wird noch nicht unterstützt.")
-    if form.find("form") or form.find("fieldset") or form.has_attr("onsubmit"):
+    if form.find("form") or form.find("fieldset", disabled=True) or form.has_attr("onsubmit"):
         raise FormNavigationError("Formularstruktur oder Skriptsteuerung benötigt Prüfung.")
     controls, buttons = [], []
     for element in form.find_all(["input", "select", "textarea", "button"]):
@@ -110,8 +110,6 @@ def read_search_form(document: SourceDocument, *, required_fields: set[str]) -> 
             options = [option for option in element.find_all("option")
                        if not option.has_attr("disabled") and
                        not (option.find_parent("optgroup") and option.find_parent("optgroup").has_attr("disabled"))]
-            if any(option.has_attr("selected") and option not in options for option in element.find_all("option")):
-                raise FormNavigationError("Deaktivierte Vorauswahl benötigt Prüfung.")
             if any(option.has_attr("selected") and option not in options for option in element.find_all("option")):
                 raise FormNavigationError("Deaktivierte Vorauswahl benötigt Prüfung.")
             option_values = tuple(option.get("value", option.get_text(strip=True)) for option in options)
