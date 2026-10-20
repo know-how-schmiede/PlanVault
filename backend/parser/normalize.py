@@ -45,6 +45,12 @@ class CancelledDate:
 
 
 @dataclass(frozen=True)
+class SeriesAnnotation:
+    series_index: int
+    kind: str
+    text: str
+
+@dataclass(frozen=True)
 class CalendarPreview:
     course_key: str
     title: str
@@ -54,6 +60,7 @@ class CalendarPreview:
     cancellations: tuple[CancelledDate, ...] = ()
     # Eine vollständige Semesterprüfung ist Aufgabe des Importers.
     complete: bool = False
+    series_annotations: tuple[SeriesAnnotation, ...] = ()
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), ensure_ascii=False, sort_keys=True)
@@ -145,9 +152,10 @@ def normalize_course(
                else "source_context_requires_verification")
     occurrences = []
     cancellations = []
+    annotations = []
     for index, series in enumerate(course.series):
         rule = rules.get(series.recurrence)
-        if rule is None or series.note or series.execution_note:
+        if rule is None or series.execution_note:
             raise NormalizationError("Rhythmus, Gruppierung oder Bemerkung benötigt Prüfung.")
         if series.timezone != "Europe/Berlin" or series.start_time >= series.end_time:
             raise NormalizationError("Ungültige Zeitzone oder Tageszeiten.")
@@ -156,6 +164,19 @@ def normalize_course(
             raise NormalizationError("Terminzeitraum oder Wochentag ist ungültig.")
         if rule == "single" and span != 0:
             raise NormalizationError("Einzeltermin benötigt genau ein Datum.")
+        if series.note:
+            if series.note == "Vorlesung":
+                kind = "teaching_format"
+            elif series.note == "Nachholtermin" and rule == "single" and series.recurrence == "Einzel":
+                kind = "makeup_label"
+                review.add("replacement_reference_requires_review")
+            elif re.fullmatch(r"Labor [A-Z]\d{1,2}\.\d{1,2}\.\d{2}", series.note):
+                kind = "room_hint"
+                review.add("room_note_requires_review")
+            else:
+                raise NormalizationError("Serienbemerkung ist noch nicht als Hinweis verifiziert.")
+            annotations.append(SeriesAnnotation(index, kind, series.note))
+            review.add("notes_require_review")
         days = {
             series.valid_from + timedelta(days=offset)
             for offset in range(span + 1)
@@ -185,4 +206,5 @@ def normalize_course(
             ))
     occurrences.sort(key=lambda item: (item.starts_at, item.series_index))
     return CalendarPreview(key, course.title, course.semester, tuple(occurrences),
-                           tuple(sorted(review)), tuple(cancellations))
+                           tuple(sorted(review)), tuple(cancellations),
+                           series_annotations=tuple(annotations))

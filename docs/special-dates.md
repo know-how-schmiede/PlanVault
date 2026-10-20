@@ -85,3 +85,28 @@ ausgegeben. Diese Daten erscheinen weder in `repr` noch im bereinigten CLI-Beric
 und werden noch nicht auf Datenträger gespeichert. Für eine spätere geschützte
 Prüfansicht muss die Darstellung separat umgesetzt und gegen XSS abgesichert
 werden. Der Semesterbericht behält Schema 3 und die bisherigen Zähler.
+### Serienhinweise innerhalb V0.0.16
+
+Drei live belegte Formate dürfen als Hinweis erhalten bleiben:
+
+- Exakt `Vorlesung`: Kennzeichnung des Lehrformats.
+- Exakt `Nachholtermin`: nur beim bereits strukturiert erfassten Rhythmus `Einzel`
+  mit genau einem Datum. Keine Zuordnung zu einem bestimmten Ausfall.
+- `Labor` gefolgt von einer Raumkennung aus Großbuchstabe und drei durch Punkte
+  getrennten Zahlengruppen: zusätzlicher Raumhinweis. Das separate Raumfeld wird
+  nicht überschrieben. Der Hinweis bleibt stets mit `room_note_requires_review`
+  prüfpflichtig, auch wenn die Räume übereinstimmen sollten.
+
+Die Vorschau ergänzt `series_annotations` mit `series_index`, `kind` und `text`.
+Mögliche Arten sind `teaching_format`, `makeup_label` und `room_hint`. Der
+Originaltext bleibt erhalten; jede dieser Annotationen behält
+`notes_require_review`, ein Nachholtermin zusätzlich
+`replacement_reference_requires_review`. Datum, Uhrzeit, Raum und bestehende
+Termine werden durch die Annotation nicht verändert.
+
+Die Erkennung erfolgt über vollständige Übereinstimmung. Zusätze wie
+„nur jede zweite Woche“, unbekannte Formate und Durchführungshinweise führen
+weiterhin zum Abbruch der gesamten Veranstaltungsvorschau. Bei einem späteren
+Fehler wird keine Teilvorschau mit bereits erkannten Annotationen zurückgegeben.
+Das neue Feld gehört zur internen Kalendervorschau; der bereinigte CLI-Bericht
+bleibt unverändert bei Schema 3 und enthält keine Hinweistexte.

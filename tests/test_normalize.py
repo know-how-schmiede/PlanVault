@@ -139,3 +139,44 @@ def test_invalid_week_and_reversed_interval():
         check_week_coverage(date(2026, 1, 1), date(2026, 1, 1), [WeekResult(2026, 54, "ok")])
     with pytest.raises(ValueError):
         check_week_coverage(date(2026, 2, 1), date(2026, 1, 1), [])
+
+@pytest.mark.parametrize("note,kind", [("Vorlesung", "teaching_format"), ("Labor X9.8.76", "room_hint")])
+def test_verified_series_labels_preserve_text_without_altering_events(course, context, note, kind):
+    original = normalize_course(course, context)
+    preview = normalize_course(changed(course, note=note), context)
+    assert preview.occurrences == original.occurrences
+    assert preview.series_annotations[0].text == note
+    assert preview.series_annotations[0].kind == kind
+    assert preview.series_annotations[0].series_index == 0
+    assert "notes_require_review" in preview.review_reasons
+    assert not preview.complete
+    if kind == "room_hint":
+        assert "room_note_requires_review" in preview.review_reasons
+        assert all(event.room == "DEMO" for event in preview.occurrences)
+    assert json.loads(preview.to_json())["series_annotations"][0]["text"] == note
+
+
+def test_makeup_label_only_annotates_explicit_single(course, context):
+    single = changed(course, recurrence="Einzel", valid_until=date(2025, 10, 20))
+    original = normalize_course(single, context)
+    preview = normalize_course(changed(single, note="Nachholtermin"), context)
+    assert preview.occurrences == original.occurrences
+    assert preview.series_annotations[0].kind == "makeup_label"
+    assert "replacement_reference_requires_review" in preview.review_reasons
+    assert "replacement_id" not in preview.to_json()
+    assert not preview.complete
+
+
+@pytest.mark.parametrize("note", ["Nachholtermin", "Vorlesung nur jede zweite Woche", "Vorlesung entfällt",
+                                  "Labor X9.8.76 ab 12 Uhr", "Gruppe A", "Vorlesung<script>"])
+def test_unknown_or_temporal_note_is_not_silently_accepted(course, context, note):
+    with pytest.raises(NormalizationError):
+        normalize_course(changed(course, note=note), context)
+
+
+def test_annotation_series_indices_and_late_failure_are_atomic(course, context):
+    series = (replace(course.series[0], note="Vorlesung"), replace(course.series[0], note="Labor X9.8.76"))
+    preview = normalize_course(replace(course, series=series), context)
+    assert [a.series_index for a in preview.series_annotations] == [0, 1]
+    with pytest.raises(NormalizationError):
+        normalize_course(replace(course, series=series + (replace(course.series[0], note="Unbekannte Regel"),)), context)

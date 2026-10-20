@@ -2,7 +2,7 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
-## V0.0.16 – Verlegungshinweise und ungeklärte Detaildaten erhalten
+## V0.0.16 – Verlegungs- und Serienhinweise erhalten
 
 **Datum:** 2026-10-20
 
@@ -12,11 +12,12 @@ Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefas
 - Explizite Ausfälle auch mit zusätzlichen Datumsangaben im Hinweis verarbeitet. Hinweistexte bleiben erhalten und gesondert prüfpflichtig; keine Ersatztermine erzeugt oder mit Einzelterminen verknüpft.
 - Ungültige führende Ausfalldaten und mehrdeutige Angaben bleiben gesperrt. Allgemeine Serienbemerkungen werden nicht automatisch als Terminregeln interpretiert.
 - Bei blockierter Normalisierung vollständig geparste Veranstaltungsdaten intern als `unresolved_course` erhalten. Keine Teilvorschau, keine Ausgabe der Inhalte im CLI-Bericht, keine Speicherung auf Datenträger.
+- Belegte Serienbemerkungen „Vorlesung“, „Nachholtermin“ bei explizitem Einzeltermin sowie Laborraumhinweise als Annotation mit Serienbezug erhalten. Keine Änderung von Datum, Uhrzeit oder Raumfeld; unbekannte Bemerkungen bleiben gesperrt.
 - Fiktive Tests, README, Roadmap und Quellenanalyse aktualisiert; Semesterbericht bleibt bei Schema 3.
 
-**Prüfung:** 238 lokale Tests erfolgreich. Abschließender Live-Lauf mit 62 HTTP-Anfragen: 54 Details geprüft, 51 Vorschauen (davon 18 mit fachlichen Prüfhinweisen), drei weiterhin blockierte Veranstaltungen mit insgesamt vier Serienbemerkungen. Alle drei ungeklärten Veranstaltungsdaten bleiben intern erhalten. Keine Rohseiten oder vertraulichen Werte gespeichert. `git diff --check` ohne Fehler. Vollständigkeitsnachweis, Speicherung und Webanzeige bleiben offen; kein Deployment im LXC.
+**Prüfung:** 248 lokale Tests erfolgreich. Der erste Live-Lauf dieser Version prüfte 54 Details mit 62 HTTP-Anfragen: 51 Vorschauen und drei blockierte Veranstaltungen mit vier Serienbemerkungen. Diese Bemerkungen wurden anschließend in einem erneuten Diagnose-Lauf und begrenzten Detailabrufen klassifiziert. Abschließende gezielte Prüfung der drei betroffenen Veranstaltungen: drei Vorschauen, alle vier Hinweise erhalten, elf HTTP-Anfragen. Alle drei Vorschauen bleiben fachlich prüfpflichtig; insbesondere weicht der Laborraumhinweis vom Raumfeld ab. Kein erneuter vollständiger Lauf nach der letzten Änderung. Keine Rohseiten oder vertraulichen Werte gespeichert. `git diff --check` ohne Fehler. Vollständigkeitsnachweis, Speicherung und Webanzeige bleiben offen; kein Deployment im LXC.
 
-**Commit-Kurzbeschreibung:** Version 0.0.16 mit erhaltenen Verlegungshinweisen und ungeklärten Detaildaten ergänzen
+**Commit-Kurzbeschreibung:** Version 0.0.16 mit erhaltenen Verlegungs- und geprüften Serienhinweisen ergänzen
 
 ## V0.0.15 – Mehrfache Ausfälle und klare Normalisierungsdiagnose
 
