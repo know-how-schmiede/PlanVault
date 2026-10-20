@@ -12,6 +12,8 @@ from backend.importer.http import SourceClient, SourceFetchError
 from backend.importer.forms import FormNavigationError
 from backend.importer.navigation import search_study, follow_named_result, submit_labeled_search
 from backend.importer.weeks import audit_weeks
+from backend.importer.weeks import read_week_menu, inspect_week
+from backend.importer.details import collect_course_references, fetch_detail_sample, DetailImportError
 
 
 @click.command("source-check")
@@ -99,7 +101,56 @@ def source_weeks_check(query, title, start, end, weeks):
         raise click.ClickException("Wochenprüfung ist unvollständig.")
 
 
+@click.command("source-details-check")
+@click.option("--query", required=True)
+@click.option("--title", required=True)
+@click.option("--semester", required=True, help="Erwartete Semesterbeschriftung der Detailseite.")
+@click.option("--study-key", required=True, help="Lokale opake Studiengangskennung.")
+@click.option("--regulations-key", required=True, help="Lokale opake Prüfungsordnungskennung.")
+@click.option("--week", required=True, help="Explizite ISO-Woche, z. B. 2026-W44.")
+@click.option("--limit", default=2, show_default=True, type=click.IntRange(1, 10))
+@with_appcontext
+def source_details_check(query, title, semester, study_key, regulations_key, week, limit):
+    """Kleine Detailstichprobe aus einer ausdrücklich gewählten Woche prüfen."""
+    try:
+        match = re.fullmatch(r"(\d{4})-W(\d{2})", week)
+        if not match:
+            raise ValueError
+        key = int(match[1]), int(match[2])
+        date.fromisocalendar(*key, 1)
+        if not semester.strip() or any(not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", value)
+                                       for value in (study_key, regulations_key)):
+            raise ValueError
+    except ValueError:
+        raise click.ClickException("ISO-Woche, Semester oder lokale Kennungen ungültig.") from None
+    try:
+        with SourceClient(current_app.config.get("LSF_BASE_URL", ""), max_requests=12 + limit, retries=0) as client:
+            results = search_study(client, query)
+            selection = follow_named_result(client, results, title=title)
+            plan = submit_labeled_search(client, selection, field_label="Studiengang", button_caption="Suche starten")
+            menu = read_week_menu(plan)
+            choices = [choice for choice in menu.choices if choice.key == key]
+            if len(choices) != 1:
+                raise DetailImportError("Gewünschte Woche wird nicht angeboten.")
+            plan = menu.form.submit(client, values={menu.field_name: (choices[0].value,)}, button=menu.button)
+            if inspect_week(plan, choices[0]).status != "ok":
+                raise DetailImportError("Woche ist leer oder prüfpflichtig; keine Detailstichprobe gestartet.")
+            references = collect_course_references(client, (plan,))
+            sample = fetch_detail_sample(client, references, semester=semester, study_key=study_key,
+                                         regulations_key=regulations_key, limit=limit)
+    except (DetailImportError, FormNavigationError, SourceFetchError) as error:
+        raise click.ClickException(str(error)) from None
+    click.echo(f"Veranstaltungsblöcke: {sample.block_count}; eindeutige Detailziele: {sample.reference_count}.")
+    click.echo(f"Geprüfte Details: {len(sample.details)}; ungeprüfte Detailziele: {sample.unchecked_count}.")
+    review = sum(result.status != "preview" for result in sample.details)
+    click.echo(f"Details mit ungeklärter Normalisierung: {review}.")
+    click.echo("Nur Stichprobe: keine dauerhafte Quellidentität, kein vollständiger Semesterimport, kein Archivstand.")
+    if review:
+        raise click.ClickException("Detailnormalisierung benötigt Prüfung.")
+
+
 def register_cli(app):
     app.cli.add_command(source_check)
     app.cli.add_command(source_plan_check)
     app.cli.add_command(source_weeks_check)
+    app.cli.add_command(source_details_check)

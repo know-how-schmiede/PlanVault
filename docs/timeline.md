@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.9 – Detailzuordnung und begrenzte Importstichprobe
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.9` gesetzt.
+- Veranstaltungslinks anhand der beobachteten Blockstruktur gesammelt und von Raumlinks getrennt.
+- Identische absolute Ziele innerhalb des Prüflaufs zusammengefasst; unterschiedliche Ziele niemals allein anhand des Titels zusammengeführt.
+- Begrenzten Detailabruf mit Semesterprüfung, Parser und Kalendervorschau verbunden. Fehler verhindern ein erfolgreiches Teilergebnis; ungeklärte Normalisierung bleibt markiert.
+- Befehl `source-details-check` ergänzt: explizite Woche, erwartetes Semester, lokale Zuordnungskennungen und maximal zehn Detailziele.
+- README, Roadmap, Quellenanalyse und Anleitung aktualisiert.
+
+**Prüfung:** 166 lokale Tests erfolgreich. Live-Stichprobe mit acht HTTP-Anfragen: 53 Blöcke, 47 unterschiedliche Detailziele; zwei Details mit einer beziehungsweise zwei Serien verarbeitet, 45 Ziele ungeprüft. Keine Rohseiten oder Quelladressen gespeichert. `git diff --check` ohne Fehler. Dauerhafte Quellidentität, vollständiger Semesterimport und Deployment im LXC bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.9 mit Detailzuordnung und begrenzter Importstichprobe ergänzen
+
 ## V0.0.8 – Wochennavigation und Abdeckungsprüfung
 
 **Datum:** 2026-10-20

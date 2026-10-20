@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.8`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.9`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -105,3 +105,9 @@ Normale Fieldsets, gleichwertige doppelte Suchschaltflächen und die schreibgesc
 Die [Wochennavigation](week-navigation.md) liest datierte Auswahloptionen und verwendet die beobachtete Schaltfläche zum Anzeigen. Wochennummer, ISO-Jahr, Datumsbereich, ausgewählte Woche und die fünf sichtbaren Tagesüberschriften werden geprüft. Ein unabhängiger Prüfzeitraum bestimmt die erwartete Wochenabdeckung.
 
 Live am 2026-10-20: 26 angebotene Wochen; KW 44/2026 strukturell passend, KW 53/2026 mit prüfpflichtigen Ferienhinweisen. Acht HTTP-Anfragen einschließlich Studiengangsnavigation. 24 Wochen bleiben fehlend. 146 lokale Tests bestehen. Keine Rohseiten gespeichert; vollständige Erfassung, Wochenenden, Sonderansichten und Veranstaltungsdetails bleiben offen.
+
+## Ergänzung V0.0.9
+
+Die [Detailstichprobe](detail-sample.md) liest genau einen Veranstaltungslink aus der ersten Zeile der beobachteten achtzeiligen Blocktabelle. Raumlinks werden getrennt behandelt. Gleiche absolute Ziele werden innerhalb des Prüflaufs zusammengefasst; dies ist keine dauerhafte Veranstaltungsidentität.
+
+Live am 2026-10-20: 53 Blöcke, 47 unterschiedliche Detailziele, zwei geprüfte Details mit einer beziehungsweise zwei Serien und 15 beziehungsweise 16 Vorschauterminen. 45 Ziele blieben ungeprüft. Acht HTTP-Anfragen einschließlich Studiengangsnavigation; keine Rohseiten gespeichert. 166 lokale Tests bestehen. Der Befehl source-details-check ermöglicht eine begrenzte Stichprobe aus einer ausdrücklich gewählten Woche; keine Archivveröffentlichung.
