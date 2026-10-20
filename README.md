@@ -6,7 +6,7 @@
 
 WI-PlanArchiv ist eine eigenständige, interne Webanwendung zur automatisierten Sicherung, Versionierung und übersichtlichen Anzeige von Vorlesungsplänen. Ausgangspunkt ist die Vorlesungsplanung der Wirtschaftsingenieurwesen-Studiengänge (WI) der Hochschule Pforzheim im QIS-LSF-System. Die Architektur soll eine spätere Erweiterung auf andere Studiengänge ermöglichen.
 
-> **Projektstatus:** Konzept / Entwicklungsstart. Die technische Struktur der LSF-Seiten und der konkrete Abrufmechanismus sind noch nicht verifiziert. Alle gezeigten Beispieltermine sind fiktiv.
+> **Projektstatus:** Grundgerüst installiert und Update getestet. Die Quellenanalyse läuft: Studiengangsuche, Planabruf und Wochenwechsel sind per HTTP ohne Anmeldung verifiziert. Automatischer Import und vollständige Semestererfassung folgen. Siehe [Quellenanalyse](docs/source-analysis.md).
 
 ## Ziele
 
@@ -119,6 +119,8 @@ Archivdaten selbst zusätzlich unabhängig sichern (z. B. zweiter Server/NAS, ko
 Änderungen, Versionsvorschläge und Commit-Kurzbeschreibungen stehen in der [Timeline](docs/timeline.md).
 
 ## Meilensteine
+
+Aktueller Schritt ist die [Quellenanalyse (M0)](docs/source-analysis.md). Installation, Update und Betrieb wurden vom Projektverantwortlichen erfolgreich getestet.
 
 Die [Roadmap](docs/roadmap.md) beschreibt Umsetzungsschritte, Versionsziele und Abschlusskriterien.
 

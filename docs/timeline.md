@@ -2,6 +2,19 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.3 – Versionsfortschreibung
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Anwendungsversion auf Wunsch des Users zentral in `version.py` auf `0.0.3` gesetzt. Der Footer übernimmt die Version nach dem Deployment automatisch.
+- Aktuelle Versionsangaben in Roadmap und Quellenanalyse aktualisiert. M0 bleibt in Bearbeitung.
+
+**Prüfung:** Versionswert, zentrale Einbindung im Footer und Dokumentationsangaben abgeglichen; `git diff --check` ohne Fehler. Keine erneuten Laufzeittests für die reine Versionsänderung; noch nicht auf dem Server ausgerollt.
+
+**Commit-Kurzbeschreibung:** Anwendungsversion auf 0.0.3 erhöhen
+
 ## V0.0.2 – Debian-13-LXC-Installation
 
 **Datum:** 2026-10-20
@@ -13,14 +26,15 @@ Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefas
 - Dienstkonto, virtuelle Python-Umgebung, Gunicorn, systemd-Dienst, Konfigurationsdatei und Datenverzeichnis vorgesehen. Vorhandene Installationen werden nicht überschrieben; Testausführung unter dem Dienstkonto und lokale HTTP-Prüfung integriert.
 - Standard-Bind-Adresse auf `0.0.0.0` geändert; Abschlussmeldung zeigt die erkannten Container-IPv4-Webadressen mit dem gewählten Port. Anleitung für direkten Netzwerkzugriff und bestehende Installationen angepasst.
 - Separates Git-Update-Skript ergänzt: Dienstkonfiguration erkennen, neuen Release und venv vorab testen, Konfiguration und Daten sichern, umschalten und bei Fehlern den bisherigen Anwendungspfad wiederherstellen. Konfiguration und Bind-Adresse bleiben erhalten; Update-Anleitung ergänzt.
+- Erfolgreichen erneuten Betriebs- und Update-Test laut Nutzerbestätigung dokumentiert. M0 mit docs/source-analysis.md begonnen: Studiengangsuche und Planabruf ohne Login sowie Wochenwechsel einschließlich Jahreswechsel per HTTP geprüft. Semesterfilter können nicht zugeordnete Veranstaltungen ausblenden; verbleibende Prüfungen für Vollständigkeit und Sondertermine dokumentiert.
 - Produktionsabhängigkeiten und LF-Zeilenenden für Shellskripte definiert.
 - Installer an den Aufbau der NeoFab-ScanLab-Vorlage angepasst: interaktive Standardwerte, validierte Eingaben für Dienstnutzer, Installationspfad, Branch oder Tag und Bind-Adresse/Port, automatischer Clone des öffentlichen Projekt-Repositories sowie abschließende Übersicht mit installiertem Git-Commit.
 - Download-Schnellstart ohne vorhandenen Checkout in docs/install.md und scripts/README.md ergänzt. Projektanweisungen um verbindliche Regeln für Git-basierte Installer und passende Anleitungen erweitert.
 - `docs/install.md` mit Installation, Zugriff, Konfiguration, Betrieb und Fehlerbehandlung erstellt; README und Roadmap aktualisiert.
 
-**Prüfung:** Bash-Syntax mit `bash -n` und Abbruch ohne root-Rechte geprüft; `git diff --check` ohne Fehler. Versionswert und Dokumentationsverweise abgeglichen. Die neue Webadressen-Ausgabe mit mehreren IPv4, Duplikaten, IPv6, lokalem Zugriff und fehlender IPv4 isoliert erfolgreich geprüft; der geänderte Netzwerkstandard wurde noch nicht erneut im LXC installiert. Laut vom User bereitgestelltem Installationsprotokoll vom 2026-10-20 ist die Debian-13-LXC-Erstinstallation für Commit `a58ee45b6495d130080b2d29e7330b8c6a4277b5` erfolgreich: Python 3.13.5, drei Tests bestanden, systemd-Dienst eingerichtet und lokale HTTP-Prüfung erfolgreich. Bind-Adresse `127.0.0.1:8000`. Browserdarstellung und externer Zugriff sind noch nicht bestätigt. Update-Skript: Bash-Syntax, Abbruch ohne root und Rollback-Steuerung mit simulierten Systembefehlen geprüft (Vorbereitungsfehler, Umschaltfehler, Fehler vor Verschieben und erfolgreicher Abschluss). Vollständiger Update-Praxistest im LXC bleibt offen. Prüfergebnis in Anleitung und Roadmap nachgeführt.
+**Prüfung:** Bash-Syntax mit `bash -n` und Abbruch ohne root-Rechte geprüft; `git diff --check` ohne Fehler. Versionswert und Dokumentationsverweise abgeglichen. Die neue Webadressen-Ausgabe mit mehreren IPv4, Duplikaten, IPv6, lokalem Zugriff und fehlender IPv4 isoliert erfolgreich geprüft; der geänderte Netzwerkstandard wurde noch nicht erneut im LXC installiert. Laut vom User bereitgestelltem Installationsprotokoll vom 2026-10-20 ist die Debian-13-LXC-Erstinstallation für Commit `a58ee45b6495d130080b2d29e7330b8c6a4277b5` erfolgreich: Python 3.13.5, drei Tests bestanden, systemd-Dienst eingerichtet und lokale HTTP-Prüfung erfolgreich. Bind-Adresse `127.0.0.1:8000`. Der User bestätigt anschließend den laufenden Server und Zugriff im internen Netz. Update-Skript: Bash-Syntax, Abbruch ohne root und Rollback-Steuerung mit simulierten Systembefehlen geprüft (Vorbereitungsfehler, Umschaltfehler, Fehler vor Verschieben und erfolgreicher Abschluss). Erfolgreicher Update-Praxistest im LXC anschließend vom User bestätigt; tatsächlicher Fehlerfall mit Rollback im LXC noch offen. Prüfergebnis in Anleitung und Roadmap nachgeführt. Quellenanalyse: HTTP-200-Antworten für Einstieg, Suche, Plan und zwei Wochenwechsel beobachtet; keine vertraulichen Quelladressen oder Rohseiten im Repository abgelegt.
 
-**Commit-Kurzbeschreibung:** Debian-LXC-Installation und Updates mit Sicherung und Anleitung ergänzen
+**Commit-Kurzbeschreibung:** Debian-LXC-Installation und Updates ergänzen sowie Quellenanalyse beginnen
 
 ## V0.0.1 – Konzept und Entwicklungsstart
 

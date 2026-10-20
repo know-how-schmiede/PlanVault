@@ -9,7 +9,7 @@ Diese Anleitung installiert WI-PlanArchiv als systemd-Dienst mit Gunicorn. Aktue
 - Der gewünschte Stand einschließlich Installer, Tests und Requirements muss auf GitHub veröffentlicht sein. Ein vorheriger Repository-Checkout im Container ist nicht nötig. Für die spätere Quellenanalyse zusätzlich eine berechtigte Netzwerkverbindung zur Datenquelle.
 - Als Startgröße sind 1–2 vCPU, 1 GB RAM und 8 GB Speicher vorgesehen; der spätere Archivbedarf ist zusätzlich einzuplanen.
 
-Das Skript erstellt keinen Container und verändert keine Proxmox-, Firewall- oder Netzwerkeinstellungen. Es benötigt keine aktivierten Nesting-Funktionen. Die Erstinstallation wurde laut bereitgestelltem Nutzerprotokoll am 2026-10-20 im Debian-13-LXC für Commit `a58ee45b6495d130080b2d29e7330b8c6a4277b5` erfolgreich ausgeführt: drei Tests bestanden, systemd-Einrichtung und lokale HTTP-Prüfung erfolgreich. Browserdarstellung und externer Zugriff sind separat zu prüfen.
+Das Skript erstellt keinen Container und verändert keine Proxmox-, Firewall- oder Netzwerkeinstellungen. Es benötigt keine aktivierten Nesting-Funktionen. Die Erstinstallation wurde laut bereitgestelltem Nutzerprotokoll am 2026-10-20 im Debian-13-LXC für Commit `a58ee45b6495d130080b2d29e7330b8c6a4277b5` erfolgreich ausgeführt: drei Tests bestanden, systemd-Einrichtung und lokale HTTP-Prüfung erfolgreich. Der User hat anschließend nach erneutem Test den laufenden Server und Zugriff im internen Netz bestätigt.
 
 ## Wohin wird installiert?
 
@@ -136,7 +136,7 @@ Nach Neustart prüft das Skript Dienststatus, HTTP-Erreichbarkeit und die erwart
 
 Der automatische Rückweg betrifft Anwendungscode und Python-Umgebung. Das Skript führt keine Datenbankmigrationen durch; spätere Änderungen des Datenformats benötigen vor ihrer Einführung ein eigenes Migrations- und Wiederherstellungskonzept. Ein Stromausfall oder `SIGKILL` kann nicht durch die Fehlerbehandlung abgefangen werden. Für eine manuelle Wiederherstellung den Dienst stoppen, den aktuellen Symlink beiseitelegen und `application` aus der passenden Sicherung an den ursprünglichen Installationspfad zurückverschieben. Einen dort gesicherten alten venv-Pfad nicht direkt starten. Konfiguration und Daten nur bei Bedarf und nach Prüfung gezielt aus der Sicherung wiederherstellen.
 
-Das Update-Skript wurde in der Windows-Entwicklungsumgebung auf Bash-Syntax und Fehlerbehandlung geprüft; ein vollständiges Update im Debian-LXC ist noch offen.
+Das Update-Skript wurde lokal auf Bash-Syntax und simulierte Fehlerbehandlung geprüft. Der erfolgreiche Update-Praxistest im Debian-LXC und der laufende Server wurden anschließend vom User bestätigt. Ein absichtlich ausgelöster Fehler mit Rollback wurde im Zielcontainer noch nicht nachgewiesen.
 
 Bei Startfehlern zunächst Dienststatus und Journal lokal prüfen. Bei Paket- oder Clone-Fehlern DNS, Netzwerk, Paketquellen sowie GitHub-Erreichbarkeit und den gewählten Branch oder Tag prüfen. Ein fehlgeschlagener Clone kann ein Installationsverzeichnis hinterlassen; vor erneutem Versuch gezielt prüfen. Bei fehlgeschlagenen Tests wird der Dienst nicht neu eingerichtet oder gestartet. Das Skript installiert keine Scheduler-Jobs und verändert keine bestehende Datenbank.
 
