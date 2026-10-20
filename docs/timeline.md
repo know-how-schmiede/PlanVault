@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.19 – Kompaktes Logo und nächste Schritte auf der Startseite
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.19` gesetzt; Footer übernimmt die Version.
+- Webseitenlogo durch die unveränderte Datei „WI-PlanArchiv_ Vorlesungsplanung gesichert.png“ ersetzt.
+- Logo und Einführungstext nebeneinander in einer responsiven 1:3-Spaltenaufteilung angeordnet. Die Logospalte bleibt inklusive schmaler Ansichten unter 25 Prozent der Inhaltsbreite; keine Verzerrung des Bildes.
+- Überschrift „Dein Vorlesungsplan …“ und Beschreibung rechts neben dem Logo platziert, zusätzlichen Slogan entfernt.
+- Nächste Schritte sichtbar ergänzt: vollständigen Import absichern, Archivstände sicher speichern, Wochen-/Listenansicht entwickeln. Noch keine umgesetzten Archivfunktionen behauptet.
+- Erfolgreiches Server-Update nach V0.0.18 durch den User bestätigt; Installationsanleitung und Roadmap entsprechend aktualisiert.
+
+**Prüfung:** 274 lokale Tests erfolgreich, einschließlich korrekter Logodatei, Startseiteninhalt und zentraler Version. `git diff --check` ohne Fehler. Layout über HTML und CSS geprüft; keine Browser-Sichtprüfung durchgeführt. V0.0.19 noch nicht auf dem Server installiert. Der User bestätigt das vorherige Update, nicht eine Erstinstallation oder Vollständigkeit des Datenimports.
+
+**Commit-Kurzbeschreibung:** Version 0.0.19 mit kompaktem Logo, seitlichem Einführungstext und nächsten Schritten ergänzen
+
 ## V0.0.18 – Logo, Installation ohne curl und geprüfte Klausurzeiten
 
 **Datum:** 2026-10-20

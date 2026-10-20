@@ -9,8 +9,9 @@
   <body>
     <header>
       <a class="brand" href="{{ url_for('web.index') }}" aria-label="WI-PlanArchiv – Startseite">
-        <img src="{{ url_for('static', filename='brand.png') }}" alt="WI-PlanArchiv – Vorlesungsplanung sichern. Immer verfügbar." width="1774" height="887" fetchpriority="high">
+        <img src="{{ url_for('static', filename='brand.png') }}" alt="WI-PlanArchiv" width="1536" height="1024" fetchpriority="high">
       </a>
+      <div class="hero-copy">{% block introduction %}{% endblock %}</div>
     </header>
     <main id="content">{% block content %}{% endblock %}</main>
     <footer>WI-PlanArchiv · Version V{{ app_version }}</footer>

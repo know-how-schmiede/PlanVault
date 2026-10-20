@@ -4,7 +4,7 @@ WI-PlanArchiv wird schrittweise von der Konzeption zur zuverlässig betriebenen 
 
 ## Aktueller Stand
 
-Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.18`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Laut Nutzerprotokoll vom 2026-10-20 bestehen im Debian-13-LXC alle drei Tests; systemd-Einrichtung und lokale HTTP-Prüfung sind erfolgreich. Der User bestätigt nach erneutem Test den laufenden Server und Zugriff im internen Netz. Der erste Live-Quellzugriff für Studiengangsuche, Plan und Wochenwechsel ist verifiziert; ein automatisierter Datenimport ist noch nicht implementiert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Erstinstallation im Zielcontainer ist durch das Nutzerprotokoll bestätigt. Ein separates Update-Skript mit vorbereiteten Releases, Sicherung und Rückkehr zum alten Anwendungsstand liegt vor; der erfolgreiche Update-Praxistest ist durch den User bestätigt; ein absichtlich ausgelöster Fehler mit Rollback wurde im LXC noch nicht nachgewiesen. M0 ist in der [Quellenanalyse](source-analysis.md) begonnen: HTTP-Abruf, Wochenwechsel und zwei Detailseiten sind geprüft. Ein Detailparser mit fiktiver Testgrundlage liegt vor; Sonderfälle, Quellidentität und Semester-Vollständigkeit bleiben offen; M1 bis M5 bleiben offen.
+Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.19`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Laut Nutzerprotokoll vom 2026-10-20 bestehen im Debian-13-LXC alle drei Tests; systemd-Einrichtung und lokale HTTP-Prüfung sind erfolgreich. Der User bestätigt nach erneutem Test den laufenden Server und Zugriff im internen Netz. Der erste Live-Quellzugriff für Studiengangsuche, Plan und Wochenwechsel ist verifiziert; ein automatisierter Datenimport ist noch nicht implementiert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Erstinstallation im Zielcontainer ist durch das Nutzerprotokoll bestätigt. Ein separates Update-Skript mit vorbereiteten Releases, Sicherung und Rückkehr zum alten Anwendungsstand liegt vor; der erfolgreiche Update-Praxistest ist durch den User bestätigt; ein absichtlich ausgelöster Fehler mit Rollback wurde im LXC noch nicht nachgewiesen. M0 ist in der [Quellenanalyse](source-analysis.md) begonnen: HTTP-Abruf, Wochenwechsel und zwei Detailseiten sind geprüft. Ein Detailparser mit fiktiver Testgrundlage liegt vor; Sonderfälle, Quellidentität und Semester-Vollständigkeit bleiben offen; M1 bis M5 bleiben offen.
 
 Die neue Kalendervorschau erzeugt UTC-Termine und prüft Ausfälle; ein separater Wochenabgleich erkennt Lücken und Fehler. Sonderregeln und Quellzuordnung sind technisch vorbereitet, aber noch nicht live verifiziert. M0/M1 bleiben offen. Siehe [Entscheidung zur Kalendervorschau](decisions/002-kalendervorschau.md).
 
@@ -158,3 +158,21 @@ Beide Ansichten zeigen Montag bis Freitag. Im untersuchten Auswahlformular wurde
 Das bestehende Logo wird lokal und responsiv im gemeinsamen Seitenkopf angezeigt. Installations- und Update-Skript benötigen kein curl mehr: wget dient im Schnellstart zum Download; lokale Gesundheitsprüfungen verwenden Python ohne Proxy und mit Timeout, Größenlimit und exakter Versionsprüfung beim Update. Die neue Skriptfassung ist lokal getestet, noch nicht im Ziel-LXC ausgeführt.
 
 Die zwei offenen Normalisierungsfälle wurden untersucht. Eine Einzelterminserie enthält einen eindeutigen Klausurzeit-Hinweis innerhalb des größeren Tabellenzeitraums. Diese eng begrenzte Form wird nun übernommen; Originalzeiten, Hinweis und fachlicher Prüfstatus bleiben erhalten. Die Begrüßungs-/Einführungsbemerkungen der anderen Veranstaltung bleiben blockierend und intern erhalten. Abschließender gezielter Live-Test: zwei Details, eine Vorschau mit Klausurzeit-Annotation und ein ungeklärtes Detail, zehn HTTP-Anfragen. Kein erneuter vollständiger Lauf nach der Änderung. Wochenenden und vollständiger Semesterumfang bleiben separat nachzuweisen.
+
+## Ergänzung V0.0.19 – Startseite und bestätigtes Update
+
+Das vom User gewünschte Logo „WI-PlanArchiv_ Vorlesungsplanung gesichert“ ersetzt
+den bisherigen Webseitenbanner. Die linke Spalte belegt höchstens ein Viertel
+des Inhaltsbereichs; Überschrift und Beschreibung stehen rechts daneben.
+Der zusätzliche Slogan wurde entfernt. Die Startseite nennt nun die nächsten
+Schritte ausdrücklich als geplante Arbeiten:
+
+1. Verbleibende Begrüßungs-/Einführungshinweise klären und den vollständigen
+   Semesterumfang einschließlich Wochenenden nachweisen.
+2. SQLite-Persistenz mit vorläufigen Snapshots, Prüfung und atomarer Veröffentlichung
+   umsetzen; fehlerhafte Läufe dürfen den letzten gültigen Stand nicht ersetzen.
+3. Wochen- und Listenansicht mit Filtern, Archivstand und Sicherungszeitpunkt ergänzen.
+
+Der User bestätigt das erfolgreiche Server-Update nach V0.0.18. Das ist ein
+Betriebsnachweis des Updates, keine Freigabe des noch unvollständigen Imports.
+V0.0.19 ist lokal vorbereitet und wurde nicht durch Codex auf dem Server installiert.

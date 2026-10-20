@@ -1,11 +1,20 @@
 {% extends "base.html" %}
-{% block content %}
-<p class="eyebrow">Vorlesungsplanung sichern. Immer verfügbar.</p>
+{% block introduction %}
 <h1>Dein Vorlesungsplan verdient ein Archiv.</h1>
 <p>WI-PlanArchiv wird Vorlesungspläne sichern und vergangene Stände übersichtlich verfügbar machen.</p>
+{% endblock %}
+{% block content %}
 <section aria-labelledby="status-heading">
   <h2 id="status-heading">Entwicklung gestartet</h2>
   <p>Es sind noch keine Vorlesungspläne archiviert. Datenimport und Stundenplanansicht werden in den nächsten Schritten umgesetzt.</p>
   <p>Letzte erfolgreiche Sicherung: noch keine.</p>
+</section>
+<section aria-labelledby="next-steps-heading">
+  <h2 id="next-steps-heading">Nächste Schritte</h2>
+  <ol class="next-steps">
+    <li><strong>Import vervollständigen.</strong> Offene Veranstaltungshinweise klären und den gesamten Semesterumfang einschließlich Wochenenden prüfen.</li>
+    <li><strong>Pläne sicher speichern.</strong> Geprüfte Archivstände sichern und den letzten gültigen Stand bei Fehlern schützen.</li>
+    <li><strong>Stundenpläne anzeigen.</strong> Wochen- und Listenansicht mit Filtern und dem Zeitpunkt der letzten erfolgreichen Sicherung ergänzen.</li>
+  </ol>
 </section>
 {% endblock %}

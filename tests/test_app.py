@@ -39,3 +39,10 @@ def test_brand_is_local_and_accessible():
     response = client.get(logo["src"])
     assert response.status_code == 200 and response.mimetype == "image/png"
     assert response.data.startswith(b"\x89PNG\r\n\x1a\n")
+    from pathlib import Path
+    asset = Path(__file__).resolve().parents[1] / "images" / "WI-PlanArchiv_ Vorlesungsplanung gesichert.png"
+    assert response.data == asset.read_bytes()
+    assert soup.select_one("header .hero-copy h1").get_text() == "Dein Vorlesungsplan verdient ein Archiv."
+    assert len(soup.find_all("h1")) == 1
+    assert "Vorlesungsplanung sichern" not in soup.get_text()
+    assert len(soup.select(".next-steps li")) == 3
