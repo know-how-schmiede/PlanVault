@@ -4,7 +4,7 @@ WI-PlanArchiv wird schrittweise von der Konzeption zur zuverlässig betriebenen 
 
 ## Aktueller Stand
 
-Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.1`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Startanleitung und Tests liegen vor; die Laufzeitprüfung ist offen, da der Python-Befehl in dieser Umgebung nicht startet. Datenimport und Live-Quellzugriff sind noch nicht implementiert bzw. verifiziert. M0 bis M5 bleiben offen.
+Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.2`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Startanleitung und Tests liegen vor; die Laufzeitprüfung ist offen, da der Python-Befehl in dieser Umgebung nicht startet. Datenimport und Live-Quellzugriff sind noch nicht implementiert bzw. verifiziert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Installation im Zielcontainer ist noch zu prüfen. M0 bis M5 bleiben offen.
 
 ## Versionsplanung
 

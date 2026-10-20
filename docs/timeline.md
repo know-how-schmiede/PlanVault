@@ -2,6 +2,24 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.2 – Debian-13-LXC-Installation
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Anwendungsversion auf Wunsch des Users in `version.py` auf `0.0.2` gesetzt; der gemeinsame Footer übernimmt diesen Wert automatisch.
+- Erstinstallationsskript für Debian-13-LXC mit Prüfung von Betriebssystem, root-Rechten, systemd, Installationszielen und lokalem Port ergänzt.
+- Dienstkonto, virtuelle Python-Umgebung, Gunicorn, systemd-Dienst, Konfigurationsdatei und Datenverzeichnis vorgesehen. Vorhandene Installationen werden nicht überschrieben; Testausführung unter dem Dienstkonto und lokale HTTP-Prüfung integriert.
+- Produktionsabhängigkeiten und LF-Zeilenenden für Shellskripte definiert.
+- Installer an den Aufbau der NeoFab-ScanLab-Vorlage angepasst: interaktive Standardwerte, validierte Eingaben für Dienstnutzer, Installationspfad, Branch oder Tag und Bind-Adresse/Port, automatischer Clone des öffentlichen Projekt-Repositories sowie abschließende Übersicht mit installiertem Git-Commit.
+- Download-Schnellstart ohne vorhandenen Checkout in docs/install.md und scripts/README.md ergänzt. Projektanweisungen um verbindliche Regeln für Git-basierte Installer und passende Anleitungen erweitert.
+- `docs/install.md` mit Installation, Zugriff, Konfiguration, Betrieb und Fehlerbehandlung erstellt; README und Roadmap aktualisiert.
+
+**Prüfung:** Bash-Syntax mit `bash -n` und Abbruch ohne root-Rechte geprüft; `git diff --check` ohne Fehler. Versionswert und Dokumentationsverweise abgeglichen. Debian-13-LXC-Installation, systemd-Start und Python-Tests in dieser Windows-Umgebung nicht ausgeführt; das Skript führt Tests und HTTP-Prüfung bei der Installation aus.
+
+**Commit-Kurzbeschreibung:** Git-basierten Debian-LXC-Installer mit Anleitung und Projektregeln ergänzen
+
 ## V0.0.1 – Konzept und Entwicklungsstart
 
 **Datum:** 2026-10-20

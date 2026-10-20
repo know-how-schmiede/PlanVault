@@ -131,6 +131,8 @@ Die [Roadmap](docs/roadmap.md) beschreibt Umsetzungsschritte, Versionsziele und 
 
 ## Lokale Entwicklung und Deployment
 
+Für einen Debian-13-LXC steht das [Installationsskript](scripts/install-debian13.sh) bereit. Der Installer lädt den gewählten Branch oder Tag automatisch aus GitHub. Die [Installationsanleitung](docs/install.md) enthält den Schnellstart ohne vorhandenen Checkout; [scripts/README.md](scripts/README.md) bietet den kurzen Einstieg sowie Hinweise zu den interaktiven Standardwerten.
+
 Voraussetzung: Python 3.11 oder neuer. Im Repository-Hauptverzeichnis eine virtuelle Umgebung anlegen und die Abhängigkeiten installieren:
 
 ```powershell
