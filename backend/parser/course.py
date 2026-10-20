@@ -46,6 +46,7 @@ _WEEKDAYS = {day: number for number, day in enumerate(("Mo", "Di", "Mi", "Do", "
 _HEADERS = ("Tag", "Zeit", "Rhythmus", "Dauer", "Raum", "Lehrperson", "Durchf.", "Bemerkung", "fällt aus am")
 _TIME_RANGE = re.compile(r"(\d{1,2}:\d{2})\s*[-–]\s*(\d{1,2}:\d{2})")
 _DATE_RANGE = re.compile(r"(\d{1,2}\.\d{1,2}\.\d{4})\s*[-–]\s*(\d{1,2}\.\d{1,2}\.\d{4})")
+_SINGLE_DATE = re.compile(r"\d{1,2}\.\d{1,2}\.\d{4}")
 
 
 def _text(cell: Tag) -> str:
@@ -81,11 +82,13 @@ def _series(cells: dict[str, str]) -> ScheduleSeries:
     weekday = cells["Tag"].removesuffix(".")
     times = _TIME_RANGE.fullmatch(cells["Zeit"])
     dates = _DATE_RANGE.fullmatch(cells["Dauer"])
-    if weekday not in _WEEKDAYS or times is None or dates is None or not cells["Rhythmus"]:
+    single_date = _SINGLE_DATE.fullmatch(cells["Dauer"])
+    if weekday not in _WEEKDAYS or times is None or (dates is None and single_date is None) or not cells["Rhythmus"]:
         raise SourceParseError("Terminangaben sind unvollständig oder noch nicht unterstützt.")
     try:
         start_time, end_time = (datetime.strptime(value, "%H:%M").time() for value in times.groups())
-        valid_from, valid_until = (datetime.strptime(value, "%d.%m.%Y").date() for value in dates.groups())
+        date_values = dates.groups() if dates else (cells["Dauer"], cells["Dauer"])
+        valid_from, valid_until = (datetime.strptime(value, "%d.%m.%Y").date() for value in date_values)
     except ValueError:
         raise SourceParseError("Termin enthält ein ungültiges Datum oder eine ungültige Uhrzeit.") from None
     if start_time >= end_time or valid_from > valid_until:

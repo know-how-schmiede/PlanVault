@@ -128,3 +128,14 @@ def test_missing_title_is_rejected(detail_html):
     soup.h3.decompose()
     with pytest.raises(SourceParseError):
         parse_course_detail(str(soup))
+
+
+def test_synthetic_single_date_is_preserved_but_rhythm_needs_review(detail_html):
+    # Zellweise ändern, unabhängig von der Formatierung der Fixture.
+    soup = BeautifulSoup(detail_html, "html.parser")
+    cells = soup.find_all("table")[1].find_all("tr")[1].find_all("td")
+    cells[3].string = "DEMO-EINZEL"
+    cells[4].string = "06.10.2025"
+    course = parse_course_detail(str(soup))
+    assert course.series[0].valid_from == course.series[0].valid_until == date(2025, 10, 6)
+    assert "unverified_recurrence" in course.review_reasons

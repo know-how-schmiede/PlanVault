@@ -2,6 +2,24 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.4 – Kalendervorschau und Wochenabgleich
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.4` gesetzt; der gemeinsame Footer übernimmt sie.
+- Erfolgreichen Website-Aufruf nach dem vorherigen Update durch den User bestätigt.
+- Separate JSON-fähige Kalendervorschau ergänzt: wöchentliche Serien, vollständige Ausfalldaten, UTC-Zeitpunkte und lokale ISO-Wochen. Mehrdeutige Zeiten und ungeklärte Angaben führen zum Fehler statt zu Teilresultaten.
+- Synthetisch geprüfte Einzel- und Blockregeln nur über explizite Rhythmuszuordnung zugelassen; Parser erhält einzelne Datumsangaben. Echte LSF-Sonderfälle bleiben zu verifizieren.
+- Veranstaltungszuordnung über explizite Quell-, Studiengangs-, Prüfungsordnungs- und Semesterkennungen vorbereitet; keine Identität aus Titeln ableiten.
+- Wochenabgleich erkennt fehlende, fehlerhafte, doppelte und unerwartete Wochen. Bestätigte leere Wochen von ungeprüften Leerantworten getrennt.
+- Architekturentscheidung, README, Quellenanalyse und Roadmap aktualisiert. Zeitzonendaten für Windows als bedingte Abhängigkeit ergänzt.
+
+**Prüfung:** 46 lokale Tests erfolgreich, einschließlich Versionsfooter, Zeitumstellung, Jahreswechsel, Ausfällen, Sonderregeln und fehlerhafter Wochenabdeckung; `git diff --check` ohne Fehler. Neue Fälle ausschließlich fiktiv; keine neuen Live-Abrufe oder Bereitstellung im LXC. Vollständiger Semesterimport, Navigation und echte Sonderfälle bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.4 mit Kalendervorschau und sicherem Wochenabgleich ergänzen
+
 ## V0.0.3 – Quellenanalyse und erster Detailparser
 
 **Datum:** 2026-10-20

@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.3`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.4`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -62,3 +62,17 @@ Der Parser allein bestätigt keine vollständige Semestererfassung. Der Aufruf d
 1. Eine tatsächlich belegte Block-/Einzeltermin- oder Gruppenkonstellation und konkrete Ausfallangaben untersuchen; zusätzliche bereinigte Testdaten ergänzen.
 2. Einen HTTP-Abrufadapter mit Laufzeitkonfiguration und temporärer Sitzung umsetzen. Formularziele und Navigationswerte aus der Antwort lesen, statt ungeprüfte Endpunkte fest einzubauen; Ereignisidentität aus der Navigation belastbar zuordnen.
 3. Die erwarteten Wochen und tatsächlich verarbeiteten Wochen explizit vergleichen. Anmeldeseiten, Fehlerseiten und unvollständige Antworten dürfen nicht als leere Pläne gelten.
+
+## Ergänzung V0.0.4
+
+Eine getrennte Normalisierung erstellt jetzt Kalendertermine als JSON-fähige
+Vorschau, einschließlich UTC-Umrechnung, lokaler ISO-Wochen und streng geprüfter
+Ausfalldaten. Einzel- und Blockregeln sind mit fiktiven Daten getestet und nur
+durch explizite Zuordnung nutzbar. Das ist kein neuer Live-Nachweis.
+
+Ein Wochenabgleich für vorgegebene Semestergrenzen liegt vor. Sein Aufrufer muss
+erfolgreiche und tatsächlich bestätigte leere Wochen liefern; Fehlantworten,
+Lücken und Duplikate verhindern die Bestätigung der Wochenabdeckung.
+Die Anbindung an die echte Navigation und die Verifizierung der Quellkennungen
+bleiben offen. Ergebnisse sind ausdrücklich keine vollständigen Semesterimporte.
+Details und Grenzen: [Kalendervorschau](decisions/002-kalendervorschau.md).
