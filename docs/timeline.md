@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.8 – Wochennavigation und Abdeckungsprüfung
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.8` gesetzt.
+- Datierte Wochenauswahl mit Prüfung von Datumsbereich, ISO-Jahr, Wochennummer und Eindeutigkeit ergänzt.
+- Wochenwechsel über beobachtete Formularwerte mit Prüfung der ausgewählten Woche und sichtbaren Tagesüberschriften verbunden.
+- Wochenantworten gegen einen unabhängig angegebenen Zeitraum abgeglichen. Nicht besuchte Wochen bleiben fehlend; ungeklärte leere Ansichten und Ferienhinweise verhindern eine Vollständigkeitsmeldung.
+- Manuellen Befehl `source-weeks-check` für ausdrücklich ausgewählte Wochen ergänzt. Beim ersten ungeklärten Ergebnis stoppt die Prüfung.
+- README, Roadmap, Quellenanalyse und Bedienungsanleitung aktualisiert.
+
+**Prüfung:** 146 lokale Tests erfolgreich. Live-Stichprobe mit acht HTTP-Anfragen: 26 angebotene Wochen, KW 44/2026 strukturell passend, KW 53/2026 wegen Ferienhinweisen prüfpflichtig; 24 fehlende Wochen korrekt gemeldet. Keine Quelladressen oder Rohseiten gespeichert. `git diff --check` ohne Fehler. Vollständiger Semesterimport, Wochenend-/Sonderterminerfassung und Deployment im Zielcontainer bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.8 mit Wochennavigation und strenger Abdeckungsprüfung ergänzen
+
 ## V0.0.7 – Live-geprüfte Studiengangsnavigation
 
 **Datum:** 2026-10-20

@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.7`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.8`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -99,3 +99,9 @@ Eine generische [Formularnavigation](form-navigation.md) liest beobachtete Formu
 Die neue Implementierung hat am 2026-10-20 den vollständigen Navigationsweg vom Einstieg über die Studiengangssuche und den eindeutigen Treffer bis zur Planantwort live durchlaufen. Geprüft wurde die bereits dokumentierte Auswahl mit Prüfungsordnung 2024. Sichtbare Beschriftungen und label/for-Zuordnungen liefern die Formulardaten zur Laufzeit; keine echten Feldnamen oder Navigationsparameter sind im Repository gespeichert.
 
 Normale Fieldsets, gleichwertige doppelte Suchschaltflächen und die schreibgeschützte Studiengangsanzeige ohne Feldnamen wurden berücksichtigt. Der erfolgreiche Ablauf benötigte sechs Anfragen einschließlich Weiterleitungen. 53 Blöcke des bekannten Veranstaltungsmusters wurden erkannt; daraus folgt keine Zahl eindeutiger Veranstaltungen oder vollständige Semesterabdeckung. 122 lokale Tests bestehen. Der neue Befehl [source-plan-check](source-check.md) erlaubt den manuellen Test im LXC; dieser Zielcontainer-Test und die automatisierte Wochennavigation bleiben offen.
+
+## Ergänzung V0.0.8
+
+Die [Wochennavigation](week-navigation.md) liest datierte Auswahloptionen und verwendet die beobachtete Schaltfläche zum Anzeigen. Wochennummer, ISO-Jahr, Datumsbereich, ausgewählte Woche und die fünf sichtbaren Tagesüberschriften werden geprüft. Ein unabhängiger Prüfzeitraum bestimmt die erwartete Wochenabdeckung.
+
+Live am 2026-10-20: 26 angebotene Wochen; KW 44/2026 strukturell passend, KW 53/2026 mit prüfpflichtigen Ferienhinweisen. Acht HTTP-Anfragen einschließlich Studiengangsnavigation. 24 Wochen bleiben fehlend. 146 lokale Tests bestehen. Keine Rohseiten gespeichert; vollständige Erfassung, Wochenenden, Sonderansichten und Veranstaltungsdetails bleiben offen.

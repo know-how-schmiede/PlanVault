@@ -67,7 +67,7 @@ gehalten und beim Schließen gelöscht. Der Aufrufer muss verifizierte
 Studiengangs-, Prüfungsordnungs- und Quellkennungen bereitstellen.
 
 Die Studiengangsnavigation ist ab V0.0.7 implementiert und für einen Studiengang
-live geprüft. Wochenabrufe und der Abgleich eines gesamten Semesters fehlen. Die Website
+live geprüft. Ab V0.0.8 können ausdrücklich ausgewählte Wochen gegen einen unabhängigen Zeitraum geprüft werden; siehe [Wochennavigation](week-navigation.md). Ein vollständiger Semesterimport fehlt weiterhin. Die Website
 zeigt weiterhin die Startseite; ein normaler Seitenaufruf startet keinen Abruf.
 Der Client ist mit simulierten Antworten und dem Studiengangsablauf live getestet. Ein Live-Test der neuen
 Implementierung im Zielcontainer steht aus.
