@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 import re
+from collections.abc import Callable
 
 from backend.importer.coverage import Coverage, WeekResult, check_week_coverage
 from backend.importer.forms import FormNavigationError, SearchForm, read_search_form
@@ -117,7 +118,8 @@ def inspect_week(document: SourceDocument, expected: WeekChoice) -> WeekResult:
 
 
 def audit_weeks(client: SourceClient, document: SourceDocument, *, start: date, end: date,
-                requested: tuple[tuple[int, int], ...]) -> WeekAudit:
+                requested: tuple[tuple[int, int], ...],
+                on_week: Callable[[SourceDocument], None] | None = None) -> WeekAudit:
     """Explizit ausgewählte Wochen sequenziell prüfen; beim ersten Fehler abbrechen.
 
     Der Zeitraum ist eine unabhängige Erwartung des Aufrufers. Nicht abgerufene
@@ -146,6 +148,8 @@ def audit_weeks(client: SourceClient, document: SourceDocument, *, start: date, 
             # Auch in der letzten Antwort muss das Wochenangebot unverändert sein.
             if tuple(c.key for c in read_week_menu(document).choices) != tuple(c.key for c in initial.choices):
                 raise FormNavigationError("Wochenangebot hat sich während der Prüfung geändert.")
+            if result.status == "ok" and on_week is not None:
+                on_week(document)
             results.append(result)
             if result.status != "ok":
                 break

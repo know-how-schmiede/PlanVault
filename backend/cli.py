@@ -14,6 +14,7 @@ from backend.importer.navigation import search_study, follow_named_result, submi
 from backend.importer.weeks import audit_weeks
 from backend.importer.weeks import read_week_menu, inspect_week
 from backend.importer.details import collect_course_references, fetch_detail_sample, DetailImportError
+from backend.importer.run import ImportCheckInputError, run_import_check
 
 
 @click.command("source-check")
@@ -149,8 +150,52 @@ def source_details_check(query, title, semester, study_key, regulations_key, wee
         raise click.ClickException("Detailnormalisierung benötigt Prüfung.")
 
 
+@click.command("source-import-check")
+@click.option("--query", required=True)
+@click.option("--title", required=True)
+@click.option("--semester", required=True)
+@click.option("--study-key", required=True)
+@click.option("--regulations-key", required=True)
+@click.option("--start", required=True, type=click.DateTime(formats=["%Y-%m-%d"]))
+@click.option("--end", required=True, type=click.DateTime(formats=["%Y-%m-%d"]))
+@click.option("--week", "weeks", multiple=True, required=True)
+@click.option("--limit", default=2, show_default=True, type=click.IntRange(1, 10))
+@click.option("--json", "json_output", is_flag=True, help="Bereinigten strukturierten Bericht ausgeben.")
+@with_appcontext
+def source_import_check(query, title, semester, study_key, regulations_key, start, end, weeks, limit, json_output):
+    """Wochen- und Detailprüfung zu einem unveröffentlichten Prüflauf verbinden."""
+    requested = []
+    for value in weeks:
+        match = re.fullmatch(r"(\d{4})-W(\d{2})", value)
+        if not match:
+            raise click.ClickException("ISO-Woche muss das Format JJJJ-WNN haben.")
+        requested.append((int(match[1]), int(match[2])))
+    try:
+        with SourceClient(current_app.config.get("LSF_BASE_URL", ""),
+                          max_requests=min(100, 12 + 2 * len(requested) + limit), retries=0) as client:
+            report = run_import_check(
+                client, query=query, title=title, semester=semester,
+                study_key=study_key, regulations_key=regulations_key,
+                start=start.date(), end=end.date(), requested=tuple(requested), detail_limit=limit,
+            )
+    except (ImportCheckInputError, SourceFetchError, DetailImportError) as error:
+        raise click.ClickException(str(error)) from None
+    if json_output:
+        click.echo(report.to_json())
+    else:
+        click.echo(f"Prüflauf {report.run_id}: {report.status}")
+        click.echo(f"Wochen geprüft: {len(report.checked_weeks)}; fehlend: {len(report.missing_weeks)}.")
+        click.echo(f"Details geprüft: {report.checked_details}; ungeprüfte Ziele: {report.unchecked_details}.")
+        click.echo("Offene Punkte: " + ", ".join(report.blockers))
+        click.echo("Keine Archivveröffentlichung; vollständiger Semesterimport nicht bestätigt.")
+    # Ein technisch durchgelaufener Test ist keine Freigabe für einen Archivstand.
+    if not report.complete:
+        raise click.exceptions.Exit(1)
+
+
 def register_cli(app):
     app.cli.add_command(source_check)
     app.cli.add_command(source_plan_check)
     app.cli.add_command(source_weeks_check)
     app.cli.add_command(source_details_check)
+    app.cli.add_command(source_import_check)

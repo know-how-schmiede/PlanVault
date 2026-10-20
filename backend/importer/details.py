@@ -46,6 +46,32 @@ class DetailSample:
         return self.reference_count - len(self.details)
 
 
+def merge_course_references(groups: tuple[tuple[CourseReference, ...], ...]) -> tuple[CourseReference, ...]:
+    """Bereits geprüfte Verweise ohne erneute Abrufe wochenübergreifend vereinen."""
+    merged = {}
+    for group in groups:
+        for reference in group:
+            previous = merged.get(reference.location)
+            if previous and (previous.caption != reference.caption or previous.key != reference.key):
+                raise DetailImportError("Widersprüchliche Detailzuordnung zwischen Wochen.")
+            merged[reference.location] = CourseReference(
+                reference.key, reference.location, reference.caption,
+                reference.block_count + (previous.block_count if previous else 0),
+            )
+    if sum(reference.block_count for reference in merged.values()) > 5000:
+        raise DetailImportError("Zu viele Veranstaltungsblöcke.")
+    return tuple(merged.values())
+
+
+def validate_detail_context(semester: str, study_key: str, regulations_key: str, limit: int):
+    if not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 10:
+        raise DetailImportError("Detailgrenze muss zwischen eins und zehn liegen.")
+    if (not isinstance(semester, str) or not semester.strip() or
+            any(not isinstance(key, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", key)
+                for key in (study_key, regulations_key))):
+        raise DetailImportError("Semester und opake Studiengangs-/Prüfungsordnungskennungen erforderlich.")
+
+
 def collect_course_references(client: SourceClient, documents: tuple[SourceDocument, ...]) -> tuple[CourseReference, ...]:
     """Gleiche absolute Linkziele über alle übergebenen Pläne einmal aufnehmen.
 
@@ -92,14 +118,9 @@ def fetch_detail_sample(client: SourceClient, references: tuple[CourseReference,
                         semester: str, study_key: str, regulations_key: str,
                         limit: int = 2) -> DetailSample:
     """Maximal zehn eindeutige Detailziele; bei Abruf-/Parserfehlern kein Teilergebnis."""
-    if (not isinstance(limit, int) or isinstance(limit, bool) or not 1 <= limit <= 10 or
-            not references or len({ref.location for ref in references}) != len(references)):
+    validate_detail_context(semester, study_key, regulations_key, limit)
+    if not references or len({ref.location for ref in references}) != len(references):
         raise DetailImportError("Ungültige oder doppelte Detailauswahl.")
-    # Identitätskontext vor Netzwerkzugriff prüfen, nicht erst nach dem Abruf.
-    if (not isinstance(semester, str) or not semester.strip() or
-            any(not isinstance(key, str) or not re.fullmatch(r"[A-Za-z0-9_-]{1,128}", key)
-                for key in (study_key, regulations_key))):
-        raise DetailImportError("Semester und opake Studiengangs-/Prüfungsordnungskennungen erforderlich.")
     details = []
     for reference in references[:limit]:
         try:

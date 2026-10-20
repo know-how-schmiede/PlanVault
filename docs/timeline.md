@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.10 – Gemeinsamer Import-Prüflauf und JSON-Bericht
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.10` gesetzt.
+- Navigation, Wochenabgleich und Detailstichprobe zu einem gemeinsamen Prüflauf verbunden.
+- Gleiche Detailziele aus mehreren geprüften Wochen zusammengeführt; keine Detailabrufe nach ungeklärten Wochenantworten.
+- Bereinigten Bericht mit Lauf-ID, UTC-Zeitstempeln, Versionsangabe, Phasen, Anzahlen und offenen Punkten ergänzt. Keine Quelladressen oder Veranstaltungsdaten im Bericht.
+- Befehl `source-import-check` mit optionaler JSON-Ausgabe ergänzt. Vollständigkeit und Veröffentlichung bleiben ausdrücklich unbestätigt.
+- README, Roadmap, Quellenanalyse und Anleitung aktualisiert.
+
+**Prüfung:** 178 lokale Tests erfolgreich. Gemeinsamer Live-Prüflauf mit zehn HTTP-Anfragen: KW 43/2026 und KW 44/2026 passend, 51 unterschiedliche Detailziele, zwei Details geprüft; 24 fehlende Wochen und 49 ungeprüfte Ziele korrekt ausgewiesen. Keine Rohseiten oder Quelladressen gespeichert. `git diff --check` ohne Fehler. Kein vollständiger Semesterimport, keine Archivveröffentlichung und kein Deployment im LXC.
+
+**Commit-Kurzbeschreibung:** Version 0.0.10 mit gemeinsamem Import-Prüflauf und bereinigtem JSON-Bericht ergänzen
+
 ## V0.0.9 – Detailzuordnung und begrenzte Importstichprobe
 
 **Datum:** 2026-10-20
