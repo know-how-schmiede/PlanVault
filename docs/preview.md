@@ -9,7 +9,7 @@ werden nicht in die Vorschau übernommen. Die Quelle bleibt für die Prüfung ma
 
 ## 1. Aktualisieren und Anzeige vorbereiten
 
-Zuerst V0.0.21 auf GitHub veröffentlichen und das [Update](install.md#vorhandene-installation-aktualisieren)
+Zuerst V0.0.22 auf GitHub veröffentlichen und das [Update](install.md#vorhandene-installation-aktualisieren)
 ausführen. Danach ist der Vorschau-Link sichtbar, zunächst ohne Termine.
 Ein Update allein lädt keine Hochschuldaten. Es werden auch keine Demo-Termine eingespielt.
 
@@ -103,3 +103,24 @@ Datei bleibt dabei erhalten. Löschen und Aufbewahrung sind lokal zu verwalten.
 Nächste Schritte: vollständigen Import absichern, geschützte Archivspeicherung
 implementieren und daraus eine Wochenansicht entwickeln. Die lokale Funktion ist
 mit fiktiven Daten getestet; ein echter Vorschauimport im Ziel-LXC steht noch aus.
+
+## Wochenansicht ab V0.0.22
+
+Nach dem Update öffnet der Vorschau-Link standardmäßig die Wochenansicht. Vorhandene
+Vorschau-Dateien aus V0.0.21 bleiben lesbar: Für die neue Darstellung sind weder
+Datenmigration noch erneuter Import nötig. Ohne Vorschau-Datei weiterhin zuerst
+die Einrichtung oben durchführen.
+
+- Montag bis Sonntag erscheinen mit Datum und zeitlich sortierten Terminen.
+- Am Desktop stehen die Tage nebeneinander; auf kleineren Bildschirmen werden sie
+  in zwei Spalten oder untereinander angezeigt. Zeitgleiche Termine bleiben erhalten.
+- Standardauswahl ist die aktuelle Woche in Europe/Berlin, sofern sie Termine enthält.
+  Sonst erscheint die nächste erfasste Woche, nach Semesterende die letzte vorhandene.
+- „Vorherige/Nächste erfasste Woche“ navigiert zwischen Wochen mit Vorschauterminen.
+  Lücken werden ausdrücklich nicht als freie Wochen interpretiert.
+- „Listenansicht“ behält die gewählte Woche bei. Dort kann zusätzlich „Alle erfassten
+  Wochen“ ausgewählt werden. Der Wechsel zurück wählt wieder eine einzelne Woche.
+- Tage ohne Einträge zeigen „Keine erfassten Termine. Abdeckung ungeprüft.“
+
+Die Ansicht ist weiterhin unvollständig; sie bestätigt weder Semesterabdeckung noch
+Archivfreigabe. Alle Termine und Warnhinweise stammen aus derselben lokalen Vorschau.

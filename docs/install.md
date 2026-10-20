@@ -153,7 +153,7 @@ bash /root/update-wi-planarchiv.sh
 
 **4. Auf Abschluss warten:** Tests und Sicherung müssen erfolgreich sein. Während der abschließenden Umschaltung ist die Webseite kurz nicht erreichbar. Die Erfolgsmeldung nennt unter anderem den neuen Git-Stand und die Sicherung.
 
-**5. Ergebnis prüfen:** Die bisherige Webadresse erneut öffnen und die Seite neu laden. Nach Veröffentlichung und Update dieser Version soll im Footer **V0.0.21** stehen. Bei Fehlern zuerst die unten beschriebenen Statusbefehle verwenden; nicht mit dem Erstinstaller darüberinstallieren.
+**5. Ergebnis prüfen:** Die bisherige Webadresse erneut öffnen und die Seite neu laden. Nach Veröffentlichung und Update dieser Version soll im Footer **V0.0.22** stehen. Bei Fehlern zuerst die unten beschriebenen Statusbefehle verwenden; nicht mit dem Erstinstaller darüberinstallieren.
 
 Nur nach erfolgreichem Download ausführen. Das Skript erkennt Dienstnutzer und Installationspfad aus dem bestehenden systemd-Dienst. Es fragt Branch oder Tag (Standard `main`) und den aktuellen HTTP-Port (Standard `8000`) ab. Der Dienst muss laufen und über diesen Port lokal erreichbar sein. Der Code muss root gehören; lokale Git-Änderungen sowie `.env` oder `instance/` im Anwendungspfad führen zum Abbruch. Laufzeitdaten gehören nach `/var/lib/wi-planarchiv`, Konfiguration nach `/etc/wi-planarchiv`.
 

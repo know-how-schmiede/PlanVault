@@ -2,6 +2,22 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.22 – Wochenansicht für die Import-Vorschau
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.22` gesetzt.
+- Vorschau standardmäßig als responsive Wochenansicht von Montag bis Sonntag dargestellt; Datum, Uhrzeit, Raum, Lehrperson und Prüfhinweise bleiben sichtbar.
+- Navigation zwischen erfassten Wochen und Wechsel zur Listenansicht ergänzt. Auswahl aktueller, nächster oder letzter erfasster Woche anhand der lokalen ISO-Kalenderwoche.
+- Tage und Wochen ohne erfasste Termine werden nicht als bestätigte Freizeiten dargestellt. Zeitgleiche Termine bleiben erhalten; keine Archivfreigabe.
+- Vorschau-Dateiformat unverändert, kein erneuter Import für die Darstellung nötig. Anleitung, Startseite, README und Roadmap aktualisiert.
+
+**Prüfung:** 298 lokale Tests erfolgreich, einschließlich Jahreswechsel, lokaler Tageszuordnung, Zeitumstellung, überlappender Termine, Navigation, Ansichtswechsel und weiterhin sicherer HTML-Ausgabe. HTML/CSS geprüft; keine Browser-Sichtprüfung. Kein Deployment oder neuer Live-Import. `git diff --check` ohne Fehler.
+
+**Commit-Kurzbeschreibung:** Version 0.0.22 mit Wochenansicht und Navigation für die Import-Vorschau ergänzen
+
 ## V0.0.21 – Unvollständige Import-Vorschau auf der Webseite
 
 **Datum:** 2026-10-20

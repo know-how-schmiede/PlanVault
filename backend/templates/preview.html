@@ -14,16 +14,47 @@
 <section aria-labelledby="preview-heading">
   <h2 id="preview-heading">{{ preview.semester }}</h2>
   <p>Vorschau erstellt: {{ preview.created_label }} (Europe/Berlin). Kein automatischer Live-Abgleich.</p>
-  <p>{{ preview.checked_details }} Veranstaltungsdetails geprüft; {{ preview.blocked_details }} blockiert und nicht in dieser Liste enthalten.</p>
+  <p>{{ preview.checked_details }} Veranstaltungsdetails geprüft; {{ preview.blocked_details }} blockiert und nicht in dieser Vorschau enthalten.</p>
+  <nav class="preview-navigation" aria-label="Vorschauansicht">
+    <a href="{{ url_for('web.preview', view='week', week=selected) }}" {% if mode == 'week' %}aria-current="page"{% endif %}>Wochenansicht</a>
+    <a href="{{ url_for('web.preview', view='list', week=selected) }}" {% if mode == 'list' %}aria-current="page"{% endif %}>Listenansicht</a>
+  </nav>
   <form method="get" class="preview-filter">
+    <input type="hidden" name="view" value="{{ mode }}">
     <label for="week">Kalenderwoche</label>
     <select name="week" id="week">
-      <option value="">Alle erfassten Wochen</option>
+      {% if mode == 'list' %}<option value="">Alle erfassten Wochen</option>{% endif %}
       {% for week in weeks %}<option value="{{ week }}" {% if week == selected %}selected{% endif %}>{{ week }}</option>{% endfor %}
     </select>
     <button type="submit">Anzeigen</button>
   </form>
+  {% if selected %}
+  <nav class="preview-navigation" aria-label="Erfasste Kalenderwochen">
+    {% if previous %}<a rel="prev" href="{{ url_for('web.preview', view=mode, week=previous) }}">Vorherige erfasste Woche ({{ previous }})</a>{% endif %}
+    {% if following %}<a rel="next" href="{{ url_for('web.preview', view=mode, week=following) }}">Nächste erfasste Woche ({{ following }})</a>{% endif %}
+  </nav>
+  {% endif %}
   <p>{{ events|length }} Termine angezeigt. Fehlende Termine sind kein Nachweis für freie Zeiten.</p>
+  {% if mode == 'week' %}
+  <h3>{{ selected }} · {{ days[0].date }} bis {{ days[-1].date }}</h3>
+  <p>Alle Zeiten in Europe/Berlin. Die Navigation überspringt Wochen ohne erfasste Termine; deren Vollständigkeit ist nicht bestätigt.</p>
+  <div class="preview-week">
+    {% for day in days %}
+    <section class="preview-day" aria-labelledby="day-{{ loop.index }}">
+      <h4 id="day-{{ loop.index }}">{{ day.name }}<span>{{ day.date }}</span></h4>
+      {% for event in day.events %}
+      <article class="week-event">
+        <p class="event-time">{{ event.time }}</p>
+        <h5>{{ event.title }}</h5>
+        <p>Raum: {{ event.room or 'nicht angegeben' }}</p>
+        <p>Lehrperson: {{ event.instructor or 'nicht angegeben' }}</p>
+        {% if event.review %}<p class="review-label">Fachliche Prüfung offen</p>{% endif %}
+      </article>
+      {% else %}<p class="day-empty">Keine erfassten Termine. Abdeckung ungeprüft.</p>{% endfor %}
+    </section>
+    {% endfor %}
+  </div>
+  {% else %}
   <ul class="preview-events">
     {% for event in events %}
     <li>
@@ -34,6 +65,7 @@
     </li>
     {% endfor %}
   </ul>
+  {% endif %}
 </section>
 {% else %}
 <section aria-labelledby="empty-heading">

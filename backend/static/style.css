@@ -30,3 +30,16 @@ a:focus-visible { outline: 3px solid #1553a0; outline-offset: 4px; }
 .event-time { font-weight: 700; }
 .review-label { color: #704700; }
 select:focus-visible, button:focus-visible { outline: 3px solid #1553a0; outline-offset: 3px; }
+
+.preview-navigation { display: flex; flex-wrap: wrap; gap: .8rem; margin-block: 1rem; }
+.preview-navigation a { padding: .5rem .7rem; border: 1px solid #cfdaea; border-radius: .4rem; color: #1553a0; }
+.preview-navigation a[aria-current] { background: #e9f1fc; font-weight: 700; }
+.preview-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .5rem; }
+.preview-day { min-width: 0; margin: 0; padding: .6rem; border-radius: .5rem; overflow-wrap: anywhere; background: #f4f7fb; }
+.preview-day h4 { margin: 0 0 .8rem; font-size: .95rem; }
+.preview-day h4 span { display: block; margin-top: .3rem; font-size: .8rem; font-weight: 400; }
+.week-event { padding-block: .7rem; border-top: 2px solid #1553a0; }
+.week-event h5 { font-size: .95rem; margin: .4rem 0; }
+.week-event p, .day-empty { font-size: .85rem; margin: .4rem 0; line-height: 1.5; }
+@media (max-width: 60rem) { .preview-week { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 36rem) { .preview-week { grid-template-columns: minmax(0, 1fr); } }

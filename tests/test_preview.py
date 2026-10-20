@@ -113,3 +113,63 @@ def test_cli_saves_only_after_successful_detail_fetch(tmp_path, sample, monkeypa
     assert path.exists() is not fail
     assert not report['published'] and not report['complete']
     assert 'PRIVATE' not in result.output and 'Fiktiver' not in result.output
+
+
+def test_week_view_has_seven_days_and_list_remains_available(tmp_path, sample):
+    from bs4 import BeautifulSoup
+    path = tmp_path / 'test.preview.json'
+    save_preview_file(path, sample, 'DEMO-Semester')
+    client = create_app({'TESTING': True, 'PREVIEW_FILE': str(path)}).test_client()
+    soup = BeautifulSoup(client.get('/vorschau').data, 'html.parser')
+    days = soup.select('.preview-day')
+    assert len(days) == 7
+    assert 'Montag' in days[0].get_text() and 'Sonntag' in days[-1].get_text()
+    assert len(days[-1].select('.week-event')) == 1
+    assert '00:15' in days[-1].get_text()
+    assert len(soup.select('.day-empty')) == 6
+    assert 'Abdeckung ungeprüft' in days[0].get_text()
+    assert not soup.select('a[rel="prev"], a[rel="next"]')
+    listing = BeautifulSoup(client.get('/vorschau?view=list').data, 'html.parser')
+    assert len(listing.select('.preview-events li')) == 1
+    assert not listing.select('.preview-week')
+    assert client.get('/vorschau?view=invalid').status_code == 400
+
+
+def test_week_navigation_preserves_mode_and_handles_year_boundary(tmp_path, sample):
+    from bs4 import BeautifulSoup
+    path = tmp_path / 'test.preview.json'
+    save_preview_file(path, sample, 'DEMO-Semester')
+    data = json.loads(path.read_text(encoding='utf-8'))
+    template = data['events'][0]
+    data['events'] = [dict(template, start=day + 'T10:00:00+00:00', end=day + 'T11:00:00+00:00')
+                      for day in ('2025-12-22', '2025-12-29', '2026-01-12')]
+    path.write_text(json.dumps(data), encoding='utf-8')
+    client = create_app({'TESTING': True, 'PREVIEW_FILE': str(path)}).test_client()
+    soup = BeautifulSoup(client.get('/vorschau?view=week&week=2026-W01').data, 'html.parser')
+    assert '29.12.2025 bis 04.01.2026' in soup.get_text()
+    assert 'week=2025-W52' in soup.select_one('a[rel="prev"]')['href']
+    assert 'week=2026-W03' in soup.select_one('a[rel="next"]')['href']
+    assert 'view=week' in soup.select_one('a[rel="next"]')['href']
+    assert 'Wochen ohne erfasste Termine' in soup.get_text()
+    listing = BeautifulSoup(client.get('/vorschau?view=list').data, 'html.parser')
+    assert len(listing.select('.preview-events li')) == 3
+
+
+@pytest.mark.parametrize('today,expected', [(date(2025, 12, 29), '2026-W01'),
+                                          (date(2025, 12, 1), '2025-W52'),
+                                          (date(2026, 1, 5), '2026-W03'),
+                                          (date(2026, 2, 1), '2026-W03')])
+def test_default_week_uses_current_next_or_last_recorded_week(today, expected):
+    from backend.preview_calendar import default_week
+    assert default_week(['2025-W52', '2026-W01', '2026-W03'], today) == expected
+    assert default_week([], today) == ''
+
+
+def test_calendar_keeps_overlapping_events_and_sorts_by_absolute_time():
+    from backend.preview_calendar import week_days
+    events = [dict(title='Demo B', start='2026-10-25T01:15:00+00:00'),
+              dict(title='Demo A', start='2026-10-25T00:30:00+00:00'),
+              dict(title='Demo C', start='2026-10-25T00:30:00+00:00')]
+    days = week_days('2026-W43', events)
+    assert [event['title'] for event in days[6]['events']] == ['Demo A', 'Demo C', 'Demo B']
+    assert all(not day['events'] for day in days[:6])
