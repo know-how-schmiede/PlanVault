@@ -212,14 +212,17 @@ def source_import_check(query, title, semester, study_key, regulations_key, star
 @click.option("--title", required=True)
 @click.option("--json", "json_output", is_flag=True)
 @click.option("--details", is_flag=True, help="Alle bekannten Detailziele innerhalb des Budgets prüfen.")
+@click.option("--save-preview", is_flag=True, help="Unvollständige Web-Vorschau lokal speichern; benötigt --details und PREVIEW_FILE.")
 @click.option("--semester", default=None)
 @click.option("--study-key", default=None)
 @click.option("--regulations-key", default=None)
 @click.option("--detail-budget", default=60, show_default=True, type=click.IntRange(1, 100))
 @with_appcontext
-def source_semester_check(query, title, json_output, details, semester, study_key, regulations_key, detail_budget):
+def source_semester_check(query, title, json_output, details, semester, study_key, regulations_key, detail_budget, save_preview=False):
     """Zwei zusätzliche Semesteransichten prüfen, ohne Details zu importieren."""
     try:
+        if save_preview and (not details or not current_app.config.get("PREVIEW_FILE")):
+            raise FormNavigationError("Vorschau benötigt --details und PREVIEW_FILE.")
         policy = _identity_policy()
         if policy is None:
             raise FormNavigationError("Semesterprüfung benötigt eine konfigurierte Quellkennung.")
@@ -261,6 +264,9 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
                 report["normalization_summary"] = sample.normalization_summary()
                 report["known_details_checked"] = True
                 report["weekday_coverage"] = weekday_coverage(views, sample)
+                if save_preview:
+                    from backend.preview import save_preview_file
+                    save_preview_file(current_app.config["PREVIEW_FILE"], sample, semester)
     except (SourceFetchError, FormNavigationError, DetailImportError):
         report["status"] = "failed"
     if json_output:

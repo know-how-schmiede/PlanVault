@@ -19,3 +19,14 @@ a:focus-visible { outline: 3px solid #1553a0; outline-offset: 4px; }
 .hero-copy p { margin-bottom: 0; }
 .next-steps { padding-left: 1.5rem; line-height: 1.7; }
 .next-steps li + li { margin-top: .75rem; }
+
+.preview-warning { border-left: .4rem solid #a56800; background: #fff8e7; }
+.preview-filter { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+.preview-filter select, .preview-filter button { font: inherit; padding: .65rem; max-width: 100%; }
+.preview-filter button { background: #1553a0; color: white; border: 0; border-radius: .4rem; cursor: pointer; }
+.preview-events { list-style: none; padding: 0; }
+.preview-events li { border-top: 1px solid #cfdaea; padding-block: 1rem; overflow-wrap: anywhere; }
+.preview-events h3, .preview-events p { margin: .35rem 0; }
+.event-time { font-weight: 700; }
+.review-label { color: #704700; }
+select:focus-visible, button:focus-visible { outline: 3px solid #1553a0; outline-offset: 3px; }

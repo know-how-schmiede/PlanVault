@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.21 – Unvollständige Import-Vorschau auf der Webseite
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.21` gesetzt.
+- Startseitenlink und responsive Terminliste mit Kalenderwochenfilter, Raum, Lehrperson und lokalem Erstellungszeitpunkt ergänzt.
+- Dauerhafte Kennzeichnung als unvollständige Vorschau ohne Archivfreigabe; blockierte Details werden gezählt, fachlich prüfpflichtige Termine markiert.
+- Manueller Semesterprüflauf kann mit `--save-preview` und lokal konfiguriertem `PREVIEW_FILE` eine separate Vorschau schreiben. Kein Quellabruf durch Webseitenbesuche.
+- Atomarer Dateiaustausch, Größen- und Inhaltsprüfung sowie Schutz der bisherigen Vorschau bei Fehlern oder leeren Ergebnissen. Keine Quelladressen, Cookies oder Freitextbemerkungen gespeichert; HTML wird bei Anzeige escaped.
+- Einrichtung und Import für den bestehenden Debian-LXC dokumentiert, README und Roadmap aktualisiert.
+
+**Prüfung:** 291 lokale Tests erfolgreich, einschließlich Speichern/Lesen, CLI-Anbindung, Fehlererhalt, ungültigen Dateien, Kalenderwochenfilter, lokaler Zeit und HTML-Escaping. Kein echter Vorschauimport und kein Deployment im Ziel-LXC. Keine Browser-Sichtprüfung; HTML und CSS lokal geprüft. Keine Archivveröffentlichung.
+
+**Commit-Kurzbeschreibung:** Version 0.0.21 mit gekennzeichneter Import-Vorschau und Kalenderwochenfilter ergänzen
+
 ## V0.0.20 – Anfängeranleitung und Wochentagsabgleich
 
 **Datum:** 2026-10-20

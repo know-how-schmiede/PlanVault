@@ -153,7 +153,7 @@ bash /root/update-wi-planarchiv.sh
 
 **4. Auf Abschluss warten:** Tests und Sicherung müssen erfolgreich sein. Während der abschließenden Umschaltung ist die Webseite kurz nicht erreichbar. Die Erfolgsmeldung nennt unter anderem den neuen Git-Stand und die Sicherung.
 
-**5. Ergebnis prüfen:** Die bisherige Webadresse erneut öffnen und die Seite neu laden. Nach Veröffentlichung und Update dieser Version soll im Footer **V0.0.20** stehen. Bei Fehlern zuerst die unten beschriebenen Statusbefehle verwenden; nicht mit dem Erstinstaller darüberinstallieren.
+**5. Ergebnis prüfen:** Die bisherige Webadresse erneut öffnen und die Seite neu laden. Nach Veröffentlichung und Update dieser Version soll im Footer **V0.0.21** stehen. Bei Fehlern zuerst die unten beschriebenen Statusbefehle verwenden; nicht mit dem Erstinstaller darüberinstallieren.
 
 Nur nach erfolgreichem Download ausführen. Das Skript erkennt Dienstnutzer und Installationspfad aus dem bestehenden systemd-Dienst. Es fragt Branch oder Tag (Standard `main`) und den aktuellen HTTP-Port (Standard `8000`) ab. Der Dienst muss laufen und über diesen Port lokal erreichbar sein. Der Code muss root gehören; lokale Git-Änderungen sowie `.env` oder `instance/` im Anwendungspfad führen zum Abbruch. Laufzeitdaten gehören nach `/var/lib/wi-planarchiv`, Konfiguration nach `/etc/wi-planarchiv`.
 
@@ -188,3 +188,6 @@ Ab V0.0.18 benötigen Installations- und Update-Skript kein `curl`. Der Schnells
 | Dienst startet nicht | `systemctl status wi-planarchiv --no-pager` zeigt den Zustand; `journalctl -u wi-planarchiv -n 50 --no-pager` zeigt die letzten Meldungen. Vertrauliche Angaben vor Weitergabe entfernen. |
 
 Der User bestätigt den funktionierenden Stand nach V0.0.19. V0.0.20 ist erst nach Veröffentlichung und Ausführung des Updates auf dem Server verfügbar.
+## Import-Vorschau aktivieren
+
+Ab V0.0.21 führt ein Link auf der Startseite zur unvollständigen Terminliste. Damit echte Termine erscheinen, die [Vorschau-Anleitung](preview.md) zur Konfiguration und zum manuellen Import befolgen. Das Update allein importiert keine Daten.

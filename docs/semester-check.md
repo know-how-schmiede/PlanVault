@@ -150,3 +150,7 @@ Auch `complete` und `published` bleiben false. Der nächste notwendige Nachweis
 ist weiterhin eine belastbare Erfassung aller Semestertage sowie die Klärung
 der offenen Bemerkungen. Der neue Abgleich ist mit fiktiven Daten getestet;
 ein vollständiger Live-Semesterlauf wurde für V0.0.20 nicht wiederholt.
+
+## Optionale Web-Vorschau ab V0.0.21
+
+Nur mit --details, --save-preview und konfiguriertem PREVIEW_FILE schreibt der Prüflauf normalisierbare Termine separat als unvollständige Web-Vorschau. Ohne diese Option bleibt der Aufruf unverändert ohne Dateischreibzugriff. Einrichtung, Zugriff und Exitcode erläutert die [Vorschau-Anleitung](preview.md). Keine Archivfreigabe.

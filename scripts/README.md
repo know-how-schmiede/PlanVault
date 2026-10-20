@@ -44,7 +44,7 @@ cat /root/update-wi-planarchiv.sh && \
 bash /root/update-wi-planarchiv.sh
 ```
 
-Bei Branch/Tag Enter für `main` drücken. Bei Port Enter für den bisherigen Standard `8000` drücken, andernfalls den tatsächlich verwendeten Port angeben. Auf die Erfolgsmeldung warten, dann die bisherige Webseite neu laden und die Version im Footer prüfen (für diesen veröffentlichten Stand: V0.0.20). Das Update-Skript erkennt Benutzer und Pfad aus dem Dienst, testet den neuen Stand vor der Umschaltung und sichert die alte Installation. Konfiguration einschließlich Bind-Adresse bleibt erhalten. Bei Fehlern während Neustart oder HTTP-Prüfung wird zum alten Anwendungsstand zurückgekehrt. Sicherungen und Releases werden aufbewahrt. Details und Grenzen stehen in der [Installationsanleitung](../docs/install.md).
+Bei Branch/Tag Enter für `main` drücken. Bei Port Enter für den bisherigen Standard `8000` drücken, andernfalls den tatsächlich verwendeten Port angeben. Auf die Erfolgsmeldung warten, dann die bisherige Webseite neu laden und die Version im Footer prüfen (für diesen veröffentlichten Stand: V0.0.21). Das Update-Skript erkennt Benutzer und Pfad aus dem Dienst, testet den neuen Stand vor der Umschaltung und sichert die alte Installation. Konfiguration einschließlich Bind-Adresse bleibt erhalten. Bei Fehlern während Neustart oder HTTP-Prüfung wird zum alten Anwendungsstand zurückgekehrt. Sicherungen und Releases werden aufbewahrt. Details und Grenzen stehen in der [Installationsanleitung](../docs/install.md).
 
 Die Eingabeprüfung der Installations- und Update-Skripte entfernt jetzt Leerzeichen am Rand und Wagenrückläufe. 14 isolierte Eingabetests bestehen; der erfolgreiche Serverbetrieb wurde inzwischen vom User bestätigt (siehe [Timeline](../docs/timeline.md)).
 
