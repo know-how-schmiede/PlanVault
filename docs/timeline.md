@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.13 – Zusätzliche Semesteransichten prüfen
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.13` gesetzt; gemeinsamer Footer übernimmt die Version.
+- Semesteransicht und Block-/Einzelterminansicht über sichtbare Auswahlbeschriftungen erschlossen.
+- `source-semester-check` mit optionalem bereinigtem JSON-Bericht ergänzt. Konfigurierte Quellkennung ist Voraussetzung; maximal zwölf HTTP-Anfragen, keine Detailabrufe.
+- Übernahme der Ansicht, unverändertes Wochenangebot, Struktur und Kennungen geprüft. Zusätzliche Detailziele der zweiten Ansicht werden gezählt.
+- Leere Ansichten bleiben ungeklärt; Fehler führen zu keiner erfolgreichen Teilbestandsaufnahme. Vollständigkeit und Veröffentlichung bleiben gesperrt.
+- Fiktive Tests, Anleitung, README, Roadmap und Quellenanalyse ergänzt.
+
+**Prüfung:** 216 lokale Tests erfolgreich. Implementierter Adapter live mit acht HTTP-Anfragen geprüft: 54 eindeutige Detailziele in der Semesteransicht, Block-/Einzelterminansicht ohne erkannte Blöcke und daher `empty_unverified`. Begrenzte Vorprüfungen dienten der Strukturanalyse. Keine Quelladressen, echten Parameter oder Rohseiten gespeichert. `git diff --check` ohne Fehler. Vollständiger Semesterimport, Speicherung und Webanzeige bleiben offen; kein Deployment im LXC.
+
+**Commit-Kurzbeschreibung:** Version 0.0.13 mit begrenzter Prüfung zusätzlicher Semesteransichten ergänzen
+
 ## V0.0.12 – Konfigurierbare Veranstaltungsidentität
 
 **Datum:** 2026-10-20

@@ -1,6 +1,7 @@
 """Manuelle Diagnose; kein Quellzugriff durch normale Webseitenaufrufe."""
 
 import re
+import json
 from datetime import date
 
 import click
@@ -16,6 +17,8 @@ from backend.importer.weeks import read_week_menu, inspect_week
 from backend.importer.details import collect_course_references, fetch_detail_sample, DetailImportError
 from backend.importer.run import ImportCheckInputError, run_import_check
 from backend.importer.identity import configured_identity, SourceIdentityError
+from backend.importer.semester import audit_semester_views
+from version import __version__
 
 
 def _identity_policy():
@@ -203,9 +206,52 @@ def source_import_check(query, title, semester, study_key, regulations_key, star
         raise click.exceptions.Exit(1)
 
 
+@click.command("source-semester-check")
+@click.option("--query", required=True)
+@click.option("--title", required=True)
+@click.option("--json", "json_output", is_flag=True)
+@with_appcontext
+def source_semester_check(query, title, json_output):
+    """Zwei zusätzliche Semesteransichten prüfen, ohne Details zu importieren."""
+    try:
+        policy = _identity_policy()
+        if policy is None:
+            raise FormNavigationError("Semesterprüfung benötigt eine konfigurierte Quellkennung.")
+        if not query.strip() or len(query) > 200 or not title.strip():
+            raise FormNavigationError("Ungültige Studiengangsauswahl.")
+    except (SourceIdentityError, FormNavigationError) as error:
+        raise click.ClickException(str(error)) from None
+    report = {"schema_version": 1, "app_version": __version__, "status": "needs_review",
+              "views": [], "complete": False, "published": False}
+    try:
+        with SourceClient(current_app.config.get("LSF_BASE_URL", ""),
+                          max_requests=12, retries=0) as client:
+            results = search_study(client, query)
+            selected = follow_named_result(client, results, title=title)
+            plan = submit_labeled_search(client, selected, field_label="Studiengang",
+                                         button_caption="Suche starten")
+            views = audit_semester_views(client, plan, identity_policy=policy)
+            report["views"] = [
+                {"view": v.view, "status": v.status, "reference_count": v.reference_count,
+                 "additional_count": v.additional_count} for v in views
+            ]
+    except (SourceFetchError, FormNavigationError, DetailImportError):
+        report["status"] = "failed"
+    if json_output:
+        click.echo(json.dumps(report, ensure_ascii=False, indent=2))
+    else:
+        click.echo(f"Semesteransichten: {report['status']}")
+        for view in report["views"]:
+            click.echo(f"{view['view']}: {view['reference_count']} Detailziele, "
+                       f"{view['additional_count']} zusätzliche Ziele; {view['status']}.")
+        click.echo("Nur Bestandsaufnahme: Semesterzuordnung, Wochenenden und vollständiger Inhalt bleiben ungeprüft.")
+    raise click.exceptions.Exit(1)
+
+
 def register_cli(app):
     app.cli.add_command(source_check)
     app.cli.add_command(source_plan_check)
     app.cli.add_command(source_weeks_check)
     app.cli.add_command(source_details_check)
     app.cli.add_command(source_import_check)
+    app.cli.add_command(source_semester_check)
