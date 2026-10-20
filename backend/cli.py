@@ -17,7 +17,7 @@ from backend.importer.weeks import read_week_menu, inspect_week
 from backend.importer.details import collect_course_references, fetch_detail_sample, DetailImportError
 from backend.importer.run import ImportCheckInputError, run_import_check
 from backend.importer.identity import configured_identity, SourceIdentityError
-from backend.importer.semester import audit_semester_views
+from backend.importer.semester import audit_semester_views, fetch_semester_details, validate_semester_details
 from version import __version__
 
 
@@ -210,8 +210,13 @@ def source_import_check(query, title, semester, study_key, regulations_key, star
 @click.option("--query", required=True)
 @click.option("--title", required=True)
 @click.option("--json", "json_output", is_flag=True)
+@click.option("--details", is_flag=True, help="Alle bekannten Detailziele innerhalb des Budgets prüfen.")
+@click.option("--semester", default=None)
+@click.option("--study-key", default=None)
+@click.option("--regulations-key", default=None)
+@click.option("--detail-budget", default=60, show_default=True, type=click.IntRange(1, 100))
 @with_appcontext
-def source_semester_check(query, title, json_output):
+def source_semester_check(query, title, json_output, details, semester, study_key, regulations_key, detail_budget):
     """Zwei zusätzliche Semesteransichten prüfen, ohne Details zu importieren."""
     try:
         policy = _identity_policy()
@@ -219,13 +224,19 @@ def source_semester_check(query, title, json_output):
             raise FormNavigationError("Semesterprüfung benötigt eine konfigurierte Quellkennung.")
         if not query.strip() or len(query) > 200 or not title.strip():
             raise FormNavigationError("Ungültige Studiengangsauswahl.")
-    except (SourceIdentityError, FormNavigationError) as error:
+        if details:
+            validate_semester_details(semester, study_key, regulations_key, detail_budget)
+        elif any(value is not None for value in (semester, study_key, regulations_key)):
+            raise FormNavigationError("Semester- und Studiengangsangaben benötigen --details.")
+    except (SourceIdentityError, FormNavigationError, DetailImportError) as error:
         raise click.ClickException(str(error)) from None
-    report = {"schema_version": 1, "app_version": __version__, "status": "needs_review",
-              "views": [], "complete": False, "published": False}
+    report = {"schema_version": 2, "app_version": __version__, "status": "needs_review",
+              "views": [], "details_requested": details, "checked_details": 0,
+              "normalization_review_count": 0, "known_details_checked": False,
+              "complete": False, "published": False}
     try:
         with SourceClient(current_app.config.get("LSF_BASE_URL", ""),
-                          max_requests=12, retries=0) as client:
+                          max_requests=min(100, 12 + (2 * detail_budget if details else 0)), retries=0) as client:
             results = search_study(client, query)
             selected = follow_named_result(client, results, title=title)
             plan = submit_labeled_search(client, selected, field_label="Studiengang",
@@ -235,6 +246,13 @@ def source_semester_check(query, title, json_output):
                 {"view": v.view, "status": v.status, "reference_count": v.reference_count,
                  "additional_count": v.additional_count} for v in views
             ]
+            if details:
+                sample = fetch_semester_details(client, views, semester=semester,
+                                               study_key=study_key, regulations_key=regulations_key,
+                                               budget=detail_budget)
+                report["checked_details"] = len(sample.details)
+                report["normalization_review_count"] = sum(d.requires_review for d in sample.details)
+                report["known_details_checked"] = True
     except (SourceFetchError, FormNavigationError, DetailImportError):
         report["status"] = "failed"
     if json_output:
@@ -244,6 +262,9 @@ def source_semester_check(query, title, json_output):
         for view in report["views"]:
             click.echo(f"{view['view']}: {view['reference_count']} Detailziele, "
                        f"{view['additional_count']} zusätzliche Ziele; {view['status']}.")
+        if details:
+            click.echo(f"Details geprüft: {report['checked_details']}; "
+                       f"prüfpflichtige Normalisierung: {report['normalization_review_count']}.")
         click.echo("Nur Bestandsaufnahme: Semesterzuordnung, Wochenenden und vollständiger Inhalt bleiben ungeprüft.")
     raise click.exceptions.Exit(1)
 

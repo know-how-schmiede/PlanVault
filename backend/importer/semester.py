@@ -2,7 +2,10 @@
 
 from dataclasses import dataclass, field
 
-from backend.importer.details import collect_course_references, CourseReference
+from backend.importer.details import (
+    collect_course_references, CourseReference, merge_course_references,
+    fetch_detail_sample, validate_detail_context, DetailImportError, DetailSample,
+)
 from backend.importer.forms import FormNavigationError
 from backend.importer.identity import SourceIdentityPolicy
 from backend.importer.navigation import _page, _caption
@@ -13,6 +16,31 @@ VIEWS = (
     ("semester", "Semesteransicht"),
     ("special_dates", "Semesterzeitansicht nur Block/Einzeltermine"),
 )
+
+
+def validate_semester_details(semester, study_key, regulations_key, budget):
+    validate_detail_context(semester, study_key, regulations_key, 1)
+    if not isinstance(budget, int) or isinstance(budget, bool) or not 1 <= budget <= 100:
+        raise DetailImportError("Detailbudget muss zwischen eins und hundert liegen.")
+
+
+def fetch_semester_details(client, views, *, semester, study_key, regulations_key, budget):
+    """Alle bekannten Ziele oder Abbruch; kein stilles Abschneiden auf das Budget."""
+    validate_semester_details(semester, study_key, regulations_key, budget)
+    if (tuple(v.view for v in views) != tuple(code for code, _ in VIEWS) or
+            any(v.status not in {"observed", "empty_unverified"} for v in views)):
+        raise DetailImportError("Unvollständige Bestandsaufnahme der Semesteransichten.")
+    references = merge_course_references(tuple(v.references for v in views))
+    if not references or len(references) > budget:
+        raise DetailImportError("Keine Detailziele oder Detailbudget überschritten.")
+    if any(r.identity_scope != "configured" for r in references):
+        raise DetailImportError("Semesterdetails benötigen konfigurierte Quellkennungen.")
+    details = []
+    for reference in references:
+        sample = fetch_detail_sample(client, (reference,), semester=semester,
+                                     study_key=study_key, regulations_key=regulations_key, limit=1)
+        details.extend(sample.details)
+    return DetailSample(len(references), sum(r.block_count for r in references), tuple(details))
 
 
 @dataclass(frozen=True)

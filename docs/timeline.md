@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.14 – Alle bekannten Semesterdetails prüfen
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version zentral auf Userwunsch auf `0.0.14` gesetzt; Footer übernimmt die Version.
+- Semesterprüfbefehl um `--details`, erwartetes Semester, lokale Studiengangs-/Prüfungsordnungskennungen und Detailbudget erweitert.
+- Alle eindeutigen Ziele beider Semesteransichten werden sequenziell geprüft. Budgetüberschreitung bricht vor dem ersten Detailabruf ab, statt still eine Stichprobe zu erzeugen.
+- Jede Detailseite muss zum erwarteten Semester passen. Abruf- oder Parserfehler liefern keine erfolgreiche Teilprüfung; ungeklärte Normalisierungen bleiben sichtbar.
+- Bereinigten Semesterbericht auf Schema 2 mit Detailzählern und `known_details_checked` erweitert. Keine Archivfreigabe oder Speicherung.
+- Tests, Anleitung, README, Roadmap und Quellenanalyse aktualisiert.
+
+**Prüfung:** 226 lokale Tests erfolgreich. Einmaliger Live-Lauf mit 62 HTTP-Anfragen einschließlich Navigation: alle 54 bekannten Detailziele geparst und gegen das erwartete Semester geprüft; 21 Details haben offene Normalisierungsfragen oder Prüfhinweise. Keine Quellseiten oder vertraulichen Werte gespeichert. `git diff --check` ohne Fehler. Vollständigkeit der Quelle, leere Zusatzansicht, Wochenenden und fachliche Zuordnungen bleiben offen; kein Deployment im LXC.
+
+**Commit-Kurzbeschreibung:** Version 0.0.14 mit budgetierter Prüfung aller bekannten Semesterdetails ergänzen
+
 ## V0.0.13 – Zusätzliche Semesteransichten prüfen
 
 **Datum:** 2026-10-20

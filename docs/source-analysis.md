@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.13`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.14`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -131,3 +131,10 @@ Eine [konfigurierbare Veranstaltungskennung](source-identity.md) ordnet Detailzi
 ## Ergänzung V0.0.13 – Semesteransichten
 
 Die [zusätzliche Semesterprüfung](semester-check.md) ist implementiert und live geprüft: 54 eindeutige Detailziele in der Semesteransicht; keine erkannten Blöcke in der Block-/Einzelterminansicht. Die leere Ansicht bleibt ausdrücklich ungeklärt. Der neue Befehl prüft Auswahl und unverändertes Wochenangebot, erfasst zusätzliche Kennungen und veröffentlicht keine Daten. Nächster Schritt: Semesterzuordnung und vollständige Detailerfassung auf Basis dieser Ziele absichern; Wochenenden und die leere Zusatzansicht bleiben offen. M0/M1 sind noch nicht abgeschlossen.
+
+## Ergänzung V0.0.14 – Vollständige Prüfung bekannter Detailziele
+
+Der Semesterprüfbefehl unterstützt jetzt `--details`: Ziele beider Ansichten werden anhand ihrer Kennungen vereinigt und innerhalb eines ausdrücklichen Budgets vollständig geprüft. Jede Detailseite muss zum vorgegebenen Semester passen. Budgetüberschreitungen führen vor dem ersten Detailabruf zum Abbruch, Abruf- und Parserfehler liefern keine erfolgreiche Teilprüfung. Unbekannte Sonderfälle bleiben prüfpflichtig. Die Prüfung aller bekannten Ziele beweist noch keine vollständige Quellerfassung; leere Zusatzansicht, Wochenenden und Studiengangszuordnung bleiben offen. Siehe [Semesterprüfung](semester-check.md).
+
+
+**Live-Prüfung V0.0.14 (2026-10-20):** Alle 54 bekannten Detailziele wurden mit insgesamt 62 HTTP-Anfragen geparst und gegen das erwartete Semester geprüft. 21 Details bleiben wegen Normalisierung oder fachlicher Prüfhinweise offen. Es wurden keine Rohseiten oder vertraulichen Quellwerte gespeichert. Nächster Schritt: diese offenen Normalisierungsfälle gezielt untersuchen und unterstützen; Vollständigkeit der Quelle weiterhin separat nachweisen.
