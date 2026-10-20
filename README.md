@@ -131,7 +131,25 @@ Die [Roadmap](docs/roadmap.md) beschreibt Umsetzungsschritte, Versionsziele und 
 
 ## Lokale Entwicklung und Deployment
 
-Die konkreten Installations- und Startbefehle werden nach dem initialen Codegerüst ergänzt. Zielumgebung ist ein Debian-LXC auf Proxmox; für die Entwicklung sind ein Python-Virtualenv und eine lokale SQLite-Datenbank ausreichend. Konfiguration über Umgebungsvariablen bzw. nicht eingecheckte Konfigurationsdateien.
+Voraussetzung: Python 3.11 oder neuer. Im Repository-Hauptverzeichnis eine virtuelle Umgebung anlegen und die Abhängigkeiten installieren:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\python -m pip install -r requirements-dev.txt
+.venv\Scripts\python -m flask --app backend:create_app run
+```
+
+Unter Linux entsprechend `.venv/bin/python` statt `.venv\Scripts\python` verwenden. Die lokale Startseite ist unter `http://127.0.0.1:5000` erreichbar. Der Flask-Entwicklungsserver ist für die lokale Entwicklung vorgesehen.
+
+Tests ausführen:
+
+```powershell
+.venv\Scripts\python -m pytest
+```
+
+Flask stellt Web-Routen und Templates bereit; pytest prüft Startseite, Footer-Version und die Vertraulichkeit der Konfiguration. Die Startseite benötigt keine Datenquelle und führt keine Abrufe aus. `LSF_BASE_URL` wird nur bei Bedarf über die Prozessumgebung bereitgestellt. `.env.example` dokumentiert den Variablennamen; `.env` wird nicht automatisch geladen. Siehe [Datenquellenkonfiguration](docs/source-configuration.md).
+
+Das Grundgerüst enthält getrennte Pakete für Import, Parser, Speicherung und Scheduler; deren Fachfunktionen folgen in den nächsten Meilensteinen. Zielumgebung bleibt ein Debian-LXC auf Proxmox mit SQLite. Produktionsdeployment und Datenbank werden später ergänzt.
 
 **Wichtig:** Der produktive Sicherungsdienst muss die Quelle aus dem Hochschulnetz tatsächlich erreichen können. Die öffentliche Erreichbarkeit der Archivansicht und deren Berechtigungen sind unabhängig davon zu prüfen.
 
@@ -148,12 +166,14 @@ Die konkreten Installations- und Startbefehle werden nach dem initialen Codeger�
 
 ```text
 README.md               Projektüberblick
-AGENTS.md               Verbindliche Arbeitsanweisungen für Codex
-assets/                 Logos, Banner und spätere Screenshots
-backend/                Backend und Import-Logik (geplant)
-frontend/               Templates und statische Dateien (geplant)
-tests/                  Automatische Tests und Test-Fixtures (geplant)
-docs/                   Architektur, Entscheidungen, Installation (geplant)
+docs/AGENTS.md          Verbindliche Arbeitsanweisungen für Codex
+images/                 Projektbanner
+version.py              Zentrale Anwendungsversion
+backend/                Flask-App und Pakete für die spätere Import-Logik
+backend/templates/      Jinja-Templates mit gemeinsamem Footer
+backend/static/         Stylesheets
+tests/                  Automatische Tests
+docs/                   Anweisungen, Roadmap und Timeline
 ```
 
 ## Lizenz

@@ -4,7 +4,7 @@ WI-PlanArchiv wird schrittweise von der Konzeption zur zuverlässig betriebenen 
 
 ## Aktueller Stand
 
-Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.1`. Projektanweisungen und Dokumentation liegen vor; Webanwendung, Datenimport und Live-Quellzugriff sind noch nicht implementiert bzw. verifiziert. Alle folgenden Umsetzungsschritte sind offen.
+Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.1`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Startanleitung und Tests liegen vor; die Laufzeitprüfung ist offen, da der Python-Befehl in dieser Umgebung nicht startet. Datenimport und Live-Quellzugriff sind noch nicht implementiert bzw. verifiziert. M0 bis M5 bleiben offen.
 
 ## Versionsplanung
 
@@ -96,6 +96,6 @@ Die MVP-Freigabe setzt M0 bis M4 und die unten genannten Betriebskriterien vorau
 
 ## Pflege und nächste Schritte
 
-Als Nächstes wird das Projektgerüst umgesetzt. Die Quellenanalyse folgt, sobald berechtigter Zugriff und geeignete Quelldaten vorliegen. Zeitliche Zusagen werden erst nach Klärung dieser Abhängigkeiten getroffen.
+Als Nächstes werden Installation, Startseite und Tests mit einer verfügbaren Python-Laufzeit geprüft. Die Quellenanalyse folgt, sobald berechtigter Zugriff und geeignete Quelldaten vorliegen. Zeitliche Zusagen werden erst nach Klärung dieser Abhängigkeiten getroffen.
 
 Bei jeder Änderung die [Timeline](timeline.md) mit Version, Beschreibung, Prüfstatus und Commit-Kurzbeschreibung ergänzen. Versionsvorschläge werden anhand des tatsächlich erreichten Stands bewertet; die dritte Stelle bleibt dem User vorbehalten.
