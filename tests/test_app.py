@@ -26,3 +26,16 @@ def test_stylesheet_is_available():
     response = app.test_client().get("/static/style.css")
     assert response.status_code == 200
     assert response.mimetype == "text/css"
+
+
+def test_brand_is_local_and_accessible():
+    from bs4 import BeautifulSoup
+    app = create_app({"TESTING": True})
+    client = app.test_client()
+    soup = BeautifulSoup(client.get("/").data, "html.parser")
+    logo = soup.select_one("header .brand img")
+    assert logo is not None and "WI-PlanArchiv" in logo["alt"]
+    assert logo.find_parent("a")["href"] == "/"
+    response = client.get(logo["src"])
+    assert response.status_code == 200 and response.mimetype == "image/png"
+    assert response.data.startswith(b"\x89PNG\r\n\x1a\n")

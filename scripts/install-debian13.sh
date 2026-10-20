@@ -18,6 +18,34 @@ if [[ ! -d /run/systemd/system ]]; then
     exit 1
 fi
 
+# Lokale HTTP-Prüfung ohne Proxy, curl oder zusätzliche Python-Pakete.
+health_check() {
+    python3 - "$1" "${2:-2}" "${3:-}" <<'PY_HEALTH'
+import http.client
+import re
+import sys
+
+connection = None
+try:
+    port, timeout, expected = int(sys.argv[1]), float(sys.argv[2]), sys.argv[3]
+    if not 1 <= port <= 65535 or not 0 < timeout <= 10:
+        raise ValueError
+    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=timeout)
+    connection.request("GET", "/")
+    response = connection.getresponse()
+    body = response.read(1_000_001)
+    valid = response.status == 200 and len(body) <= 1_000_000
+    if expected:
+        valid = valid and re.search(rb"Version V" + re.escape(expected.encode("utf-8")) + rb"(?![0-9.])", body) is not None
+    sys.exit(0 if valid else 1)
+except (OSError, ValueError, http.client.HTTPException):
+    sys.exit(1)
+finally:
+    if connection is not None:
+        connection.close()
+PY_HEALTH
+}
+
 export LC_ALL=C
 normalize_answer() {
     local value=$1
@@ -79,7 +107,7 @@ fi
 export DEBIAN_FRONTEND=noninteractive
 echo '==> Systempakete installieren'
 apt-get update
-apt-get install -y --no-install-recommends git python3 python3-venv ca-certificates curl
+apt-get install -y --no-install-recommends git python3 python3-venv ca-certificates
 python3 -c 'import socket, sys; s = socket.socket(); s.bind((sys.argv[1], int(sys.argv[2]))); s.close()' "$LISTEN_HOST" "$LISTEN_PORT"
 echo '==> Gewählten Git-Stand herunterladen'
 GIT_TERMINAL_PROMPT=0 git clone --depth 1 --single-branch --branch "$GIT_BRANCH" -- "$REPO_URL" "$APP_DIR"
@@ -147,7 +175,7 @@ systemctl enable --now wi-planarchiv.service
 
 healthy=false
 for attempt in {1..15}; do
-    if curl --fail --silent --max-time 2 --output /dev/null "http://127.0.0.1:${LISTEN_PORT}/"; then
+    if health_check "$LISTEN_PORT" 2; then
         healthy=true
         break
     fi

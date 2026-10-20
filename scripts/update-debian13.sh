@@ -11,7 +11,7 @@ source /etc/os-release
 [[ ${ID:-} == debian && ${VERSION_ID:-} == 13 && -d /run/systemd/system ]] || {
     echo 'Debian 13 mit systemd erforderlich.' >&2; exit 1;
 }
-for command in git python3 curl runuser flock realpath; do
+for command in git python3 runuser flock realpath; do
     command -v "$command" >/dev/null || { echo "Befehl fehlt: $command" >&2; exit 1; }
 done
 exec 9>/run/lock/wi-planarchiv-update.lock
@@ -45,6 +45,34 @@ if [[ -e $APP_DIR/instance || -e $APP_DIR/.env ]]; then
 fi
 
 # ASCII-Prüfung unabhängig von der Container-Locale; Terminal-Randzeichen entfernen.
+# Lokale HTTP-Prüfung ohne Proxy, curl oder zusätzliche Python-Pakete.
+health_check() {
+    python3 - "$1" "${2:-2}" "${3:-}" <<'PY_HEALTH'
+import http.client
+import re
+import sys
+
+connection = None
+try:
+    port, timeout, expected = int(sys.argv[1]), float(sys.argv[2]), sys.argv[3]
+    if not 1 <= port <= 65535 or not 0 < timeout <= 10:
+        raise ValueError
+    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=timeout)
+    connection.request("GET", "/")
+    response = connection.getresponse()
+    body = response.read(1_000_001)
+    valid = response.status == 200 and len(body) <= 1_000_000
+    if expected:
+        valid = valid and re.search(rb"Version V" + re.escape(expected.encode("utf-8")) + rb"(?![0-9.])", body) is not None
+    sys.exit(0 if valid else 1)
+except (OSError, ValueError, http.client.HTTPException):
+    sys.exit(1)
+finally:
+    if connection is not None:
+        connection.close()
+PY_HEALTH
+}
+
 export LC_ALL=C
 normalize_answer() {
     local value=$1
@@ -65,7 +93,7 @@ HEALTH_PORT=${answer:-$HEALTH_PORT}
     echo 'Ungültiger Port.' >&2; exit 1;
 }
 # Keine Konfigurationsdatei als Shellcode laden oder vertrauliche Werte ausgeben.
-curl --fail --silent --max-time 5 --output /dev/null "http://127.0.0.1:$HEALTH_PORT/"
+health_check "$HEALTH_PORT" 5 || { echo 'Lokale HTTP-Prüfung vor dem Update fehlgeschlagen.' >&2; exit 1; }
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)-$$
 RELEASE_ROOT=${APP_DIR}-releases
 RELEASE=$RELEASE_ROOT/$STAMP
@@ -141,7 +169,7 @@ systemctl start "$SERVICE"
 healthy=false
 for attempt in {1..15}; do
     if systemctl is-active --quiet "$SERVICE" &&
-       curl --fail --silent --max-time 2 "http://127.0.0.1:$HEALTH_PORT/" | grep -Fq "Version V${EXPECTED_VERSION}"; then
+       health_check "$HEALTH_PORT" 2 "$EXPECTED_VERSION"; then
         healthy=true
         break
     fi

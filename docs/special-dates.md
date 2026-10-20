@@ -110,3 +110,23 @@ weiterhin zum Abbruch der gesamten Veranstaltungsvorschau. Bei einem späteren
 Fehler wird keine Teilvorschau mit bereits erkannten Annotationen zurückgegeben.
 Das neue Feld gehört zur internen Kalendervorschau; der bereinigte CLI-Bericht
 bleibt unverändert bei Schema 3 und enthält keine Hinweistexte.
+## V0.0.18 – Explizite Klausurzeiten innerhalb eines Einzeltermins
+
+Live belegt ist die vollständige Bemerkungsform „Die Klausur beginnt um H:MM Uhr
+und endet um H:MM Uhr.“. Sie wird nur beim Rhythmus `Einzel` mit genau einem Datum
+verwendet. Beide Uhrzeiten müssen gültig sein und vollständig innerhalb des
+strukturierten Tabellenzeitraums liegen; Beginn muss vor Ende liegen. Unbekannte
+Zusätze, wöchentliche Serien oder Zeiten außerhalb des reservierten Intervalls
+werden nicht automatisch angepasst.
+
+Die Vorschau verwendet die ausdrücklich angegebenen Klausurzeiten. Die Annotation
+`exam_time` erhält den vollständigen Text sowie `source_start_time` und
+`source_end_time` als ursprüngliche lokale Tabellenzeiten. Andere Annotationen
+haben für diese beiden optionalen Felder den Wert `null`. Die UTC-Umrechnung
+verwendet weiterhin Europe/Berlin mit Prüfung der Zeitumstellung.
+`timing_note_requires_review` und `notes_require_review` bleiben erhalten;
+die Vorschau ist kein freigegebener Archivstand.
+
+Die zweite untersuchte Veranstaltung mit Begrüßungs-/Einführungshinweisen bleibt
+ungeklärt. Ihr Inhalt wird nicht anhand einzelner Wörter als unbedenklich
+freigegeben. Die geparsten Daten bleiben intern für eine fachliche Prüfung erhalten.

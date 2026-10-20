@@ -180,3 +180,34 @@ def test_annotation_series_indices_and_late_failure_are_atomic(course, context):
     assert [a.series_index for a in preview.series_annotations] == [0, 1]
     with pytest.raises(NormalizationError):
         normalize_course(replace(course, series=series + (replace(course.series[0], note="Unbekannte Regel"),)), context)
+
+def test_explicit_exam_time_within_single_slot_preserves_original_times(course, context):
+    note = "Die Klausur beginnt um 8:15 Uhr und endet um 8:45 Uhr."
+    single = changed(course, recurrence="Einzel", valid_until=date(2025, 10, 20), note=note)
+    preview = normalize_course(single, context)
+    assert len(preview.occurrences) == 1
+    assert preview.occurrences[0].starts_at == "2025-10-20T06:15:00+00:00"
+    assert preview.occurrences[0].ends_at == "2025-10-20T06:45:00+00:00"
+    annotation = preview.series_annotations[0]
+    assert annotation.kind == "exam_time" and annotation.text == note
+    assert annotation.source_start_time == "08:00:00"
+    assert annotation.source_end_time == "09:00:00"
+    assert "timing_note_requires_review" in preview.review_reasons
+    assert not preview.complete
+
+
+@pytest.mark.parametrize("start,end", [("7:00", "8:45"), ("8:15", "9:30"), ("8:45", "8:15"),
+                                     ("8:15", "8:15"), ("25:00", "26:00")])
+def test_invalid_or_outside_exam_times_remain_blocked(course, context, start, end):
+    note = f"Die Klausur beginnt um {start} Uhr und endet um {end} Uhr."
+    with pytest.raises(NormalizationError):
+        normalize_course(changed(course, recurrence="Einzel", valid_until=date(2025, 10, 20), note=note), context)
+
+
+def test_exam_time_not_applied_to_weekly_series_or_extended_text(course, context):
+    note = "Die Klausur beginnt um 8:15 Uhr und endet um 8:45 Uhr."
+    with pytest.raises(NormalizationError):
+        normalize_course(changed(course, note=note), context)
+    with pytest.raises(NormalizationError):
+        normalize_course(changed(course, recurrence="Einzel", valid_until=date(2025, 10, 20),
+                                 note=note + " Nur nach Absprache."), context)

@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.18 – Logo, Installation ohne curl und geprüfte Klausurzeiten
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version zentral auf Userwunsch auf `0.0.18` gesetzt.
+- Vorhandenes Logo als lokale statische Bilddatei in den gemeinsamen Seitenkopf eingebunden; responsive Breite, unverzerrtes Seitenverhältnis und zugänglicher Startseitenlink.
+- Verpflichtende curl-Abhängigkeit aus Installer und Update entfernt. HTTP-Prüfung über Python-Standardbibliothek mit festem Loopback-Ziel, ohne Proxy, mit Timeout und Größenlimit. Update prüft die exakte Version; Sicherung und Rollback bleiben erhalten.
+- Download-Anleitungen auf wget mit temporärem Ziel und Fehlerkette umgestellt; Arbeitsanweisungen ergänzt.
+- Zwei offene Normalisierungsfälle untersucht. Eindeutige Klausurzeiten innerhalb eines reservierten Einzeltermins unterstützt, mit erhaltenen Tabellenzeiten und Prüfhinweis. Eine Veranstaltung mit Begrüßungs-/Einführungsbemerkungen bleibt gesperrt.
+- Fiktive Tests, README, Roadmap und Fachanleitungen aktualisiert.
+
+**Prüfung:** 274 lokale Tests erfolgreich, einschließlich HTTP-Fehlern, falscher Version, Größenlimit, Timeout, Logo-Auslieferung und Klausurzeit-Grenzfällen. Bash-Syntax beider Skripte und 14 isolierte Eingabetests erfolgreich. Quellenanalyse mit 74 HTTP-Anfragen und anschließenden begrenzten Detailprüfungen; abschließender gezielter Live-Test mit zehn Anfragen: ein neu normalisiertes Detail und eines weiter blockiert. Kein erneuter vollständiger Import nach der Änderung. Browser-Sichtprüfung mangels verfügbarer Browseroberfläche nicht möglich; HTML, CSS und Bildauslieferung lokal geprüft. Keine Installation oder Update-Ausführung im Ziel-LXC, keine Archivveröffentlichung.
+
+**Commit-Kurzbeschreibung:** Version 0.0.18 mit Webseitenlogo, curl-freien Skripten und geprüften Klausurzeiten ergänzen
+
 ## V0.0.17 – Bisher übersehene Veranstaltungsblöcke erfassen
 
 **Datum:** 2026-10-20

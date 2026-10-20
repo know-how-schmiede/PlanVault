@@ -7,7 +7,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
-    <header><a href="{{ url_for('web.index') }}">WI-PlanArchiv</a></header>
+    <header>
+      <a class="brand" href="{{ url_for('web.index') }}" aria-label="WI-PlanArchiv – Startseite">
+        <img src="{{ url_for('static', filename='brand.png') }}" alt="WI-PlanArchiv – Vorlesungsplanung sichern. Immer verfügbar." width="1774" height="887" fetchpriority="high">
+      </a>
+    </header>
     <main id="content">{% block content %}{% endblock %}</main>
     <footer>WI-PlanArchiv · Version V{{ app_version }}</footer>
   </body>

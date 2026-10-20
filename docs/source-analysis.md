@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.17`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.18`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -164,3 +164,9 @@ Beide Ansichten zeigen Montag bis Freitag. Im untersuchten Auswahlformular wurde
 
 
 **Abschließender Live-Lauf V0.0.17:** 74 HTTP-Anfragen, 66 Details geparst, 64 Vorschauen erzeugt (21 mit fachlichen Prüfhinweisen), zwei neu erfasste Details technisch blockiert. Keine Wochenendtermine in den erzeugten Vorschauen; dies ist kein Nachweis für die Abwesenheit weiterer Wochenendveranstaltungen. Nächster Schritt: die zwei neuen Normalisierungsfälle klären und die verbleibenden Vollständigkeitskriterien absichern.
+
+## Ergänzung V0.0.18 – Logo, curl-freier Betrieb und Klausurzeiten
+
+Das bestehende Logo wird lokal und responsiv im gemeinsamen Seitenkopf angezeigt. Installations- und Update-Skript benötigen kein curl mehr: wget dient im Schnellstart zum Download; lokale Gesundheitsprüfungen verwenden Python ohne Proxy und mit Timeout, Größenlimit und exakter Versionsprüfung beim Update. Die neue Skriptfassung ist lokal getestet, noch nicht im Ziel-LXC ausgeführt.
+
+Die zwei offenen Normalisierungsfälle wurden untersucht. Eine Einzelterminserie enthält einen eindeutigen Klausurzeit-Hinweis innerhalb des größeren Tabellenzeitraums. Diese eng begrenzte Form wird nun übernommen; Originalzeiten, Hinweis und fachlicher Prüfstatus bleiben erhalten. Die Begrüßungs-/Einführungsbemerkungen der anderen Veranstaltung bleiben blockierend und intern erhalten. Abschließender gezielter Live-Test: zwei Details, eine Vorschau mit Klausurzeit-Annotation und ein ungeklärtes Detail, zehn HTTP-Anfragen. Kein erneuter vollständiger Lauf nach der Änderung. Wochenenden und vollständiger Semesterumfang bleiben separat nachzuweisen.

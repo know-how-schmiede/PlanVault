@@ -22,19 +22,17 @@ Ausgangssituation: Ein frisch erstellter Debian-13-LXC-Container mit systemd, ge
 ```bash
 # Download vorbereiten
 apt-get update
-apt-get install -y --no-install-recommends ca-certificates curl
+apt-get install -y --no-install-recommends ca-certificates wget
 
 # Installer herunterladen und vor der Ausführung ansehen
-curl --fail --show-error --location \
-  https://raw.githubusercontent.com/know-how-schmiede/PlanVault/main/scripts/install-debian13.sh \
-  --output /root/install-wi-planarchiv.sh
-less /root/install-wi-planarchiv.sh
-
-# Interaktive Installation starten
+wget --timeout=30 --tries=3 --output-document=/root/install-wi-planarchiv.sh.download \
+  https://raw.githubusercontent.com/know-how-schmiede/PlanVault/main/scripts/install-debian13.sh && \
+mv -- /root/install-wi-planarchiv.sh.download /root/install-wi-planarchiv.sh && \
+cat /root/install-wi-planarchiv.sh && \
 bash /root/install-wi-planarchiv.sh
 ```
 
-Falls `less` nicht installiert ist, die Datei mit `cat /root/install-wi-planarchiv.sh` ansehen. Das Skript wird erst nach erfolgreichem Download aus einer Datei ausgeführt. Die lokal entwickelten Änderungen müssen zuvor auf GitHub verfügbar sein; diese Anleitung veröffentlicht sie nicht automatisch.
+Das Skript wird erst nach erfolgreichem Download aus einer Datei ausgeführt. Die lokal entwickelten Änderungen müssen zuvor auf GitHub verfügbar sein; diese Anleitung veröffentlicht sie nicht automatisch.
 
 ### Abfragen und Standardwerte
 
@@ -54,7 +52,7 @@ Repository-Adresse, Dienstname, Konfigurations- und Datenverzeichnis bleiben fes
 
 1. Root-Rechte, Debian 13 und systemd prüfen; Einstellungen abfragen und validieren.
 2. Vorhandene Installationsziele oder Dienstkonten erkennen und vor Änderungen abbrechen.
-3. Git, Python, venv, Zertifikate und curl über apt installieren; Port prüfen.
+3. Git, Python, venv und Zertifikate über apt installieren; Port prüfen.
 4. Gewählten Branch oder Tag automatisch nach dem Installationspfad klonen und benötigte Projektdateien prüfen.
 5. Dienstnutzer, Konfiguration und Datenbereich anlegen; virtuelle Python-Umgebung mit Flask, Gunicorn und pytest einrichten.
 6. Tests unter dem Dienstkonto ausführen, anschließend systemd-Dienst einrichten und starten.
@@ -97,7 +95,7 @@ Die gegenwärtige Startseite hat keine Anmeldung. Der Netzwerkzugriff hängt von
 systemctl status wi-planarchiv --no-pager
 systemctl restart wi-planarchiv
 journalctl -u wi-planarchiv -n 50 --no-pager
-curl --fail http://127.0.0.1:8000/
+wget --no-proxy --timeout=5 --tries=1 --output-document=- http://127.0.0.1:8000/
 ```
 
 Die HTTP-Ausgabe soll die Startseite und den Versionsfooter enthalten. Tests erneut ausführen:
@@ -121,10 +119,12 @@ Leere Eingaben übernehmen `main` beziehungsweise `8000`. Leerzeichen am Rand un
 Den Update-Stand zuerst auf GitHub veröffentlichen. Als root im bestehenden Debian-13-LXC:
 
 ```bash
-curl --fail --show-error --location \
-  https://raw.githubusercontent.com/know-how-schmiede/PlanVault/main/scripts/update-debian13.sh \
-  --output /root/update-wi-planarchiv.sh
-cat /root/update-wi-planarchiv.sh
+apt-get update && \
+apt-get install -y --no-install-recommends ca-certificates wget && \
+wget --timeout=30 --tries=3 --output-document=/root/update-wi-planarchiv.sh.download \
+  https://raw.githubusercontent.com/know-how-schmiede/PlanVault/main/scripts/update-debian13.sh && \
+mv -- /root/update-wi-planarchiv.sh.download /root/update-wi-planarchiv.sh && \
+cat /root/update-wi-planarchiv.sh && \
 bash /root/update-wi-planarchiv.sh
 ```
 
@@ -145,3 +145,6 @@ Bei Startfehlern zunächst Dienststatus und Journal lokal prüfen. Bei Paket- od
 ## Aufbau und Referenz
 
 Der Aufbau mit Voraussetzungen, Schnellstart, Eingaben mit Standardwerten, Installationsphasen und abschließenden Betriebsbefehlen orientiert sich an den [NeoFab-ScanLab-Setup-Skripten](https://github.com/know-how-schmiede/NeoFab-ScanLab/tree/main/scripts). WI-PlanArchiv bündelt Basis- und Diensteinrichtung in einer Erstinstallation; ein separates Update-Skript übernimmt vorhandene Installationen mit Sicherung und Rückkehr zum vorherigen Anwendungsstand.
+
+
+Ab V0.0.18 benötigen Installations- und Update-Skript kein `curl`. Der Schnellstart verwendet `wget` nur zum Download; die Anwendung selbst kommt weiterhin über Git. Lokale HTTP-Prüfungen nutzen Python 3 ohne Proxy, mit Timeout und Größenlimit; das Update prüft zusätzlich die exakte Versionsnummer. Ein nicht erfolgreicher Download wird nicht gestartet. Die bestehende Update-Sicherung und Rückkehr zum alten Code bleiben erhalten. Die neue Fassung wurde noch nicht im Ziel-LXC ausgeführt.

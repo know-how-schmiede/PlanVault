@@ -49,6 +49,8 @@ class SeriesAnnotation:
     series_index: int
     kind: str
     text: str
+    source_start_time: str | None = None
+    source_end_time: str | None = None
 
 @dataclass(frozen=True)
 class CalendarPreview:
@@ -164,7 +166,9 @@ def normalize_course(
             raise NormalizationError("Terminzeitraum oder Wochentag ist ungültig.")
         if rule == "single" and span != 0:
             raise NormalizationError("Einzeltermin benötigt genau ein Datum.")
+        effective_start, effective_end = series.start_time, series.end_time
         if series.note:
+            exam = re.fullmatch(r"Die Klausur beginnt um (\d{1,2}:\d{2}) Uhr und endet um (\d{1,2}:\d{2}) Uhr\.", series.note)
             if series.note == "Vorlesung":
                 kind = "teaching_format"
             elif series.note == "Nachholtermin" and rule == "single" and series.recurrence == "Einzel":
@@ -173,9 +177,22 @@ def normalize_course(
             elif re.fullmatch(r"Labor [A-Z]\d{1,2}\.\d{1,2}\.\d{2}", series.note):
                 kind = "room_hint"
                 review.add("room_note_requires_review")
+            elif exam and rule == "single" and series.recurrence == "Einzel":
+                try:
+                    effective_start, effective_end = (datetime.strptime(t, "%H:%M").time() for t in exam.groups())
+                except ValueError:
+                    raise NormalizationError("Ungültige Uhrzeit im Klausurhinweis.") from None
+                if not series.start_time <= effective_start < effective_end <= series.end_time:
+                    raise NormalizationError("Klausurzeiten liegen nicht innerhalb des Tabellenzeitraums.")
+                kind = "exam_time"
+                review.add("timing_note_requires_review")
             else:
                 raise NormalizationError("Serienbemerkung ist noch nicht als Hinweis verifiziert.")
-            annotations.append(SeriesAnnotation(index, kind, series.note))
+            annotations.append(SeriesAnnotation(
+                index, kind, series.note,
+                series.start_time.isoformat() if kind == "exam_time" else None,
+                series.end_time.isoformat() if kind == "exam_time" else None,
+            ))
             review.add("notes_require_review")
         days = {
             series.valid_from + timedelta(days=offset)
@@ -196,7 +213,7 @@ def normalize_course(
         cancellations.extend(CancelledDate(index, day.isoformat(), note) for day, note in sorted(cancelled.items()))
         zone = ZoneInfo(series.timezone)
         for day in sorted(days - set(cancelled)):
-            start, end = _utc(day, series.start_time, zone), _utc(day, series.end_time, zone)
+            start, end = _utc(day, effective_start, zone), _utc(day, effective_end, zone)
             if end <= start:
                 raise NormalizationError("Zeitintervall ist nicht eindeutig.")
             year, week, _ = day.isocalendar()
