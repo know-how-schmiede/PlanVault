@@ -99,6 +99,8 @@ def test_cli_details_and_failure_are_sanitized(session, monkeypatch, failure):
     assert result.exit_code == 1
     report = json.loads(result.output)
     assert report["checked_details"] == (0 if failure else 12)
+    assert report["normalization_summary"]["preview_count"] == (0 if failure else 12)
+    assert report["normalization_summary"]["blocked_count"] == 0
     assert report["known_details_checked"] is not failure
     assert report["status"] == ("failed" if failure else "needs_review")
     assert not report["complete"] and not report["published"]

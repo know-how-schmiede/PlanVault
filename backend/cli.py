@@ -230,9 +230,10 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
             raise FormNavigationError("Semester- und Studiengangsangaben benötigen --details.")
     except (SourceIdentityError, FormNavigationError, DetailImportError) as error:
         raise click.ClickException(str(error)) from None
-    report = {"schema_version": 2, "app_version": __version__, "status": "needs_review",
+    report = {"schema_version": 3, "app_version": __version__, "status": "needs_review",
               "views": [], "details_requested": details, "checked_details": 0,
               "normalization_review_count": 0, "known_details_checked": False,
+              "normalization_summary": {"preview_count": 0, "blocked_count": 0, "review_preview_count": 0},
               "complete": False, "published": False}
     try:
         with SourceClient(current_app.config.get("LSF_BASE_URL", ""),
@@ -252,6 +253,7 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
                                                budget=detail_budget)
                 report["checked_details"] = len(sample.details)
                 report["normalization_review_count"] = sum(d.requires_review for d in sample.details)
+                report["normalization_summary"] = sample.normalization_summary()
                 report["known_details_checked"] = True
     except (SourceFetchError, FormNavigationError, DetailImportError):
         report["status"] = "failed"
@@ -265,6 +267,9 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
         if details:
             click.echo(f"Details geprüft: {report['checked_details']}; "
                        f"prüfpflichtige Normalisierung: {report['normalization_review_count']}.")
+            summary = report["normalization_summary"]
+            click.echo(f"Vorschauen: {summary['preview_count']}; blockiert: {summary['blocked_count']}; "
+                       f"Vorschauen mit Prüfhinweisen: {summary['review_preview_count']}.")
         click.echo("Nur Bestandsaufnahme: Semesterzuordnung, Wochenenden und vollständiger Inhalt bleiben ungeprüft.")
     raise click.exceptions.Exit(1)
 

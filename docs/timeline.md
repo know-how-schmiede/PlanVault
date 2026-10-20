@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.15 – Mehrfache Ausfälle und klare Normalisierungsdiagnose
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.15` gesetzt; Footer übernimmt sie.
+- Die 21 Prüffälle aus V0.0.14 in 19 blockierte Normalisierungen und zwei Vorschauen mit Prüfhinweisen aufgeschlüsselt.
+- Mehrere aufeinanderfolgende Ausfallangaben und fehlende Ausfallhinweise unterstützt. Hinweise bleiben dem jeweiligen Ausfall zugeordnet; doppelte oder ungültige Angaben verhindern eine Teilvorschau.
+- Numerische Raumkennungen mit drei Zahlenteilen nicht mehr pauschal als zusätzliche Kurzdatumsangabe gewertet. Mögliche Ersatztermine bleiben ungeklärt; keine automatische Ableitung aus Freitext.
+- Semesterbericht auf Schema 3 mit getrennten Zählern für Vorschauen, blockierte Details und Vorschauen mit Prüfhinweisen erweitert.
+- Fiktive Tests, README, Roadmap und Fachanleitungen aktualisiert.
+
+**Prüfung:** 235 lokale Tests erfolgreich. Ein Diagnose- und ein abschließender Live-Lauf mit jeweils 62 HTTP-Anfragen. Nach der Änderung: 54 Detailziele geprüft, 50 Vorschauen erzeugt, davon 17 mit fachlichen Prüfhinweisen; vier Details weiterhin technisch blockiert (vorher 19). Keine Rohseiten oder vertraulichen Quellwerte gespeichert. `git diff --check` ohne Fehler. Vollständigkeitsnachweis, Archivspeicherung und Webanzeige bleiben offen; kein Deployment im LXC.
+
+**Commit-Kurzbeschreibung:** Version 0.0.15 mit mehrfachen Ausfällen und getrennter Normalisierungsdiagnose ergänzen
+
 ## V0.0.14 – Alle bekannten Semesterdetails prüfen
 
 **Datum:** 2026-10-20

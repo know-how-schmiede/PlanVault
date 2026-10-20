@@ -1,4 +1,4 @@
-# Semesteransichten prüfen – V0.0.14
+# Semesteransichten prüfen – V0.0.15
 
 `source-semester-check` untersucht zusätzlich zur Wochenstichprobe zwei
 ausdrücklich ausgewählte Ansichten: die gesamte Semesteransicht und die
@@ -37,7 +37,7 @@ bleibt aktiv. Keine Dateien oder Archivdaten werden geschrieben.
 - Bei Struktur- oder Abruffehlern lautet der Bericht `failed`; es wird keine
   erfolgreiche Teilbestandsaufnahme ausgegeben.
 
-Der eigene Berichtsvertrag `schema_version=2` enthält Anwendungsversion, Status,
+Der eigene Berichtsvertrag `schema_version=3` enthält Anwendungsversion, Status,
 Ansichtscodes, Anzahl eindeutiger Detailziele und zusätzliche Ziele der zweiten
 Ansicht. Der erste `additional_count` ist definitionsgemäß null. URLs,
 Kennungen, Titel und andere Quellinhalte werden nicht ausgegeben.
@@ -92,3 +92,12 @@ bereits geprüfte Übersichten dürfen als Diagnose im Bericht verbleiben.
 `complete` und `published` bleiben false, Prozessstatus weiterhin 1.
 
 **Live-Prüfung V0.0.14 (2026-10-20):** Alle 54 bekannten Detailziele wurden mit insgesamt 62 HTTP-Anfragen geparst und gegen das erwartete Semester geprüft. 21 Details bleiben wegen Normalisierung oder fachlicher Prüfhinweise offen. Es wurden keine Rohseiten oder vertraulichen Quellwerte gespeichert. Nächster Schritt: diese offenen Normalisierungsfälle gezielt untersuchen und unterstützen; Vollständigkeit der Quelle weiterhin separat nachweisen.
+
+## Berichtsänderung V0.0.15
+
+Schema 3 ergänzt `normalization_summary` mit `preview_count`, `blocked_count`
+und `review_preview_count`. Die ersten beiden Werte ergeben zusammen die Zahl
+der geprüften Details. Der dritte Wert ist eine Teilmenge der Vorschauen.
+`normalization_review_count` umfasst weiterhin blockierte Details und Vorschauen
+mit fachlichen Prüfhinweisen. Bei einem abgebrochenen Detailabruf bleiben sämtliche
+Detailzähler null. Die Erweiterung gibt keine Titel, Quellwerte oder Freitexte aus.

@@ -44,3 +44,20 @@ Weiter offen bleiben dauerhafte Veranstaltungsidentität, Block-/Gruppenfälle,
 Wochenenden und vollständige Semestererfassung. Speicherung und Webanzeige
 echter Stundenpläne sind noch nicht implementiert. Bestehende CLI-Prüfbefehle
 verwenden die erweiterte Normalisierung automatisch nach dem Update.
+
+## Ergänzung V0.0.15
+
+Die Normalisierung unterstützt nun mehrere durch Leerraum getrennte Angaben
+`Datum: Hinweis` sowie `Datum:` ohne Hinweis. Jedes Datum muss ein tatsächlicher
+Termin der Serie sein. Doppelte Daten, ungültige Daten oder ein nicht unterstützter
+Eintrag verwerfen die gesamte Vorschau. Vorhandene Hinweise bleiben dem jeweiligen
+Ausfall zugeordnet; fehlende Hinweise werden als `null` erhalten.
+
+Numerische Raumkennungen mit drei Zahlenteilen werden nicht mehr pauschal als
+Kurzdatum behandelt. Vollständige oder abgekürzte zusätzliche Datumsangaben im
+Hinweis bleiben prüfpflichtig und blockieren die Normalisierung. Ersatztermine
+werden niemals aus Freitext erzeugt. Auch erfolgreich gelesene Ausfälle behalten
+`cancellations_require_review`; ein technischer Parsererfolg ist keine fachliche
+Freigabe. Tests verwenden ausschließlich fiktive Termine und Raumkennungen.
+
+**Live-Ergebnis V0.0.15:** 54 bekannte Details geprüft, 50 Vorschauen erzeugt; davon 17 mit fachlichen Prüfhinweisen. Die Zahl technisch blockierter Details sinkt von 19 auf vier. Abschließender Prüflauf: 62 HTTP-Anfragen. Nächster Schritt: die verbleibenden Bemerkungs-/Verlegungsfälle gezielt klären und den Vollständigkeitsnachweis der Quelle weiterführen. Prüfhinweise werden nicht allein wegen erfolgreicher Normalisierung entfernt.

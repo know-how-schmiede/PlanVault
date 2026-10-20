@@ -46,7 +46,6 @@ def test_preview_json_retains_cancellation_reason(html):
     "28.10.2025: Fiktiver Ausfall",
     "27.10.2025: Verlegt auf 29.10.2025",
     "27.10.2025: Verlegt auf 29.10.",
-    "27.10.2025:",
     "27.10.2025: " + "x" * 501,
 ])
 def test_unverified_annotated_cancellation_rejected(html, replacement):
@@ -70,3 +69,38 @@ def test_no_cancellation_means_single_requires_no_extra_rhythm_review(html):
     assert result.cancellations == ()
     assert result.review_reasons == ("source_context_requires_verification",)
     assert not DetailResult("DEMO", 2, "preview", result).requires_review
+
+@pytest.mark.parametrize("value,notes", [
+    ("20.10.2025: 27.10.2025:", [None, None]),
+    ("20.10.2025: Fiktiver Raum A1.3.05 27.10.2025: Fiktiver Hinweis", ["Fiktiver Raum A1.3.05", "Fiktiver Hinweis"]),
+    ("27.10.2025:", [None]),
+])
+def test_multiple_and_empty_annotated_cancellations(html, value, notes):
+    result = normalize(html.replace("27.10.2025: Fiktiver Ausfall für den Test", value))
+    assert [c.note for c in result.cancellations] == notes
+    assert "cancellations_require_review" in result.review_reasons
+    assert not result.complete
+    assert not any(o.local_date in {c.local_date for c in result.cancellations} for o in result.occurrences)
+
+
+@pytest.mark.parametrize("value", [
+    "27.10.2025: 27.10.2025: Fiktiver Konflikt",
+    "27.10.2025: Verlegt auf 29.10.",
+    "27.10.2025: Verlegt auf 29/10",
+    "27.10.2025: Verlegt auf 29.10.2025",
+    "20.10.2025: 28.10.2025:",
+    "20.10.2025: 31.02.2025:",
+])
+def test_multiple_cancellations_reject_ambiguity_atomically(html, value):
+    with pytest.raises(NormalizationError):
+        normalize(html.replace("27.10.2025: Fiktiver Ausfall für den Test", value))
+
+
+def test_summary_distinguishes_blocked_and_review_previews(html):
+    from backend.importer.details import DetailSample
+    preview = normalize(html)
+    sample = DetailSample(2, 2, (DetailResult("DEMO", 2, "preview", preview),
+                                DetailResult("OTHER", 1, "normalization_requires_review", None)))
+    assert sample.normalization_summary() == {
+        "preview_count": 1, "blocked_count": 1, "review_preview_count": 1,
+    }

@@ -71,17 +71,29 @@ def _identity(context: CourseContext) -> str:
 def _cancellations(text: str | None) -> dict[date, str | None]:
     if not text:
         return {}
-    # Live beobachtet: genau ein vollständiges Datum, Doppelpunkt, Ausfallhinweis.
-    annotated = re.fullmatch(r"(\d{1,2}\.\d{1,2}\.\d{4}):\s*(\S.{0,499})", text)
-    if annotated:
-        note = annotated[2]
-        if re.search(r"\d{1,2}[./-]\d{1,2}", note):
-            raise NormalizationError("Zusätzliche Datumsangaben im Ausfallhinweis benötigen Prüfung.")
-        try:
-            day = datetime.strptime(annotated[1], "%d.%m.%Y").date()
-        except ValueError:
-            raise NormalizationError("Ausfallangabe enthält ein ungültiges Datum.") from None
-        return {day: note}
+    # Live beobachtet: mehrere Datum:-Einträge, teils ohne Hinweis.
+    markers = list(re.finditer(r"(?<!\S)(\d{1,2}\.\d{1,2}\.\d{4}):", text))
+    if markers:
+        if markers[0].start() != 0 or len(markers) > 100 or len(text) > 10_000:
+            raise NormalizationError("Ausfallangaben benötigen eine manuelle Prüfung.")
+        result = {}
+        for index, marker in enumerate(markers):
+            end = markers[index + 1].start() if index + 1 < len(markers) else len(text)
+            note = text[marker.end():end].strip()
+            # Raumkennungen mit drei Zahlenteilen sind keine Kurzdatumsangabe.
+            # Vollständige oder abgekürzte Datumsangaben bleiben ungeklärt.
+            if (len(note) > 500 or
+                    re.search(r"(?<![\d.])\d{1,2}[./-]\d{1,2}[./-]\d{4}(?!\d)", note) or
+                    re.search(r"(?<![\d.])\d{1,2}[./-]\d{1,2}(?!\d)(?:\.(?!\d)|(?=[^\d./-]|$))", note)):
+                raise NormalizationError("Zusätzliche Datumsangaben im Ausfallhinweis benötigen Prüfung.")
+            try:
+                day = datetime.strptime(marker[1], "%d.%m.%Y").date()
+            except ValueError:
+                raise NormalizationError("Ausfallangabe enthält ein ungültiges Datum.") from None
+            if day in result:
+                raise NormalizationError("Mehrdeutige doppelte Ausfallangabe.")
+            result[day] = note or None
+        return result
     if not re.fullmatch(r"\d{1,2}\.\d{1,2}\.\d{4}(?:\s*[,;]\s*\d{1,2}\.\d{1,2}\.\d{4})*", text):
         raise NormalizationError("Ausfallangaben benötigen eine manuelle Prüfung.")
     try:

@@ -54,6 +54,14 @@ class DetailSample:
     def unchecked_count(self):
         return self.reference_count - len(self.details)
 
+    def normalization_summary(self):
+        """Technische Abbrüche von erzeugten, fachlich prüfpflichtigen Vorschauen trennen."""
+        return {
+            "preview_count": sum(d.preview is not None for d in self.details),
+            "blocked_count": sum(d.preview is None for d in self.details),
+            "review_preview_count": sum(d.preview is not None and d.requires_review for d in self.details),
+        }
+
 
 def merge_course_references(groups: tuple[tuple[CourseReference, ...], ...]) -> tuple[CourseReference, ...]:
     """Bereits geprüfte Verweise ohne erneute Abrufe wochenübergreifend vereinen."""
