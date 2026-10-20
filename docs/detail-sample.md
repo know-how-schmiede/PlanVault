@@ -6,7 +6,7 @@ steht im bekannten Block in der ersten Zeile. Raumlinks werden nicht als
 Veranstaltungsziele verwendet. Abweichende Strukturen, mehrere Links in einem
 Block, fremde Ziele oder widersprüchliche Beschriftungen führen zum Abbruch.
 
-Identische absolute Detailziele werden über alle übergebenen Planantworten
+Ohne konfigurierte Quellkennung gilt weiterhin: Identische absolute Detailziele werden über alle übergebenen Planantworten
 zusammengefasst. Unterschiedliche URLs werden auch bei gleichem Titel nicht
 zusammengeführt. Das verhindert doppelte Abrufe innerhalb der Stichprobe,
 beweist aber **keine dauerhafte Quellidentität**: Sitzungsabhängige URL-Varianten
@@ -72,3 +72,7 @@ Es wurden keine Rohseiten oder Quelladressen gespeichert.
 Semesterimport. Dauerhafte Veranstaltungsidentität, sämtliche Detailziele,
 Sonderfälle, Wochenenden und Archivveröffentlichung bleiben offen. Die Website
 zeigt weiterhin die Startseite mit Versionsfooter.
+
+## Ergänzung V0.0.12
+
+Optional werden Detailziele anhand einer [lokal konfigurierten Quellkennung](source-identity.md) zusammengeführt. Damit verändern Sitzungswerte und Titeländerungen zwischen Läufen die Kennung nicht. Fehlende oder mehrdeutige Kennungen brechen die Stichprobe ab. Studiengangs-/Prüfungsordnungszuordnung und Vollständigkeit bleiben prüfpflichtig.

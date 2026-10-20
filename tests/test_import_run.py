@@ -37,7 +37,7 @@ def workflow(monkeypatch):
                 '<input id="study" readonly><input name="selected" type="hidden" value="DEMO">'
                 '<input type="submit" name="go" value="Suche starten"></form>')
     detail = (Path(__file__).parent / "fixtures/course_detail.html").read_text(encoding="utf-8")
-    state = {"calls": [], "notice": "", "fail": None, "second_target": "/detail"}
+    state = {"calls": [], "notice": "", "fail": None, "second_target": "/detail", "first_target": "/detail"}
 
     def fetch(self, url=None, **kwargs):
         path = urlsplit(url or "https://example.invalid/start").path
@@ -54,7 +54,7 @@ def workflow(monkeypatch):
             html = plan()
         elif path == "/week":
             index = int(dict(kwargs["form"])["demo-week"].removeprefix("demo-"))
-            html = plan(index, state["notice"], state["second_target"] if index else "/detail")
+            html = plan(index, state["notice"], state["second_target"] if index else state["first_target"])
         elif path in {"/detail", "/second"}:
             html = detail
         else:
@@ -96,6 +96,44 @@ def test_report_contains_only_allowlisted_metadata(workflow):
         assert forbidden not in text
     assert json.loads(text)["app_version"] == __version__
     assert json.loads(text)["published"] is False
+
+
+def test_configured_identity_merges_weeks_and_keeps_context_blocker(workflow):
+    from backend.importer.identity import SourceIdentityPolicy
+
+    workflow["first_target"] = "/detail?record=7&session=a"
+    workflow["second_target"] = "/detail?session=b&record=7"
+    report = run(identity_policy=SourceIdentityPolicy("record", "PRIVATE-NAMESPACE"))
+    assert report.reference_count == report.checked_details == 1
+    assert workflow["calls"].count("/detail") == 1
+    assert report.identity_mode == "configured"
+    assert "source_identity_unverified" not in report.blockers
+    assert "study_context_unverified" in report.blockers
+    assert not report.complete and not report.published
+    data = report.to_json()
+    assert json.loads(data)["schema_version"] == 2
+    for secret in ("PRIVATE-NAMESPACE", "record", "session=", "example.invalid"):
+        assert secret not in data
+
+
+def test_missing_configured_identity_prevents_detail_fetch(workflow):
+    from backend.importer.identity import SourceIdentityPolicy
+
+    report = run(identity_policy=SourceIdentityPolicy("record", "demo"))
+    assert report.status == "failed"
+    assert report.checked_details == 0
+    assert "/detail" not in workflow["calls"]
+    assert not report.complete and not report.published
+
+
+def test_missing_configured_identity_prevents_detail_fetch(workflow):
+    from backend.importer.identity import SourceIdentityPolicy
+
+    report = run(identity_policy=SourceIdentityPolicy("record", "demo"))
+    assert report.status == "failed"
+    assert report.checked_details == 0
+    assert "/detail" not in workflow["calls"]
+    assert not report.complete and not report.published
 
 
 def test_missing_week_and_limited_details_are_explicit(workflow):

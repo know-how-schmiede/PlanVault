@@ -14,6 +14,7 @@ from backend.importer.forms import FormNavigationError
 from backend.importer.http import SourceClient, SourceFetchError
 from backend.importer.navigation import search_study, follow_named_result, submit_labeled_search
 from backend.importer.weeks import audit_weeks
+from backend.importer.identity import SourceIdentityPolicy
 from version import __version__
 
 
@@ -41,6 +42,7 @@ class ImportCheckReport:
     unchecked_details: int
     normalization_review_count: int
     blockers: tuple[str, ...]
+    identity_mode: str
     complete: bool = False
     published: bool = False
 
@@ -51,7 +53,8 @@ class ImportCheckReport:
 
 def run_import_check(client: SourceClient, *, query: str, title: str, semester: str,
                      study_key: str, regulations_key: str, start: date, end: date,
-                     requested: tuple[tuple[int, int], ...], detail_limit: int = 2) -> ImportCheckReport:
+                     requested: tuple[tuple[int, int], ...], detail_limit: int = 2,
+                     identity_policy: SourceIdentityPolicy | None = None) -> ImportCheckReport:
     """Navigation → Wochenprüfung → gemeinsame Detailstichprobe; kein Archivschreiben.
 
     Erwartete Quellfehler ergeben einen fehlgeschlagenen Bericht. Programmierfehler
@@ -78,7 +81,8 @@ def run_import_check(client: SourceClient, *, query: str, title: str, semester: 
     checked_weeks = ()
     references = ()
     sample = None
-    blockers = {"source_identity_unverified", "semester_content_unverified"}
+    blockers = {"semester_content_unverified",
+                "study_context_unverified" if identity_policy else "source_identity_unverified"}
     try:
         results = search_study(client, query)
         selection = follow_named_result(client, results, title=title)
@@ -87,7 +91,9 @@ def run_import_check(client: SourceClient, *, query: str, title: str, semester: 
 
         def collect(document):
             nonlocal references
-            references = merge_course_references((references, collect_course_references(client, (document,))))
+            references = merge_course_references((references, collect_course_references(
+                client, (document,), identity_policy=identity_policy,
+            )))
 
         audit = audit_weeks(client, plan, start=start, end=end, requested=requested, on_week=collect)
         coverage = audit.coverage
@@ -114,7 +120,8 @@ def run_import_check(client: SourceClient, *, query: str, title: str, semester: 
     if review_count:
         blockers.add("normalization_requires_review")
     return ImportCheckReport(
-        1, run_id, __version__, started, datetime.now(timezone.utc).isoformat(), status, stage,
+        2, run_id, __version__, started, datetime.now(timezone.utc).isoformat(), status, stage,
         start.isoformat(), end.isoformat(), requested, checked_weeks, coverage.missing, coverage.failed,
         len(references), checked, unchecked, review_count, tuple(sorted(blockers)),
+        "configured" if identity_policy else "run",
     )

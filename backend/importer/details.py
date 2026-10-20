@@ -7,6 +7,7 @@ import re
 from backend.importer.http import SourceClient, SourceDocument, SourceFetchError
 from backend.importer.navigation import _page, _caption
 from backend.importer.forms import FormNavigationError
+from backend.importer.identity import SourceIdentityPolicy, SourceIdentityError
 from backend.parser import (
     CalendarPreview, CourseContext, NormalizationError, SourceParseError,
     normalize_course, parse_course_detail,
@@ -19,11 +20,12 @@ class DetailImportError(ValueError):
 
 @dataclass(frozen=True)
 class CourseReference:
-    # Hash dient nur der Zuordnung innerhalb dieses Prüflaufs, nicht als Archiv-ID.
+    # Scope unterscheidet Lauf-Hash und ausdrücklich konfigurierte Quellkennung.
     key: str
     location: str = field(repr=False)
     caption: str = field(repr=False)
     block_count: int
+    identity_scope: str = "run"
 
 
 @dataclass(frozen=True)
@@ -36,7 +38,8 @@ class DetailResult:
     @property
     def requires_review(self) -> bool:
         return self.status != "preview" or bool(
-            self.preview and set(self.preview.review_reasons) - {"source_context_requires_verification"}
+            self.preview and set(self.preview.review_reasons) -
+            {"source_context_requires_verification", "study_context_requires_verification"}
         )
 
 
@@ -57,12 +60,14 @@ def merge_course_references(groups: tuple[tuple[CourseReference, ...], ...]) -> 
     merged = {}
     for group in groups:
         for reference in group:
-            previous = merged.get(reference.location)
+            identity = (reference.identity_scope, reference.key)
+            previous = merged.get(identity)
             if previous and (previous.caption != reference.caption or previous.key != reference.key):
                 raise DetailImportError("Widersprüchliche Detailzuordnung zwischen Wochen.")
-            merged[reference.location] = CourseReference(
+            merged[identity] = CourseReference(
                 reference.key, reference.location, reference.caption,
                 reference.block_count + (previous.block_count if previous else 0),
+                reference.identity_scope,
             )
     if sum(reference.block_count for reference in merged.values()) > 5000:
         raise DetailImportError("Zu viele Veranstaltungsblöcke.")
@@ -78,11 +83,11 @@ def validate_detail_context(semester: str, study_key: str, regulations_key: str,
         raise DetailImportError("Semester und opake Studiengangs-/Prüfungsordnungskennungen erforderlich.")
 
 
-def collect_course_references(client: SourceClient, documents: tuple[SourceDocument, ...]) -> tuple[CourseReference, ...]:
-    """Gleiche absolute Linkziele über alle übergebenen Pläne einmal aufnehmen.
+def collect_course_references(client: SourceClient, documents: tuple[SourceDocument, ...], *,
+                              identity_policy: SourceIdentityPolicy | None = None) -> tuple[CourseReference, ...]:
+    """Nach konfigurierter Kennung, sonst nach absolutem Linkziel deduplizieren.
 
-    Unterschiedliche URLs werden nicht anhand von Titeln zusammengeführt.
-    Sitzungsabhängige URL-Varianten bleiben daher bewusst unterschiedliche Ziele.
+    Titel sind niemals Identität; widersprüchliche Beschriftungen brechen ab.
     """
     if not documents or len(documents) > 54:
         raise DetailImportError("Ungültige Anzahl von Planantworten.")
@@ -108,14 +113,17 @@ def collect_course_references(client: SourceClient, documents: tuple[SourceDocum
                     raise DetailImportError("Unbekannte oder mehrdeutige Veranstaltungsverknüpfung.")
                 target = client.resolve(links[0]["href"], relative_to=document.location)
                 caption = _caption(links[0])
-                previous = references.get(target)
+                key = (identity_policy.key_for(client, target) if identity_policy
+                       else hashlib.sha256(target.encode("utf-8")).hexdigest())
+                previous = references.get(key)
                 if previous is not None and previous.caption != caption:
                     raise DetailImportError("Dasselbe Detailziel hat widersprüchliche Beschriftungen.")
-                references[target] = CourseReference(
-                    hashlib.sha256(target.encode("utf-8")).hexdigest(), target, caption,
+                references[key] = CourseReference(
+                    key, target, caption,
                     previous.block_count + 1 if previous else 1,
+                    "configured" if identity_policy else "run",
                 )
-        except (FormNavigationError, SourceFetchError):
+        except (FormNavigationError, SourceFetchError, SourceIdentityError):
             raise DetailImportError("Planstruktur oder Detailziel konnte nicht sicher zugeordnet werden.") from None
     return tuple(references.values())
 
@@ -125,7 +133,8 @@ def fetch_detail_sample(client: SourceClient, references: tuple[CourseReference,
                         limit: int = 2) -> DetailSample:
     """Maximal zehn eindeutige Detailziele; bei Abruf-/Parserfehlern kein Teilergebnis."""
     validate_detail_context(semester, study_key, regulations_key, limit)
-    if not references or len({ref.location for ref in references}) != len(references):
+    if (not references or len({ref.location for ref in references}) != len(references) or
+            len({(ref.identity_scope, ref.key) for ref in references}) != len(references)):
         raise DetailImportError("Ungültige oder doppelte Detailauswahl.")
     details = []
     for reference in references[:limit]:
@@ -135,7 +144,10 @@ def fetch_detail_sample(client: SourceClient, references: tuple[CourseReference,
         except (SourceFetchError, SourceParseError):
             raise DetailImportError("Detailstichprobe abgebrochen: Abruf, Semester oder Parserstruktur ungeklärt.") from None
         try:
-            preview = normalize_course(course, CourseContext(reference.key, study_key, regulations_key, semester))
+            preview = normalize_course(course, CourseContext(
+                reference.key, study_key, regulations_key, semester,
+                source_key_verified=reference.identity_scope == "configured",
+            ))
             status = "preview"
         except NormalizationError:
             # Ein korrekt gelesenes Detail kann noch nicht interpretierte Sonderfälle enthalten.

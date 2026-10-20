@@ -46,7 +46,7 @@ Laufzeitparameter wird vor dem Prüflauf als CLI-Fehler gemeldet.
 
 ## Berichtsvertrag
 
-`schema_version=1` enthält nur ausdrücklich erlaubte Metadaten:
+`schema_version=2` enthält nur ausdrücklich erlaubte Metadaten:
 
 - Lauf-ID, Anwendungsversion, Beginn und Ende in UTC.
 - Prüfzeitraum, angeforderte/geprüfte/fehlende und ungeklärte Wochen.
@@ -88,7 +88,11 @@ für KW 43/2026 und KW 44/2026 geprüft: beide Wochen strukturell passend,
 24 Wochen und 49 Detailziele bleiben ungeprüft. Zehn HTTP-Anfragen einschließlich
 Navigation; keine Rohseiten oder Quelladressen gespeichert.
 
-Dauerhafte Quellidentität, Sonderfälle, Wochenenden und der vollständige
+Die Aktivierung der konfigurierten Quellidentität, Sonderfälle, Wochenenden und der vollständige
 Semesterumfang bleiben offen. Erst nach deren Prüfung kann eine sichere
 Archivveröffentlichung folgen. Website und Archivdaten bleiben unverändert;
 die Startseite übernimmt lediglich die neue Version im Footer.
+
+## Ergänzung V0.0.12
+
+Mit beiden lokalen Identitätseinstellungen werden Sitzungsvarianten derselben Kennung zusammengeführt. Der Bericht ergänzt `identity_mode` (`run` oder `configured`). Bei konfigurierter Kennung bleibt `study_context_unverified` als eigener Blocker erhalten. Details zur Konfiguration und ihren Grenzen: [Veranstaltungskennungen](source-identity.md).

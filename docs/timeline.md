@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.12 – Konfigurierbare Veranstaltungsidentität
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.12` gesetzt; Footer übernimmt sie automatisch.
+- Numerische Quellkennung in getrennten HTTP-Sitzungen geprüft: 47 Detailziele behalten dieselbe Identität.
+- Lokale Einstellungen `LSF_ID_PARAMETER` und `LSF_ID_NAMESPACE` ergänzt. Keine echten Parameter oder Quellwerte im Repository hinterlegt.
+- Detailziele mit konfigurierter Kennung unabhängig von Sitzungswerten zusammengeführt. Mehrdeutige, fehlende oder widersprüchliche Zuordnungen brechen ab.
+- Ohne Konfiguration bleibt die bisherige laufbezogene Zuordnung aktiv. Studiengangs-/Prüfungsordnungszuordnung bleibt ausdrücklich prüfpflichtig.
+- Importbericht auf Schema 2 mit Identitätsmodus erweitert; Dokumentation, Roadmap und Quellenanalyse aktualisiert.
+
+**Prüfung:** 203 lokale Tests erfolgreich. Abschließender Live-Vergleich über zwei unabhängige Sitzungen mit insgesamt zwölf HTTP-Anfragen: alle 47 Paare aus Titel und Kennung stimmen überein, auch bei gleichnamigen Veranstaltungen. Weitere begrenzte Vorprüfungen dienten der Feldanalyse. Keine Rohseiten oder vertraulichen Quellwerte gespeichert. `git diff --check` ohne Fehler. Keine vollständige Semestererfassung, Archivveröffentlichung oder Installation im LXC; die lokale Kennungskonfiguration muss vor Nutzung gesetzt werden.
+
+**Commit-Kurzbeschreibung:** Version 0.0.12 mit konfigurierbarer sitzungsunabhängiger Veranstaltungskennung ergänzen
+
 ## V0.0.11 – Live-belegte Einzeltermine und Ausfälle
 
 **Datum:** 2026-10-20

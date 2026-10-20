@@ -21,6 +21,7 @@ class CourseContext:
     study_key: str
     regulations_key: str
     semester: str
+    source_key_verified: bool = False
 
 
 @dataclass(frozen=True)
@@ -124,7 +125,8 @@ def normalize_course(
     # Fehlende Veranstaltungsnummer durch expliziten Adapter-Kontext ersetzt.
     review.discard("missing_source_identifier")
     # Die bereitgestellte Zuordnung wird hier nicht erneut an der Quelle geprüft.
-    review.add("source_context_requires_verification")
+    review.add("study_context_requires_verification" if context.source_key_verified
+               else "source_context_requires_verification")
     occurrences = []
     cancellations = []
     for index, series in enumerate(course.series):

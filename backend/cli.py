@@ -15,6 +15,12 @@ from backend.importer.weeks import audit_weeks
 from backend.importer.weeks import read_week_menu, inspect_week
 from backend.importer.details import collect_course_references, fetch_detail_sample, DetailImportError
 from backend.importer.run import ImportCheckInputError, run_import_check
+from backend.importer.identity import configured_identity, SourceIdentityError
+
+
+def _identity_policy():
+    return configured_identity(current_app.config.get("LSF_ID_PARAMETER", ""),
+                               current_app.config.get("LSF_ID_NAMESPACE", ""))
 
 
 @click.command("source-check")
@@ -125,6 +131,7 @@ def source_details_check(query, title, semester, study_key, regulations_key, wee
     except ValueError:
         raise click.ClickException("ISO-Woche, Semester oder lokale Kennungen ungültig.") from None
     try:
+        policy = _identity_policy()
         with SourceClient(current_app.config.get("LSF_BASE_URL", ""), max_requests=12 + limit, retries=0) as client:
             results = search_study(client, query)
             selection = follow_named_result(client, results, title=title)
@@ -136,16 +143,17 @@ def source_details_check(query, title, semester, study_key, regulations_key, wee
             plan = menu.form.submit(client, values={menu.field_name: (choices[0].value,)}, button=menu.button)
             if inspect_week(plan, choices[0]).status != "ok":
                 raise DetailImportError("Woche ist leer oder prüfpflichtig; keine Detailstichprobe gestartet.")
-            references = collect_course_references(client, (plan,))
+            references = collect_course_references(client, (plan,), identity_policy=policy)
             sample = fetch_detail_sample(client, references, semester=semester, study_key=study_key,
                                          regulations_key=regulations_key, limit=limit)
-    except (DetailImportError, FormNavigationError, SourceFetchError) as error:
+    except (DetailImportError, FormNavigationError, SourceFetchError, SourceIdentityError) as error:
         raise click.ClickException(str(error)) from None
     click.echo(f"Veranstaltungsblöcke: {sample.block_count}; eindeutige Detailziele: {sample.reference_count}.")
     click.echo(f"Geprüfte Details: {len(sample.details)}; ungeprüfte Detailziele: {sample.unchecked_count}.")
     review = sum(result.requires_review for result in sample.details)
     click.echo(f"Details mit ungeklärter Normalisierung: {review}.")
-    click.echo("Nur Stichprobe: keine dauerhafte Quellidentität, kein vollständiger Semesterimport, kein Archivstand.")
+    click.echo("Quellzuordnung: " + ("konfigurierte Kennung" if policy else "nur innerhalb des Prüflaufs"))
+    click.echo("Nur Stichprobe: kein vollständiger Semesterimport, kein Archivstand.")
     if review:
         raise click.ClickException("Detailnormalisierung benötigt Prüfung.")
 
@@ -171,14 +179,16 @@ def source_import_check(query, title, semester, study_key, regulations_key, star
             raise click.ClickException("ISO-Woche muss das Format JJJJ-WNN haben.")
         requested.append((int(match[1]), int(match[2])))
     try:
+        policy = _identity_policy()
         with SourceClient(current_app.config.get("LSF_BASE_URL", ""),
                           max_requests=min(100, 12 + 2 * len(requested) + limit), retries=0) as client:
             report = run_import_check(
                 client, query=query, title=title, semester=semester,
                 study_key=study_key, regulations_key=regulations_key,
                 start=start.date(), end=end.date(), requested=tuple(requested), detail_limit=limit,
+                identity_policy=policy,
             )
-    except (ImportCheckInputError, SourceFetchError, DetailImportError) as error:
+    except (ImportCheckInputError, SourceFetchError, DetailImportError, SourceIdentityError) as error:
         raise click.ClickException(str(error)) from None
     if json_output:
         click.echo(report.to_json())

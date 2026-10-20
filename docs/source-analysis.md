@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.11`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.12`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -123,3 +123,7 @@ Live am 2026-10-20: KW 43/2026 und KW 44/2026 strukturell passend, 51 unterschie
 Drei weitere Detailseiten wurden gezielt geprüft. Eine enthält eine wöchentliche Serie, den Rhythmus Einzel mit genau einem Datum sowie eine Ausfallangabe mit vollständigem Datum und nachfolgendem Hinweis. Die [erweiterte Normalisierung](special-dates.md) verarbeitet diese Struktur und erhält Ausfälle separat, ohne eine Verlegungsbeziehung zu behaupten.
 
 Der abschließende Live-Test ergab zwei Serien, 16 Vorschautermine und einen Ausfall. Sieben HTTP-Anfragen einschließlich Navigation; keine Rohseiten, Quelladressen oder realen Hinweistexte gespeichert. Eine vollständig fiktive Fixture und Grenzfalltests ergänzen den Nachweis. 189 lokale Tests bestehen. Ausfallprüfung und dauerhafte Quellidentität bleiben im Ergebnis ausdrücklich offen.
+
+## Ergänzung V0.0.12 – Quellidentität
+
+Eine [konfigurierbare Veranstaltungskennung](source-identity.md) ordnet Detailziele unabhängig von Sitzungswerten zu. Der Vergleich in getrennten Sitzungen bestätigt die beobachtete Stabilität. Ohne lokale Konfiguration bleibt die laufbezogene Zuordnung aktiv. Studiengangs-/Prüfungsordnungszuordnung, weitere Sonderfälle und vollständige Semestererfassung bleiben offen. Nächster Schritt: die vollständige Semestererfassung einschließlich zusätzlicher Ansichten absichern, danach Persistenz und Webanzeige.
