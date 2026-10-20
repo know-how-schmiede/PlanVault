@@ -13,10 +13,11 @@ Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefas
 - Navigation zwischen erfassten Wochen und Wechsel zur Listenansicht ergänzt. Auswahl aktueller, nächster oder letzter erfasster Woche anhand der lokalen ISO-Kalenderwoche.
 - Tage und Wochen ohne erfasste Termine werden nicht als bestätigte Freizeiten dargestellt. Zeitgleiche Termine bleiben erhalten; keine Archivfreigabe.
 - Vorschau-Dateiformat unverändert, kein erneuter Import für die Darstellung nötig. Anleitung, Startseite, README und Roadmap aktualisiert.
+- Bebilderte Webseitenbeschreibung mit den bereitgestellten Screenshots von Startseite und Listen-Vorschau ergänzt und in der README verlinkt. Erfolgreiche Ergebnisanzeige und Kalenderwochenfilter im Serverbetrieb durch den Nutzer bestätigt; die Screenshots zeigen noch nicht die neue Wochenansicht.
 
-**Prüfung:** 298 lokale Tests erfolgreich, einschließlich Jahreswechsel, lokaler Tageszuordnung, Zeitumstellung, überlappender Termine, Navigation, Ansichtswechsel und weiterhin sicherer HTML-Ausgabe. HTML/CSS geprüft; keine Browser-Sichtprüfung. Kein Deployment oder neuer Live-Import. `git diff --check` ohne Fehler.
+**Prüfung:** 298 lokale Tests erfolgreich, einschließlich Jahreswechsel, lokaler Tageszuordnung, Zeitumstellung, überlappender Termine, Navigation, Ansichtswechsel und weiterhin sicherer HTML-Ausgabe. HTML/CSS geprüft; bereitgestellte Screenshots für die Webseitenbeschreibung visuell geprüft. Kein eigener Browser-Livetest, Deployment oder neuer Live-Import. Der Nutzer bestätigt die Ergebnisanzeige mit Kalenderwochenfilter auf dem Server. `git diff --check` ohne Fehler.
 
-**Commit-Kurzbeschreibung:** Version 0.0.22 mit Wochenansicht und Navigation für die Import-Vorschau ergänzen
+**Commit-Kurzbeschreibung:** Version 0.0.22 mit Wochenansicht, Navigation und bebilderter Webseitenbeschreibung ergänzen
 
 ## V0.0.21 – Unvollständige Import-Vorschau auf der Webseite
 

@@ -12,6 +12,10 @@ WI-PlanArchiv ist eine eigenständige, interne Webanwendung zur automatisierten 
 
 Die [unvollständige Import-Vorschau](docs/preview.md) zeigt lokal eingelesene Termine jetzt standardmäßig in einer Wochenansicht von Montag bis Sonntag. Navigation zwischen erfassten Wochen, alternative Listenansicht, Kalenderwochenfilter, Importzeitpunkt und Prüfhinweise sind verfügbar. Vorhandene Vorschau-Dateien bleiben kompatibel. Auf der Startseite führt ein Link zur Vorschau. Einmalige Einrichtung und manueller Import sind nötig; ein Update allein lädt keine Termine. Es handelt sich noch nicht um einen freigegebenen Archivstand.
 
+## Webseite und Bedienung
+
+Die [bebilderte Beschreibung der Webseite](docs/website-guide.md) zeigt die Startseite und die Import-Vorschau mit Kalenderwochenfilter. Sie erklärt die angezeigten Statusinformationen, die Bedienung und die Grenzen der noch unvollständigen Daten.
+
 ## Ziele
 
 - Ausgewählte Studiengänge bzw. standardmäßig die relevanten WI-Studiengänge regelmäßig sichern.
