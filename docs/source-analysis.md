@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Die aktuelle Anwendungsversion lautet `V0.0.3`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.3`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -27,8 +27,8 @@ Für den vertraulichen Umgang mit der Quelle gelten die [Konfigurationshinweise]
 | Datenbereitstellung | Plan und Wochenauswahl werden im gelieferten HTML dargestellt | HTTP genügt für den geprüften Ablauf |
 | Wochenwechsel | KW 44 zeigt 26.–30.10.2026; KW 53 zeigt 28.12.2026–01.01.2027 mit Weihnachtsferien-Hinweisen | Geprüft, einschließlich Jahreswechsel |
 | Semesterumfang | Auswahl bietet 26 Wochen vom 31.08.2026 bis 28.02.2027 sowie Semester-, Vorlesungszeit- und Blockterminansichten | Auswahl geprüft; vollständige Erfassung noch offen |
-| Terminstruktur | HTML-Plan mit Tagesüberschriften und verschachtelten Tabellen vorhanden | Feldzuordnung und Details noch zu prüfen |
-| Sonderfälle | Ferienhinweise in der Jahreswechselwoche sichtbar | Gruppen, Ausfälle, Block- und Einzeltermine noch offen |
+| Terminstruktur | Detailseiten mit Titelüberschrift, paarweisen Metadaten und Terminspalten für Tag, Zeit, Rhythmus, Dauer, Raum, Lehrperson, Durchführung, Bemerkung und Ausfälle | An zwei Veranstaltungen geprüft; erster Parser liest eine bzw. zwei Serien |
+| Sonderfälle | Ferienhinweise sichtbar; Block-/Einzelterminansicht aufgerufen, dort keine Blöcke nach dem bisher identifizierten Muster erkannt | Noch kein Nachweis für tatsächliche Block-/Einzeltermine, Gruppen oder Ausfälle |
 | Semesterwechsel | Nur voreingestelltes Wintersemester untersucht | Offen |
 
 Die sichtbaren Tagesüberschriften umfassen Montag bis Freitag. Daraus darf nicht geschlossen werden, dass es keine Wochenendtermine gibt. Die zusätzlichen Semesteransichten müssen daraufhin geprüft werden. Die 26 angebotenen Wochen sind ein Ausgangspunkt für den späteren Vollständigkeitsabgleich, noch kein Nachweis eines vollständigen Imports.
@@ -37,7 +37,7 @@ Ergebnisse jeweils mit Testdatum, geprüfter Auswahl und Beobachtung ergänzen. 
 
 ## Grundlage für Parser-Tests
 
-Nach Sichtung und Freigabe repräsentative, anonymisierte Fixtures unter `tests/fixtures/` vorbereiten. Vor Aufnahme sämtliche Adressen, Links, Formulardaten, eingebetteten Skriptdaten, Sitzungswerte und personenbezogenen Inhalte prüfen. Originalantworten bleiben außerhalb des Repositorys.
+Unter `tests/fixtures/course_detail.html` liegt eine auf der geprüften Struktur beruhende, vollständig fiktiv befüllte Testdatei. Sie enthält keine Originaltermine oder realen Identitäten. Weitere repräsentative, anonymisierte Fixtures bei zusätzlichen Beobachtungen ergänzen. Vor Aufnahme sämtliche Adressen, Links, Formulardaten, eingebetteten Skriptdaten, Sitzungswerte und personenbezogenen Inhalte prüfen. Originalantworten bleiben außerhalb des Repositorys.
 
 Die Fixtures sollen mindestens einen regulären Termin, eine leere Woche und einen tatsächlich in der Quelle beobachteten Sonderfall abdecken. Erwartete Ergebnisse werden anhand der geprüften Quelle festgelegt. Eine leere Woche darf nicht mit einem fehlgeschlagenen Abruf oder einer Anmeldeseite verwechselt werden.
 
@@ -47,9 +47,18 @@ M0 ist abgeschlossen, wenn ein geprüfter Navigations- und Abrufweg, eine freige
 
 Danach entsteht der Import-Prototyp für genau den geprüften Studiengang und Zeitraum. Die Versionslinie `V0.1.x` wird erst anhand der erreichten Ergebnisse vorgeschlagen; die dritte Stelle bestimmt der User.
 
+## Erster Detailparser
+
+`backend.parser.parse_course_detail(html, expected_semester=...)` liest eine Veranstaltungsdetailseite und liefert Metadaten sowie Terminserien. Der Veranstaltungstitel wird aus der beobachteten Überschrift gelesen; Langtext und Veranstaltungsnummer dürfen fehlen. Eine fehlende Nummer erzeugt einen Prüfhinweis, da der Titel keine stabile Identität garantiert.
+
+Im geprüften regulären Termin steht der Rhythmus `woch`; die Terminzeilen enthalten Start- und Enddatum sowie lokale Tageszeiten. Mehrere Serien werden erhalten. Unbekannte Rhythmen, Bemerkungen, Ausfalltexte und mehrere Termintabellen erzeugen Prüfhinweise. Es findet keine Expansion zu einzelnen Kalenderterminen statt. Die Hintergründe stehen in der [Entscheidung zu Terminserien](decisions/001-terminserien.md).
+
+Am 2026-10-20 bestehen 22 lokale Tests einschließlich der bisherigen App-Tests. Die Parser-Prüfungen umfassen unter anderem fehlende Felder, falsches Semester, ungültige Uhrzeiten und Daten, unbekannte Zeilen, Spaltenumordnung, Ausfallhinweise sowie Login-/Fehlerseiten. Zwei Live-Detailseiten wurden danach erfolgreich gelesen; nur zusammengefasste Ergebnisse wurden ausgegeben.
+
+Der Parser allein bestätigt keine vollständige Semestererfassung. Der Aufruf der Sonderterminansicht ohne erkannte Blöcke darf nicht als Beleg für das Fehlen von Sonderterminen interpretiert werden.
+
 ## Nächster Umsetzungsschritt
 
-1. Feldzuordnung anhand einer regulären Veranstaltung sowie Detailansicht untersuchen und Block-/Einzeltermine mit der Wochenansicht abgleichen.
-2. Eine kleine, bereinigte Testgrundlage erstellen; keine echten Quelladressen, Sitzungswerte oder personenbezogenen Angaben übernehmen.
-3. Einen HTTP-Abrufadapter mit Laufzeitkonfiguration und temporärer Sitzung umsetzen. Formularziele und Navigationswerte aus der Antwort lesen, statt ungeprüfte Endpunkte fest einzubauen.
-4. Die erwarteten Wochen und tatsächlich verarbeiteten Wochen explizit vergleichen. Anmeldeseiten, Fehlerseiten und unvollständige Antworten dürfen nicht als leere Pläne gelten.
+1. Eine tatsächlich belegte Block-/Einzeltermin- oder Gruppenkonstellation und konkrete Ausfallangaben untersuchen; zusätzliche bereinigte Testdaten ergänzen.
+2. Einen HTTP-Abrufadapter mit Laufzeitkonfiguration und temporärer Sitzung umsetzen. Formularziele und Navigationswerte aus der Antwort lesen, statt ungeprüfte Endpunkte fest einzubauen; Ereignisidentität aus der Navigation belastbar zuordnen.
+3. Die erwarteten Wochen und tatsächlich verarbeiteten Wochen explizit vergleichen. Anmeldeseiten, Fehlerseiten und unvollständige Antworten dürfen nicht als leere Pläne gelten.

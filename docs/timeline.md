@@ -2,7 +2,7 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
-## V0.0.3 – Versionsfortschreibung
+## V0.0.3 – Quellenanalyse und erster Detailparser
 
 **Datum:** 2026-10-20
 
@@ -10,10 +10,13 @@ Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefas
 
 - Anwendungsversion auf Wunsch des Users zentral in `version.py` auf `0.0.3` gesetzt. Der Footer übernimmt die Version nach dem Deployment automatisch.
 - Aktuelle Versionsangaben in Roadmap und Quellenanalyse aktualisiert. M0 bleibt in Bearbeitung.
+- Feldstruktur zweier Veranstaltungsdetailseiten geprüft und eine ausschließlich fiktiv befüllte HTML-Testdatei aus der beobachteten Struktur erstellt.
+- Detailparser mit Beautiful Soup ergänzt: Titel, optionale Metadaten und mehrere Terminserien lesen; unvollständige Seiten ablehnen; ungeprüfte Rhythmen, Ausfälle und fehlende Quellkennungen markieren. Keine ungeprüfte Erzeugung einzelner Kalendertermine.
+- Parserentscheidung, Abhängigkeit und verbleibende Schritte für Sonderfälle und vollständigen Import dokumentiert.
 
-**Prüfung:** Versionswert, zentrale Einbindung im Footer und Dokumentationsangaben abgeglichen; `git diff --check` ohne Fehler. Keine erneuten Laufzeittests für die reine Versionsänderung; noch nicht auf dem Server ausgerollt.
+**Prüfung:** Versionswert, zentrale Einbindung im Footer und Dokumentationsangaben abgeglichen; `git diff --check` ohne Fehler. 22 lokale Tests erfolgreich. Detailparser zusätzlich an zwei Live-Seiten erfolgreich geprüft (eine bzw. zwei Terminserien), ohne Quelladressen oder Rohdaten zu speichern. Vollständiger Semesterimport und echte Sonderfälle bleiben offen; Änderungen noch nicht auf dem Server ausgerollt.
 
-**Commit-Kurzbeschreibung:** Anwendungsversion auf 0.0.3 erhöhen
+**Commit-Kurzbeschreibung:** Version 0.0.3 mit Detailparser und geprüfter Testgrundlage ergänzen
 
 ## V0.0.2 – Debian-13-LXC-Installation
 

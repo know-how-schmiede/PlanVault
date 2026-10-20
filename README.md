@@ -6,7 +6,7 @@
 
 WI-PlanArchiv ist eine eigenständige, interne Webanwendung zur automatisierten Sicherung, Versionierung und übersichtlichen Anzeige von Vorlesungsplänen. Ausgangspunkt ist die Vorlesungsplanung der Wirtschaftsingenieurwesen-Studiengänge (WI) der Hochschule Pforzheim im QIS-LSF-System. Die Architektur soll eine spätere Erweiterung auf andere Studiengänge ermöglichen.
 
-> **Projektstatus:** Grundgerüst installiert und Update getestet. Die Quellenanalyse läuft: Studiengangsuche, Planabruf und Wochenwechsel sind per HTTP ohne Anmeldung verifiziert. Automatischer Import und vollständige Semestererfassung folgen. Siehe [Quellenanalyse](docs/source-analysis.md).
+> **Projektstatus:** Grundgerüst installiert und Update getestet. Die Quellenanalyse läuft: Studiengangsuche, Planabruf und Wochenwechsel sind per HTTP ohne Anmeldung verifiziert. Ein erster Detailparser liest Terminserien und ist mit fiktiven Testdaten sowie zwei Live-Detailseiten geprüft. Automatischer Import und vollständige Semestererfassung folgen. Siehe [Quellenanalyse](docs/source-analysis.md).
 
 ## Ziele
 
@@ -151,9 +151,9 @@ Tests ausführen:
 .venv\Scripts\python -m pytest
 ```
 
-Flask stellt Web-Routen und Templates bereit; pytest prüft Startseite, Footer-Version und die Vertraulichkeit der Konfiguration. Die Startseite benötigt keine Datenquelle und führt keine Abrufe aus. `LSF_BASE_URL` wird nur bei Bedarf über die Prozessumgebung bereitgestellt. `.env.example` dokumentiert den Variablennamen; `.env` wird nicht automatisch geladen. Siehe [Datenquellenkonfiguration](docs/source-configuration.md).
+Flask stellt Web-Routen und Templates bereit. Beautiful Soup liest die beobachtete HTML-Tabellenstruktur. pytest prüft Startseite, Footer-Version, vertrauliche Konfiguration und den Detailparser. Die Startseite benötigt keine Datenquelle und führt keine Abrufe aus. `LSF_BASE_URL` wird nur bei Bedarf über die Prozessumgebung bereitgestellt. `.env.example` dokumentiert den Variablennamen; `.env` wird nicht automatisch geladen. Siehe [Datenquellenkonfiguration](docs/source-configuration.md).
 
-Das Grundgerüst enthält getrennte Pakete für Import, Parser, Speicherung und Scheduler; deren Fachfunktionen folgen in den nächsten Meilensteinen. Zielumgebung bleibt ein Debian-LXC auf Proxmox mit SQLite. Produktionsdeployment und Datenbank werden später ergänzt.
+Das Grundgerüst enthält getrennte Pakete für Import, Parser, Speicherung und Scheduler. Der Parser für Veranstaltungsdetails ist implementiert; Netzwerkimport, Persistenz und Zeitsteuerung folgen in den nächsten Meilensteinen. Der Parser erzeugt noch keine einzelnen Kalendertermine und bestätigt keine Semester-Vollständigkeit. Zielumgebung bleibt ein Debian-LXC auf Proxmox mit SQLite. Produktionsdeployment und Datenbank werden später ergänzt.
 
 **Wichtig:** Der produktive Sicherungsdienst muss die Quelle aus dem Hochschulnetz tatsächlich erreichen können. Die öffentliche Erreichbarkeit der Archivansicht und deren Berechtigungen sind unabhängig davon zu prüfen.
 
