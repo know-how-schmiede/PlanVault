@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.16`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.17`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -155,3 +155,12 @@ Explizite Ausfalldaten können jetzt auch dann normalisiert werden, wenn der zug
 ### Fortsetzung innerhalb V0.0.16 – Serienbemerkungen
 
 Die vier Bemerkungen der drei zuvor gesperrten Veranstaltungen sind eingeordnet: zweimal eine Vorlesungskennzeichnung, einmal die Kennzeichnung eines expliziten Einzeltermins als Nachholtermin und einmal ein Laborraumhinweis. Die vermeintliche Datumsangabe war eine Raumkennung. Diese drei eng begrenzten Formate werden jetzt unverändert als `series_annotations` mit Serienindex erhalten. Sie ändern keine Termine und überschreiben kein Raumfeld. Alle Hinweise bleiben prüfpflichtig; beim Laborraumhinweis besteht eine Abweichung zum Raumfeld. Unbekannte Bemerkungen und Durchführungshinweise blockieren weiterhin die ganze Vorschau. Nächster Schritt: vollständigen Semesterumfang einschließlich Wochenenden und leerer Zusatzansicht nachweisen; danach sichere Speicherung und Webanzeige.
+
+## Ergänzung V0.0.17 – Zusätzliche Veranstaltungsblöcke
+
+Die bisher als ungeklärt leer gemeldete Block-/Einzelterminansicht enthält tatsächlich 98 Veranstaltungsblöcke einer zweiten Tabellenklasse. Die achtzeilige Struktur mit einem Detailverweis in der Kopfzeile wurde live geprüft und wird nun gemeinsam mit der bisherigen Variante erkannt. Auch die Semesteransicht enthält diese Variante: 162 Blöcke und 66 eindeutige Ziele statt zuvor 54. Die Zusatzansicht enthält 33 eindeutige Ziele, alle bereits in der Semesteransicht vorhanden. Der Sammler übersah bisher zwölf Ziele; die frühere Zahl 54 ist kein Vollständigkeitsnachweis.
+
+Beide Ansichten zeigen Montag bis Freitag. Im untersuchten Auswahlformular wurde kein Wochenendschalter gefunden. Der Bericht erfasst sichtbare Wochentage nur als Beobachtung, nicht als Nachweis fehlender Wochenendveranstaltungen. Vollständigkeit und Veröffentlichung bleiben gesperrt. Für die 66 Ziele muss das bisherige Standard-Detailbudget von 60 ausdrücklich erhöht werden, beispielsweise auf 80.
+
+
+**Abschließender Live-Lauf V0.0.17:** 74 HTTP-Anfragen, 66 Details geparst, 64 Vorschauen erzeugt (21 mit fachlichen Prüfhinweisen), zwei neu erfasste Details technisch blockiert. Keine Wochenendtermine in den erzeugten Vorschauen; dies ist kein Nachweis für die Abwesenheit weiterer Wochenendveranstaltungen. Nächster Schritt: die zwei neuen Normalisierungsfälle klären und die verbleibenden Vollständigkeitskriterien absichern.

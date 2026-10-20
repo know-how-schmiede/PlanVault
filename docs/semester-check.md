@@ -1,4 +1,4 @@
-# Semesteransichten prüfen – V0.0.15
+# Semesteransichten prüfen – V0.0.17
 
 `source-semester-check` untersucht zusätzlich zur Wochenstichprobe zwei
 ausdrücklich ausgewählte Ansichten: die gesamte Semesteransicht und die
@@ -37,7 +37,7 @@ bleibt aktiv. Keine Dateien oder Archivdaten werden geschrieben.
 - Bei Struktur- oder Abruffehlern lautet der Bericht `failed`; es wird keine
   erfolgreiche Teilbestandsaufnahme ausgegeben.
 
-Der eigene Berichtsvertrag `schema_version=3` enthält Anwendungsversion, Status,
+Der eigene Berichtsvertrag `schema_version=4` enthält Anwendungsversion, Status,
 Ansichtscodes, Anzahl eindeutiger Detailziele und zusätzliche Ziele der zweiten
 Ansicht. Der erste `additional_count` ist definitionsgemäß null. URLs,
 Kennungen, Titel und andere Quellinhalte werden nicht ausgegeben.
@@ -69,7 +69,7 @@ zusätzlich angegeben werden. Beispiel mit ausschließlich fiktiven Auswahlwerte
 python -m flask --app backend source-semester-check \
   --query "Fiktiv" --title "Fiktives Studium (DEMO-PO)" \
   --details --semester "WiSe 2026/27" \
-  --study-key DEMO --regulations-key DEMO-PO --detail-budget 60 --json
+  --study-key DEMO --regulations-key DEMO-PO --detail-budget 80 --json
 ```
 
 Das Detailbudget beträgt standardmäßig 60, zulässig sind 1 bis 100. Es wird vor
@@ -101,3 +101,31 @@ der geprüften Details. Der dritte Wert ist eine Teilmenge der Vorschauen.
 `normalization_review_count` umfasst weiterhin blockierte Details und Vorschauen
 mit fachlichen Prüfhinweisen. Bei einem abgebrochenen Detailabruf bleiben sämtliche
 Detailzähler null. Die Erweiterung gibt keine Titel, Quellwerte oder Freitexte aus.
+## Ergänzung V0.0.17 – Zweite Blockdarstellung und Schema 4
+
+Die bisher als `empty_unverified` gemeldete Zusatzansicht enthielt eine vom
+Sammler noch nicht erkannte Blockdarstellung. Beide live geprüften Varianten
+werden jetzt mit derselben strengen Prüfung von acht Zeilen, Kopfzeile und genau
+einem Detailverweis verarbeitet. Raumlinks bleiben ausgeschlossen. Gemischte
+Darstellungen werden nach Quellkennung zusammengeführt; dieselbe Kopfzelle wird
+auch dann nur einmal gezählt, wenn sie beide CSS-Klassen trägt.
+
+Die aktuelle Bestandsaufnahme umfasst 162 Blöcke und 66 eindeutige Ziele in der
+Semesteransicht sowie 98 Blöcke und 33 Ziele in der Zusatzansicht. Die 33 Ziele
+sind bereits in der ersten Ansicht enthalten. Damit wurden zwölf zuvor nicht
+erfasste Veranstaltungsziele gefunden. Frühere Angaben über 54 Ziele beziehen
+sich auf den damaligen, unvollständigen Sammler.
+
+Schema 4 ergänzt pro Ansicht `block_count` und `visible_weekdays` (Montag = 0,
+Sonntag = 6). Letzteres enthält ausschließlich erkannte Tagesüberschriften;
+eine leere Liste bedeutet keine beobachteten Überschriften. Selbst sieben
+beobachtete Wochentage würden noch keine vollständige Inhaltsprüfung belegen.
+Der Live-Test zeigt in beiden Ansichten nur Montag bis Freitag. Wochenenden und
+Semester-Vollständigkeit bleiben offen; `complete` und `published` bleiben false.
+
+Für die jetzt 66 Ziele `--detail-budget 80` verwenden. Der Standard bleibt 60,
+damit größere Abrufe bewusst gewählt werden müssen. Bei Überschreitung des
+Budgets starten keine Detailabrufe. Die Gesamtgrenze von 100 HTTP-Anfragen bleibt
+unverändert. Tatsächlich blocklose Ansichten bleiben `empty_unverified`.
+
+**Abschließender Live-Lauf V0.0.17:** 74 HTTP-Anfragen, 66 Details geparst, 64 Vorschauen erzeugt (21 mit fachlichen Prüfhinweisen), zwei neu erfasste Details technisch blockiert. Keine Wochenendtermine in den erzeugten Vorschauen; dies ist kein Nachweis für die Abwesenheit weiterer Wochenendveranstaltungen. Nächster Schritt: die zwei neuen Normalisierungsfälle klären und die verbleibenden Vollständigkeitskriterien absichern.

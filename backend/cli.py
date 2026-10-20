@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from flask import current_app
 from flask.cli import with_appcontext
 
+from backend.importer.structure import COURSE_BLOCK_SELECTOR
 from backend.importer.http import SourceClient, SourceFetchError
 from backend.importer.forms import FormNavigationError
 from backend.importer.navigation import search_study, follow_named_result, submit_labeled_search
@@ -60,7 +61,7 @@ def source_plan_check(query, title):
         soup = BeautifulSoup(plan.html, "html.parser")
         if soup.select('input[type="password" i]'):
             raise FormNavigationError("Anmeldeseite statt Planantwort erhalten.")
-        count = len(soup.select("td.plan5a"))
+        count = len(soup.select(COURSE_BLOCK_SELECTOR))
         if not count:
             raise FormNavigationError("Kein bekanntes Veranstaltungsmuster erkannt; keine bestätigte leere Planung.")
     except (SourceFetchError, FormNavigationError) as error:
@@ -230,7 +231,7 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
             raise FormNavigationError("Semester- und Studiengangsangaben benötigen --details.")
     except (SourceIdentityError, FormNavigationError, DetailImportError) as error:
         raise click.ClickException(str(error)) from None
-    report = {"schema_version": 3, "app_version": __version__, "status": "needs_review",
+    report = {"schema_version": 4, "app_version": __version__, "status": "needs_review",
               "views": [], "details_requested": details, "checked_details": 0,
               "normalization_review_count": 0, "known_details_checked": False,
               "normalization_summary": {"preview_count": 0, "blocked_count": 0, "review_preview_count": 0},
@@ -245,7 +246,9 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
             views = audit_semester_views(client, plan, identity_policy=policy)
             report["views"] = [
                 {"view": v.view, "status": v.status, "reference_count": v.reference_count,
-                 "additional_count": v.additional_count} for v in views
+                 "additional_count": v.additional_count,
+                 "block_count": sum(r.block_count for r in v.references),
+                 "visible_weekdays": v.visible_weekdays} for v in views
             ]
             if details:
                 sample = fetch_semester_details(client, views, semester=semester,

@@ -2,6 +2,24 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.17 – Bisher übersehene Veranstaltungsblöcke erfassen
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.17` gesetzt; Footer übernimmt die Version.
+- Zweite Veranstaltungsblock-Darstellung live geprüft und in Detail-, Wochen-, Semester- und Strukturprüfung gemeinsam unterstützt. Acht Zeilen und genau ein Detailverweis bleiben Pflicht.
+- Die vermeintlich leere Zusatzansicht enthält 98 Blöcke und 33 eindeutige Ziele. Die Semesteransicht enthält insgesamt 162 Blöcke und 66 Ziele: zwölf mehr als mit dem bisherigen Sammler.
+- Gemischte Darstellungen dedupliziert; Raumlinks und unvollständige Blockstrukturen weiterhin abgelehnt.
+- Semesterbericht auf Schema 4 mit Blockanzahl und beobachteten Wochentagen erweitert. Sichtbare Tagesüberschriften bestätigen keine Inhaltsvollständigkeit.
+- Anleitung auf das explizite Detailbudget 80 für die 66 Ziele angepasst; Standard 60 und harte HTTP-Grenze 100 bleiben erhalten.
+- Fiktive Tests, README, Roadmap und Quellenanalyse aktualisiert; frühere Leerinterpretation ausdrücklich korrigiert.
+
+**Prüfung:** 257 lokale Tests erfolgreich. Begrenzte Strukturproben sowie abschließender Live-Lauf mit 74 HTTP-Anfragen: alle 66 Details geparst, 64 Vorschauen erzeugt (davon 21 mit fachlichen Prüfhinweisen), zwei Details weiterhin blockiert. Beide Ansichten zeigen Montag bis Freitag; keine Wochenendtermine in den erzeugten Vorschauen. Daraus folgt kein Vollständigkeitsnachweis für Wochenenden. Keine Rohseiten oder vertraulichen Werte gespeichert. `git diff --check` ohne Fehler. Kein Deployment im LXC; Speicherung und Webanzeige bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.17 mit zusätzlicher Blockdarstellung und korrigierter Semestererfassung ergänzen
+
 ## V0.0.16 – Verlegungs- und Serienhinweise erhalten
 
 **Datum:** 2026-10-20

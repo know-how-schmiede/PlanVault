@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 import hashlib
 import re
 
+from backend.importer.structure import COURSE_BLOCK_SELECTOR
 from backend.importer.http import SourceClient, SourceDocument, SourceFetchError
 from backend.importer.navigation import _page, _caption
 from backend.importer.forms import FormNavigationError
@@ -105,7 +106,7 @@ def collect_course_references(client: SourceClient, documents: tuple[SourceDocum
     for document in documents:
         try:
             soup = _page(document)
-            blocks = soup.select("td.plan5a")
+            blocks = soup.select(COURSE_BLOCK_SELECTOR)
             if not blocks:
                 raise DetailImportError("Keine bekannten Veranstaltungsblöcke; kein bestätigter leerer Plan.")
             for block in blocks:

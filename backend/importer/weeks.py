@@ -5,6 +5,7 @@ from datetime import date, datetime, timedelta
 import re
 from collections.abc import Callable
 
+from backend.importer.structure import COURSE_BLOCK_SELECTOR
 from backend.importer.coverage import Coverage, WeekResult, check_week_coverage
 from backend.importer.forms import FormNavigationError, SearchForm, read_search_form
 from backend.importer.http import SourceClient, SourceDocument, SourceFetchError
@@ -113,7 +114,7 @@ def inspect_week(document: SourceDocument, expected: WeekChoice) -> WeekResult:
     # Bisher live beobachtet: genau Montag bis Freitag, kein Wochenendnachweis.
     if days != expected_days:
         raise FormNavigationError("Sichtbare Tagesdaten passen nicht zur angeforderten Woche.")
-    status = "notes_require_review" if notices else ("ok" if soup.select("td.plan5a") else "empty_unverified")
+    status = "notes_require_review" if notices else ("ok" if soup.select(COURSE_BLOCK_SELECTOR) else "empty_unverified")
     return WeekResult(*expected.key, status)
 
 

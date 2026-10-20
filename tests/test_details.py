@@ -195,3 +195,27 @@ def test_successful_preview_does_not_duplicate_unresolved_course(client):
     detail = sample(session, refs).details[0]
     assert detail.preview is not None
     assert detail.unresolved_course is None
+@pytest.mark.parametrize("classes", ["plan5", "plan5a", "plan5 plan5a"])
+def test_both_verified_block_classes_are_collected_once(client, classes):
+    session, calls = client
+    refs = collect_course_references(session, (doc(block().replace('class="plan5a"', f'class="{classes}"')),))
+    assert len(refs) == 1
+    assert refs[0].block_count == 1
+    assert calls == []
+
+
+def test_mixed_classes_preserve_new_targets_and_deduplicate_repeated_targets(client):
+    session, _ = client
+    regular = block("/one")
+    alternate = block("/two").replace('class="plan5a"', 'class="plan5"')
+    repeat = block("/one").replace('class="plan5a"', 'class="plan5"')
+    refs = collect_course_references(session, (doc(regular + alternate + repeat),))
+    assert len(refs) == 2
+    assert sum(r.block_count for r in refs) == 3
+
+
+def test_new_block_class_still_requires_verified_structure(client):
+    session, _ = client
+    malformed = block().replace('class="plan5a"', 'class="plan5"').replace("<tr><td>Fiktive Angabe</td></tr>", "", 1)
+    with pytest.raises(DetailImportError):
+        collect_course_references(session, (doc(malformed),))

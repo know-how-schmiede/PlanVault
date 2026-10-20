@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass, field
 
+from backend.importer.structure import COURSE_BLOCK_SELECTOR
 from backend.importer.details import (
     collect_course_references, CourseReference, merge_course_references,
     fetch_detail_sample, validate_detail_context, DetailImportError, DetailSample,
@@ -50,6 +51,7 @@ class SemesterViewResult:
     reference_count: int
     additional_count: int
     references: tuple[CourseReference, ...] = field(repr=False)
+    visible_weekdays: tuple[int, ...] = ()
 
 
 def audit_semester_views(client, document, *, identity_policy: SourceIdentityPolicy):
@@ -87,9 +89,12 @@ def audit_semester_views(client, document, *, identity_policy: SourceIdentityPol
         if len(selected) != 1 or _caption(selected[0]) != label:
             raise FormNavigationError("Quelle hat die angeforderte Semesteransicht nicht übernommen.")
         refs = (collect_course_references(client, (document,), identity_policy=identity_policy)
-                if soup.select("td.plan5a") else ())
+                if soup.select(COURSE_BLOCK_SELECTOR) else ())
+        day_names = ("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag")
+        visible_days = tuple(sorted({day_names.index(_caption(h)) for h in soup.find_all("th")
+                                     if _caption(h) in day_names}))
         keys = {r.key for r in refs}
         results.append(SemesterViewResult(code, "observed" if refs else "empty_unverified",
-                                         len(refs), len(keys - known) if results else 0, refs))
+                                         len(refs), len(keys - known) if results else 0, refs, visible_days))
         known.update(keys)
     return tuple(results)

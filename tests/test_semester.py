@@ -143,6 +143,23 @@ def test_cli_report_is_private_and_never_published(monkeypatch, fail):
     assert result.exit_code == 1
     report = json.loads(result.output)
     assert report["status"] == ("failed" if fail else "needs_review")
+    assert report["schema_version"] == 4
+    if not fail:
+        assert all(v["block_count"] == 1 and v["visible_weekdays"] == [] for v in report["views"])
     assert not report["complete"] and not report["published"]
     for secret in ("example.invalid", "PRIVATE-NAMESPACE", "Fiktiver", "VERTRAULICH", "record"):
         assert secret not in result.output
+
+@pytest.mark.parametrize("days", [("Montag", "Freitag"), ("Montag", "Samstag", "Sonntag"), ()])
+def test_alternative_blocks_are_not_empty_and_weekdays_are_only_observed(session, monkeypatch, days):
+    client, _ = session
+    def fetch(*args, **kwargs):
+        selected = dict(kwargs["form"])["demo-view"]
+        headers = "<table><tr>" + "".join(f"<th>{day}</th>" for day in days) + "</tr></table>"
+        response = document(selected, (1,), headers)
+        return SourceDocument(response.html.replace('class="plan5a"', 'class="plan5"'), response.location)
+    monkeypatch.setattr(client, "fetch", fetch)
+    results = audit_semester_views(client, document(), identity_policy=SourceIdentityPolicy("record", "demo"))
+    expected = tuple(("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag").index(d) for d in days)
+    assert all(v.status == "observed" and v.reference_count == 1 for v in results)
+    assert all(v.visible_weekdays == expected for v in results)

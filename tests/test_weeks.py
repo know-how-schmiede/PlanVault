@@ -152,3 +152,9 @@ def test_cli_partial_selection_reports_missing(monkeypatch):
     assert "Fehlende Wochen: 1" in result.output
     assert "Kein Semesterimport" in result.output
     assert "example.invalid" not in result.output
+
+
+def test_alternative_block_class_is_not_reported_as_empty():
+    document = doc(html().replace('class="plan5a"', 'class="plan5"'))
+    expected = read_week_menu(document).choices[0]
+    assert inspect_week(document, expected).status == "ok"
