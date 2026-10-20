@@ -33,6 +33,12 @@ class DetailResult:
     status: str
     preview: CalendarPreview | None = field(repr=False)
 
+    @property
+    def requires_review(self) -> bool:
+        return self.status != "preview" or bool(
+            self.preview and set(self.preview.review_reasons) - {"source_context_requires_verification"}
+        )
+
 
 @dataclass(frozen=True)
 class DetailSample:

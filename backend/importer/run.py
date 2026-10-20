@@ -110,11 +110,7 @@ def run_import_check(client: SourceClient, *, query: str, title: str, semester: 
     unchecked = len(references) - checked
     if unchecked:
         blockers.add("unchecked_details")
-    review_count = sum(
-        detail.status != "preview" or bool(
-            detail.preview and set(detail.preview.review_reasons) - {"source_context_requires_verification"}
-        ) for detail in sample.details
-    ) if sample else 0
+    review_count = sum(detail.requires_review for detail in sample.details) if sample else 0
     if review_count:
         blockers.add("normalization_requires_review")
     return ImportCheckReport(

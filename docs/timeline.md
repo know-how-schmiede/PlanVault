@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.11 – Live-belegte Einzeltermine und Ausfälle
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version auf Userwunsch zentral auf `0.0.11` gesetzt.
+- Drei weitere Detailseiten gezielt untersucht; erstmals eine Kombination aus wöchentlicher Serie, Einzeltermin und Ausfallhinweis live belegt.
+- Rhythmus `Einzel` für genau ein Datum standardmäßig unterstützt; mehrtägige Angaben weiterhin abgelehnt.
+- Ausfallformat `Datum: Hinweis` ergänzt. Ausgefallene Termine werden separat mit Datum, Serienbezug und Hinweis erhalten; keine automatische Zuordnung eines Ersatztermins.
+- Prüfhinweise in Detail-CLI und gemeinsamem Importbericht vereinheitlicht. Auch eine erzeugte Vorschau kann fachlich prüfpflichtig bleiben.
+- Fiktive Sonderfall-Fixture, Tests, README, Roadmap und Quellenanalyse aktualisiert.
+
+**Prüfung:** 189 lokale Tests erfolgreich. Abschließender Live-Test mit sieben HTTP-Anfragen: zwei Serien, 16 Vorschautermine, ein separat erhaltener Ausfall; fachliche Prüfhinweise bleiben bestehen. Keine Rohseiten, Quelladressen oder realen Hinweistexte gespeichert. `git diff --check` ohne Fehler. Vollständiger Semesterimport, stabile Identität, Speicherung und Webanzeige bleiben offen; kein Deployment im LXC.
+
+**Commit-Kurzbeschreibung:** Version 0.0.11 mit live belegten Einzelterminen und erhaltenen Ausfallhinweisen ergänzen
+
 ## V0.0.10 – Gemeinsamer Import-Prüflauf und JSON-Bericht
 
 **Datum:** 2026-10-20

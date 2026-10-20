@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.10`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.11`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -28,7 +28,7 @@ Für den vertraulichen Umgang mit der Quelle gelten die [Konfigurationshinweise]
 | Wochenwechsel | KW 44 zeigt 26.–30.10.2026; KW 53 zeigt 28.12.2026–01.01.2027 mit Weihnachtsferien-Hinweisen | Geprüft, einschließlich Jahreswechsel |
 | Semesterumfang | Auswahl bietet 26 Wochen vom 31.08.2026 bis 28.02.2027 sowie Semester-, Vorlesungszeit- und Blockterminansichten | Auswahl geprüft; vollständige Erfassung noch offen |
 | Terminstruktur | Detailseiten mit Titelüberschrift, paarweisen Metadaten und Terminspalten für Tag, Zeit, Rhythmus, Dauer, Raum, Lehrperson, Durchführung, Bemerkung und Ausfälle | An zwei Veranstaltungen geprüft; erster Parser liest eine bzw. zwei Serien |
-| Sonderfälle | Ferienhinweise sichtbar; Block-/Einzelterminansicht aufgerufen, dort keine Blöcke nach dem bisher identifizierten Muster erkannt | Noch kein Nachweis für tatsächliche Block-/Einzeltermine, Gruppen oder Ausfälle |
+| Sonderfälle | Ferienhinweise sichtbar; zusätzlich Kombination aus wöchentlicher Serie, `Einzel` und Ausfallangabe `Datum: Hinweis` in einer Detailseite geprüft | Einzeltermin und Ausfallformat ab V0.0.11 belegt; Blocktermine, Gruppen und Verlegungsbeziehungen bleiben offen |
 | Semesterwechsel | Nur voreingestelltes Wintersemester untersucht | Offen |
 
 Die sichtbaren Tagesüberschriften umfassen Montag bis Freitag. Daraus darf nicht geschlossen werden, dass es keine Wochenendtermine gibt. Die zusätzlichen Semesteransichten müssen daraufhin geprüft werden. Die 26 angebotenen Wochen sind ein Ausgangspunkt für den späteren Vollständigkeitsabgleich, noch kein Nachweis eines vollständigen Imports.
@@ -59,7 +59,7 @@ Der Parser allein bestätigt keine vollständige Semestererfassung. Der Aufruf d
 
 ## Nächster Umsetzungsschritt
 
-1. Eine tatsächlich belegte Block-/Einzeltermin- oder Gruppenkonstellation und konkrete Ausfallangaben untersuchen; zusätzliche bereinigte Testdaten ergänzen.
+1. Weitere Block-/Gruppenkonstellationen und Ausfallvarianten untersuchen; der erste Einzeltermin mit Ausfallhinweis ist belegt, die fachliche Beziehung noch offen.
 2. Den vorhandenen HTTP-Abrufadapter an die Navigation anbinden. Formularziele und Navigationswerte aus der Antwort lesen, statt ungeprüfte Endpunkte fest einzubauen; Ereignisidentität aus der Navigation belastbar zuordnen.
 3. Die erwarteten Wochen und tatsächlich verarbeiteten Wochen explizit vergleichen. Anmeldeseiten, Fehlerseiten und unvollständige Antworten dürfen nicht als leere Pläne gelten.
 
@@ -117,3 +117,9 @@ Live am 2026-10-20: 53 Blöcke, 47 unterschiedliche Detailziele, zwei geprüfte 
 Der [gemeinsame Import-Prüflauf](import-check.md) verbindet Wochenabgleich und Detailstichprobe in einer Sitzung. Gleiche Detailziele aus mehreren Wochen werden vor dem Abruf zusammengeführt. Bereinigte Berichte enthalten Lauf-ID, Zeitstempel, Version, Phasen, Anzahlen und offene Punkte, jedoch keine Quelldaten oder Veranstaltungsinhalte.
 
 Live am 2026-10-20: KW 43/2026 und KW 44/2026 strukturell passend, 51 unterschiedliche Detailziele, zwei geprüft; 24 Wochen und 49 Ziele bleiben offen. Zehn HTTP-Anfragen. 178 lokale Tests erfolgreich. Keine Rohseiten gespeichert, keine Archivveröffentlichung. Dauerhafte Quellidentität und fachliche Semester-Vollständigkeit bleiben zwingende offene Voraussetzungen.
+
+## Ergänzung V0.0.11
+
+Drei weitere Detailseiten wurden gezielt geprüft. Eine enthält eine wöchentliche Serie, den Rhythmus Einzel mit genau einem Datum sowie eine Ausfallangabe mit vollständigem Datum und nachfolgendem Hinweis. Die [erweiterte Normalisierung](special-dates.md) verarbeitet diese Struktur und erhält Ausfälle separat, ohne eine Verlegungsbeziehung zu behaupten.
+
+Der abschließende Live-Test ergab zwei Serien, 16 Vorschautermine und einen Ausfall. Sieben HTTP-Anfragen einschließlich Navigation; keine Rohseiten, Quelladressen oder realen Hinweistexte gespeichert. Eine vollständig fiktive Fixture und Grenzfalltests ergänzen den Nachweis. 189 lokale Tests bestehen. Ausfallprüfung und dauerhafte Quellidentität bleiben im Ergebnis ausdrücklich offen.

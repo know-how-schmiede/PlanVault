@@ -2,6 +2,20 @@
 
 **Stand:** 2026-10-20, Version 0.0.4.
 
+**Fortschreibung V0.0.11:** Nach Live-Nachweis wird `Einzel` mit genau einem
+Datum standardmäßig unterstützt. Das beobachtete Format `Datum: Ausfallhinweis`
+wird gelesen; Ausfälle bleiben separat samt Hinweis in der Vorschau erhalten.
+Die folgenden ursprünglichen Einschränkungen zu Einzelterminen und reinem
+Datumsformat werden damit erweitert. Blockregeln und fachliche Freigabe bleiben
+offen. Siehe [Sondertermine](../special-dates.md).
+
+**Fortschreibung V0.0.11:** Nach Live-Nachweis wird `Einzel` mit genau einem
+Datum standardmäßig unterstützt. Das beobachtete Format `Datum: Ausfallhinweis`
+wird gelesen; Ausfälle bleiben separat samt Hinweis in der Vorschau erhalten.
+Die folgenden ursprünglichen Einschränkungen zu Einzelterminen und reinem
+Datumsformat werden damit erweitert. Blockregeln und fachliche Freigabe bleiben
+offen. Siehe [Sondertermine](../special-dates.md).
+
 ## Entscheidung
 
 Der HTML-Parser erhält Terminserien weiterhin unverändert. Zusätzlich akzeptiert

@@ -1,0 +1,46 @@
+# Einzeltermine und Ausfallhinweise – V0.0.11
+
+Eine erweiterte Live-Stichprobe hat eine Detailseite mit einer wöchentlichen
+Serie, einem ausdrücklich als `Einzel` bezeichneten Termin und einer Ausfallangabe
+geliefert. Der Einzeltermin besitzt genau ein Datum; sein Wochentag passt dazu.
+Die Ausfallspalte verwendet die Form `vollständiges Datum: Hinweistext`.
+
+## Umsetzung
+
+- `Einzel` wird jetzt standardmäßig als einzelner Termin unterstützt. Start- und
+  Enddatum müssen identisch sein. Mehrtägige Bereiche werden nicht als
+  Einzeltermin oder automatisch als Blockveranstaltung interpretiert.
+- Ausfallangaben mit einem vollständigen Datum und nachfolgendem Hinweis werden
+  gelesen. Das Datum muss zu einem tatsächlich geplanten Termin der Serie passen.
+- Das ausgefallene Datum wird aus den Vorschauterminen entfernt und separat
+  unter `CalendarPreview.cancellations` erhalten: Serienindex, lokales Datum
+  und optionaler Hinweis.
+- Mehrere oder unvollständige Datumsangaben im Hinweis werden nicht als Verlegung
+  interpretiert. Unbekannte Angaben bleiben ein Fehler beziehungsweise Prüfpunkt.
+- Der Einzeltermin wird unabhängig vom Ausfall behandelt. Ein Zusammenhang als
+  Ersatztermin wird nicht automatisch behauptet.
+
+Ausfallhinweise behalten `cancellations_require_review`. Die erfolgreiche
+Erzeugung einer Vorschau ist somit keine fachliche Freigabe. Detailstichprobe und
+gemeinsamer Importbericht berücksichtigen diese Hinweise jetzt einheitlich.
+Die Diagnoseberichte enthalten weiterhin nur Status und Anzahlen, keine
+Hinweistexte oder Veranstaltungsdaten.
+
+## Nachweis und Grenzen
+
+Am 2026-10-20 wurden drei weitere Detailseiten der bereits untersuchten Auswahl
+gezielt geprüft. Zwei enthielten wöchentliche Serien; die dritte den beschriebenen
+Sonderfall. Der korrigierte Detailablauf lieferte dort zwei Serien,
+16 Vorschautermine und ein separat erhaltenes Ausfalldatum. Der abschließende
+Prüflauf benötigte sieben HTTP-Anfragen einschließlich Studiengangsnavigation.
+Rohseiten, Quelladressen und reale Hinweistexte wurden nicht gespeichert.
+
+`tests/fixtures/course_exceptions.html` bildet die relevante Struktur mit
+ausschließlich fiktiven Werten nach. 189 lokale Tests bestehen. Ungültige Daten,
+nicht zur Serie passende Ausfälle, unklare Verlegungen und mehrtägige
+„Einzel“-Angaben sind abgedeckt.
+
+Weiter offen bleiben dauerhafte Veranstaltungsidentität, Block-/Gruppenfälle,
+Wochenenden und vollständige Semestererfassung. Speicherung und Webanzeige
+echter Stundenpläne sind noch nicht implementiert. Bestehende CLI-Prüfbefehle
+verwenden die erweiterte Normalisierung automatisch nach dem Update.

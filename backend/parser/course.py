@@ -164,7 +164,7 @@ def parse_course_detail(html: str, *, expected_semester: str | None = None) -> C
             series = _series(dict(zip(headers, map(_text, cells))))
             parsed.append(series)
             table_series += 1
-            if series.recurrence != "woch":
+            if series.recurrence not in {"woch", "Einzel"}:
                 review.add("unverified_recurrence")
             if series.cancellation_text:
                 review.add("cancellations_require_review")

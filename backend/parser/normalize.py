@@ -37,12 +37,20 @@ class Occurrence:
 
 
 @dataclass(frozen=True)
+class CancelledDate:
+    series_index: int
+    local_date: str
+    note: str | None
+
+
+@dataclass(frozen=True)
 class CalendarPreview:
     course_key: str
     title: str
     semester: str
     occurrences: tuple[Occurrence, ...]
     review_reasons: tuple[str, ...]
+    cancellations: tuple[CancelledDate, ...] = ()
     # Eine vollständige Semesterprüfung ist Aufgabe des Importers.
     complete: bool = False
 
@@ -59,13 +67,24 @@ def _identity(context: CourseContext) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def _cancellations(text: str | None) -> set[date]:
+def _cancellations(text: str | None) -> dict[date, str | None]:
     if not text:
-        return set()
+        return {}
+    # Live beobachtet: genau ein vollständiges Datum, Doppelpunkt, Ausfallhinweis.
+    annotated = re.fullmatch(r"(\d{1,2}\.\d{1,2}\.\d{4}):\s*(\S.{0,499})", text)
+    if annotated:
+        note = annotated[2]
+        if re.search(r"\d{1,2}[./-]\d{1,2}", note):
+            raise NormalizationError("Zusätzliche Datumsangaben im Ausfallhinweis benötigen Prüfung.")
+        try:
+            day = datetime.strptime(annotated[1], "%d.%m.%Y").date()
+        except ValueError:
+            raise NormalizationError("Ausfallangabe enthält ein ungültiges Datum.") from None
+        return {day: note}
     if not re.fullmatch(r"\d{1,2}\.\d{1,2}\.\d{4}(?:\s*[,;]\s*\d{1,2}\.\d{1,2}\.\d{4})*", text):
         raise NormalizationError("Ausfallangaben benötigen eine manuelle Prüfung.")
     try:
-        return {datetime.strptime(part.strip(), "%d.%m.%Y").date() for part in re.split("[,;]", text)}
+        return {datetime.strptime(part.strip(), "%d.%m.%Y").date(): None for part in re.split("[,;]", text)}
     except ValueError:
         raise NormalizationError("Ausfallangabe enthält ein ungültiges Datum.") from None
 
@@ -89,14 +108,14 @@ def normalize_course(
 ) -> CalendarPreview:
     """Atomare Vorschau; unbekannte Angaben führen zum Fehler statt zu Teilterminen.
 
-    Standardmäßig ist nur ``woch`` belegt. Zusätzliche Quellrhythmen dürfen erst
+    Standardmäßig sind ``woch`` und ``Einzel`` belegt. Zusätzliche Quellrhythmen dürfen erst
     nach Prüfung explizit auf ``single`` oder ``daily`` abgebildet werden.
     Diese Optionen sind synthetisch getestet, keine Behauptung über LSF-Codes.
     """
     if course.semester != context.semester:
         raise NormalizationError("Semester der Zuordnung stimmt nicht überein.")
     key = _identity(context)
-    rules = {"woch": "weekly"} if recurrence_rules is None else dict(recurrence_rules)
+    rules = {"woch": "weekly", "Einzel": "single"} if recurrence_rules is None else dict(recurrence_rules)
     if any(value not in {"weekly", "single", "daily"} for value in rules.values()):
         raise NormalizationError("Unbekannte Wiederholungsregel.")
     if not course.series:
@@ -107,6 +126,7 @@ def normalize_course(
     # Die bereitgestellte Zuordnung wird hier nicht erneut an der Quelle geprüft.
     review.add("source_context_requires_verification")
     occurrences = []
+    cancellations = []
     for index, series in enumerate(course.series):
         rule = rules.get(series.recurrence)
         if rule is None or series.note or series.execution_note:
@@ -128,12 +148,13 @@ def normalize_course(
         cancelled = _cancellations(series.cancellation_text)
         if cancelled:
             review.add("cancellations_require_review")
-        if rule != "weekly":
+        if rule != "weekly" and not (series.recurrence == "Einzel" and rule == "single"):
             review.add("special_recurrence_requires_verification")
-        if not cancelled.issubset(days):
+        if not set(cancelled).issubset(days):
             raise NormalizationError("Ausfalldatum gehört nicht zur Terminserie.")
+        cancellations.extend(CancelledDate(index, day.isoformat(), note) for day, note in sorted(cancelled.items()))
         zone = ZoneInfo(series.timezone)
-        for day in sorted(days - cancelled):
+        for day in sorted(days - set(cancelled)):
             start, end = _utc(day, series.start_time, zone), _utc(day, series.end_time, zone)
             if end <= start:
                 raise NormalizationError("Zeitintervall ist nicht eindeutig.")
@@ -143,4 +164,5 @@ def normalize_course(
                 year, week, series.room, series.instructor,
             ))
     occurrences.sort(key=lambda item: (item.starts_at, item.series_index))
-    return CalendarPreview(key, course.title, course.semester, tuple(occurrences), tuple(sorted(review)))
+    return CalendarPreview(key, course.title, course.semester, tuple(occurrences),
+                           tuple(sorted(review)), tuple(cancellations))

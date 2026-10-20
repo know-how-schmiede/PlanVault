@@ -143,7 +143,7 @@ def source_details_check(query, title, semester, study_key, regulations_key, wee
         raise click.ClickException(str(error)) from None
     click.echo(f"Veranstaltungsblöcke: {sample.block_count}; eindeutige Detailziele: {sample.reference_count}.")
     click.echo(f"Geprüfte Details: {len(sample.details)}; ungeprüfte Detailziele: {sample.unchecked_count}.")
-    review = sum(result.status != "preview" for result in sample.details)
+    review = sum(result.requires_review for result in sample.details)
     click.echo(f"Details mit ungeklärter Normalisierung: {review}.")
     click.echo("Nur Stichprobe: keine dauerhafte Quellidentität, kein vollständiger Semesterimport, kein Archivstand.")
     if review:
