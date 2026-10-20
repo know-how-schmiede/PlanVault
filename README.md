@@ -1,5 +1,7 @@
 # WI-PlanArchiv
 
+![WI-PlanArchiv – Vorlesungsplanung sichern. Immer verfügbar.](images/WI-PlanArchiv_%20Vorlesungsplanung%20sichern.png)
+
 **Vorlesungsplanung sichern. Immer verfügbar.**
 
 WI-PlanArchiv ist eine eigenständige, interne Webanwendung zur automatisierten Sicherung, Versionierung und übersichtlichen Anzeige von Vorlesungsplänen. Ausgangspunkt ist die Vorlesungsplanung der Wirtschaftsingenieurwesen-Studiengänge (WI) der Hochschule Pforzheim im QIS-LSF-System. Die Architektur soll eine spätere Erweiterung auf andere Studiengänge ermöglichen.
@@ -16,15 +18,9 @@ WI-PlanArchiv ist eine eigenständige, interne Webanwendung zur automatisierten 
 - Änderungen zwischen Sicherungsständen später nachvollziehbar machen.
 - Eine archivierte Originaldarstellung als Ergänzung zur Prüfung vorhalten, soweit technisch und rechtlich zulässig.
 
-## Datenquelle und vertrauliche Konfiguration
+## Datenquelle
 
-Die Datenquelle ist die interne QIS-LSF-Vorlesungsplanung. **Die konkrete Quell-URL ist vertrauliche Betriebskonfiguration und gehört nicht in dieses Repository.** Sie darf weder in Dokumentation, Quellcode, Beispieldateien, Screenshots, Tests, Fehlermeldungen noch in Commit-Nachrichten veröffentlicht werden.
-
-Die Adresse wird ausschließlich zur Laufzeit über die Umgebungsvariable `LSF_BASE_URL` oder eine lokal gespeicherte, von Git ausgeschlossene Konfigurationsdatei bereitgestellt. Eine `.env.example` darf nur den Variablennamen und einen leeren Wert enthalten. Die tatsächliche URL darf nicht in `.env.example` stehen.
-
-**Wenn für Entwicklung, Tests oder Fehleranalyse die Quell-URL benötigt wird, muss ausdrücklich beim Projektverantwortlichen nachgefragt werden.** Keine Adresse erraten, aus früheren Gesprächen übernehmen oder in Dateien niederschreiben.
-
-Die Quelle kann nur aus einer berechtigten Netzwerkumgebung erreichbar sein. Ob Anmeldung, Sitzungen, dynamische Inhalte oder spezielle Parameter erforderlich sind, ist noch nicht verifiziert. Keine nicht dokumentierten Schnittstellen voraussetzen.
+Hinweise zur internen QIS-LSF-Datenquelle und zum vertraulichen Umgang mit der Quell-URL stehen in der [Dokumentation zur Datenquellenkonfiguration](docs/source-configuration.md).
 
 ## Funktionsumfang
 

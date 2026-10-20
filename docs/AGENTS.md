@@ -108,7 +108,7 @@ Schreibe bzw. aktualisiere Tests für jede relevante Änderung. Mindestens:
 - Tests für Admin-Berechtigungen und Konfigurationsvalidierung.
 - Tests für Filter sowie korrekt gekennzeichnete veraltete Archivstände.
 
-Nutze `pytest`. Halte `README.md`, relevante Dateien unter `docs/` und ggf. `CHANGELOG.md` parallel zum Code aktuell. Änderungen sollen mit nachvollziehbaren, kleinen Commits strukturiert werden, sofern Commit-Erstellung explizit beauftragt ist.
+Nutze `pytest`. Halte `README.md`, relevante Dateien unter `docs/` und insbesondere `docs/timeline.md` parallel zum Code aktuell. Änderungen sollen mit nachvollziehbaren, kleinen Commits strukturiert werden, sofern Commit-Erstellung explizit beauftragt ist.
 
 ## 9. Arbeitsweise bei Codex-Aufgaben
 
@@ -150,3 +150,13 @@ Nach Änderungen:
 - Vollautomatische Erkennung aller Planänderungen vor belastbarer Event-Normalisierung.
 - Mobile Native-App, Push-Nachrichten, umfangreiche API oder Cloud-Abhängigkeiten.
 - Behauptungen über Echtzeitdaten: PlanVault/WI-PlanArchiv ist ein **Archiv**, kein Ersatz für eine garantierte Livequelle.
+## 12. Versionierung, Footer und Timeline
+
+- Die aktuelle Anwendungsversion wird zentral in `version.py` im Repository-Hauptverzeichnis als `__version__` festgehalten. Andere Stellen beziehen die Version daraus; keine unabhängig gepflegten Versionsangaben im Anwendungscode oder in Templates.
+- Die Webseite zeigt die aktuelle Version aus `version.py` im gemeinsamen Footer aller Seiten an, mit vorangestelltem `V` (z. B. `V0.1.3`).
+- Versionsschema: `V<Major>.<Minor>.<Patch>`. Codex schlägt anhand des tatsächlich erreichten Roadmap-/Meilensteinstands die ersten beiden Stellen vor, z. B. `V0.1.x`, und begründet den Vorschlag kurz. Geplante, noch nicht umgesetzte Funktionen rechtfertigen keine höhere Version.
+- Die dritte Stelle (`x`, Patch) wählt der User. Codex darf sie weder selbst festlegen noch automatisch erhöhen. Eine vom User angegebene vollständige Version wird in `version.py` übernommen; ohne neue Angabe bleibt eine bestehende Version unverändert. Bei der erstmaligen Versionsfestlegung bleibt der Vorschlag bis zur Auswahl durch den User in der Timeline offen; `x` ist ein Platzhalter und keine veröffentlichte Anwendungsversion.
+- Orientierung für Versionsvorschläge entlang der Roadmap: `V0.0.x` für Konzept und Entwicklungsstart; `V0.1.x` für Quellenanalyse und Import-Prototyp (M0/M1); `V0.2.x` für Persistenz (M2); `V0.3.x` für Web-MVP (M3); `V0.4.x` für Administration (M4); `V0.5.x` für Erweiterungen (M5). `V1.0.x` erst bei vollständig umgesetztem und geprüftem MVP. Diese Zuordnung dient als Vorschlag, die endgültige Version bestimmt der User.
+- Bei jeder Änderung, auch an Dokumentation oder Konfiguration, `docs/timeline.md` ergänzen. Einträge stehen mit dem neuesten Datum zuerst und enthalten Datum, Version bzw. offenen Versionsvorschlag, eine kurze Beschreibung der Änderungen und den Prüfstatus.
+- Jeder Timeline-Eintrag enthält außerdem unter **Commit-Kurzbeschreibung** einen knappen deutschen Text, der als Commit-Betreff bei GitHub verwendet werden kann. Dies dokumentiert den Vorschlag und bedeutet nicht, dass bereits ein Commit erstellt wurde. Commits weiterhin nur auf ausdrücklichen Auftrag erstellen.
+- Vor Abschluss prüfen, dass `version.py`, die Footer-Anzeige und der zugehörige Timeline-Eintrag bei Versionsänderungen übereinstimmen. Solange noch keine Webanwendung existiert, die Footer-Anforderung bei deren Implementierung umsetzen und nicht als bereits erledigt darstellen.
