@@ -9,7 +9,7 @@ from backend.importer.navigation import _page, _caption
 from backend.importer.forms import FormNavigationError
 from backend.importer.identity import SourceIdentityPolicy, SourceIdentityError
 from backend.parser import (
-    CalendarPreview, CourseContext, NormalizationError, SourceParseError,
+    CalendarPreview, CourseContext, CourseDetail, NormalizationError, SourceParseError,
     normalize_course, parse_course_detail,
 )
 
@@ -34,6 +34,7 @@ class DetailResult:
     series_count: int
     status: str
     preview: CalendarPreview | None = field(repr=False)
+    unresolved_course: CourseDetail | None = field(default=None, repr=False)
 
     @property
     def requires_review(self) -> bool:
@@ -160,5 +161,6 @@ def fetch_detail_sample(client: SourceClient, references: tuple[CourseReference,
         except NormalizationError:
             # Ein korrekt gelesenes Detail kann noch nicht interpretierte Sonderfälle enthalten.
             preview, status = None, "normalization_requires_review"
-        details.append(DetailResult(reference.key, len(course.series), status, preview))
+        details.append(DetailResult(reference.key, len(course.series), status, preview,
+                                    course if preview is None else None))
     return DetailSample(len(references), sum(ref.block_count for ref in references), tuple(details))

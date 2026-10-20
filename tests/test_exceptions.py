@@ -44,8 +44,6 @@ def test_preview_json_retains_cancellation_reason(html):
 @pytest.mark.parametrize("replacement", [
     "31.02.2025: Fiktiver Ausfall",
     "28.10.2025: Fiktiver Ausfall",
-    "27.10.2025: Verlegt auf 29.10.2025",
-    "27.10.2025: Verlegt auf 29.10.",
     "27.10.2025: " + "x" * 501,
 ])
 def test_unverified_annotated_cancellation_rejected(html, replacement):
@@ -85,9 +83,6 @@ def test_multiple_and_empty_annotated_cancellations(html, value, notes):
 
 @pytest.mark.parametrize("value", [
     "27.10.2025: 27.10.2025: Fiktiver Konflikt",
-    "27.10.2025: Verlegt auf 29.10.",
-    "27.10.2025: Verlegt auf 29/10",
-    "27.10.2025: Verlegt auf 29.10.2025",
     "20.10.2025: 28.10.2025:",
     "20.10.2025: 31.02.2025:",
 ])
@@ -104,3 +99,20 @@ def test_summary_distinguishes_blocked_and_review_previews(html):
     assert sample.normalization_summary() == {
         "preview_count": 1, "blocked_count": 1, "review_preview_count": 1,
     }
+@pytest.mark.parametrize("note", ["Verlegt auf 29.10.2025", "Verlegt auf 29.10.",
+                                  "Verlegt auf 29/10, 15:30-18:45", "Verlegt auf 31.02.2025"])
+def test_replacement_text_is_preserved_without_creating_or_linking_events(html, note):
+    result = normalize(html.replace("27.10.2025: Fiktiver Ausfall für den Test", "27.10.2025: " + note))
+    assert result.cancellations[0].note == note
+    assert [o.local_date for o in result.occurrences] == ["2025-10-20", "2025-10-29", "2025-11-03"]
+    assert "replacement_reference_requires_review" in result.review_reasons
+    assert not result.complete
+    assert DetailResult("DEMO", 2, "preview", result).requires_review
+    assert "replacement_id" not in result.to_json()
+
+
+def test_replacement_text_does_not_change_the_independent_single_event(html):
+    result = normalize(html.replace("27.10.2025: Fiktiver Ausfall für den Test",
+                                    "27.10.2025: Verlegt auf 29.10., 15:30-18:45"))
+    original = normalize(html)
+    assert result.occurrences == original.occurrences

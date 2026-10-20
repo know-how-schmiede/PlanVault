@@ -61,3 +61,27 @@ werden niemals aus Freitext erzeugt. Auch erfolgreich gelesene Ausfälle behalte
 Freigabe. Tests verwenden ausschließlich fiktive Termine und Raumkennungen.
 
 **Live-Ergebnis V0.0.15:** 54 bekannte Details geprüft, 50 Vorschauen erzeugt; davon 17 mit fachlichen Prüfhinweisen. Die Zahl technisch blockierter Details sinkt von 19 auf vier. Abschließender Prüflauf: 62 HTTP-Anfragen. Nächster Schritt: die verbleibenden Bemerkungs-/Verlegungsfälle gezielt klären und den Vollständigkeitsnachweis der Quelle weiterführen. Prüfhinweise werden nicht allein wegen erfolgreicher Normalisierung entfernt.
+
+## Ergänzung V0.0.16 – Verlegungstext ist keine Terminregel
+
+Die bisherige Sperre für zusätzliche Datumsangaben im Ausfallhinweis wird durch
+eine ausdrücklich prüfpflichtige Vorschau ersetzt. Nur das führende, vollständige
+Ausfalldatum wird angewendet; es muss weiterhin zur Terminserie gehören.
+Weitere Datums- und Zeitangaben sind unverändert erhaltener Freitext, kein
+Ersatztermin. Auch ein Datum ohne Jahr erhält kein automatisch ergänztes Jahr.
+Ein unabhängig vorhandener Einzeltermin wird weder verändert noch automatisch
+als Ersatz verknüpft. `replacement_reference_requires_review` kennzeichnet diese
+Fälle zusätzlich zu `cancellations_require_review`; `complete` bleibt false.
+
+Ungültige oder doppelte führende Ausfalldaten und zu lange Hinweise brechen
+weiterhin ab. Ein ungültiges Datum innerhalb des opaken Hinweises wird als Text
+bewahrt, niemals als Kalenderdatum interpretiert. Allgemeine Serienbemerkungen
+oder Durchführungshinweise bleiben zunächst blockierend: Hier könnten Regeln
+stehen, welche die ganze Serie beeinflussen.
+
+Bei blockierter Normalisierung enthält das interne Detailergebnis jetzt
+`unresolved_course` mit allen bereits geparsten Serien. Es wird keine Teilvorschau
+ausgegeben. Diese Daten erscheinen weder in `repr` noch im bereinigten CLI-Bericht
+und werden noch nicht auf Datenträger gespeichert. Für eine spätere geschützte
+Prüfansicht muss die Darstellung separat umgesetzt und gegen XSS abgesichert
+werden. Der Semesterbericht behält Schema 3 und die bisherigen Zähler.

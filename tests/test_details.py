@@ -167,3 +167,31 @@ def test_cli_sample_summary_has_no_source_data(monkeypatch):
     assert "Nur Stichprobe" in result.output
     assert "example.invalid" not in result.output
     assert "Fiktive" not in result.output
+
+@pytest.mark.parametrize("field", ["note", "execution_note"])
+def test_unresolved_series_retained_without_partial_calendar(client, monkeypatch, field):
+    from dataclasses import replace
+    from backend.parser import parse_course_detail
+    session, _ = client
+    html = (Path(__file__).parent / "fixtures/course_detail.html").read_text(encoding="utf-8")
+    course = parse_course_detail(html)
+    changed = replace(course, series=(course.series[0], replace(course.series[1], **{field: "Fiktive ungeklärte Einschränkung"})))
+    monkeypatch.setattr("backend.importer.details.parse_course_detail", lambda *a, **k: changed)
+    refs = collect_course_references(session, (doc(block()),))
+    result = sample(session, refs)
+    detail = result.details[0]
+    assert detail.preview is None
+    assert detail.unresolved_course == changed
+    assert getattr(detail.unresolved_course.series[1], field) == "Fiktive ungeklärte Einschränkung"
+    assert detail.requires_review
+    assert not result.complete
+    assert "Fiktive ungeklärte" not in repr(result)
+    assert "Fiktive ungeklärte" not in str(result.normalization_summary())
+
+
+def test_successful_preview_does_not_duplicate_unresolved_course(client):
+    session, _ = client
+    refs = collect_course_references(session, (doc(block()),))
+    detail = sample(session, refs).details[0]
+    assert detail.preview is not None
+    assert detail.unresolved_course is None

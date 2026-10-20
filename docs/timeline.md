@@ -2,6 +2,22 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.16 – Verlegungshinweise und ungeklärte Detaildaten erhalten
+
+**Datum:** 2026-10-20
+
+**Änderungen:**
+
+- Version zentral auf Userwunsch auf `0.0.16` gesetzt; Footer übernimmt die Version.
+- Explizite Ausfälle auch mit zusätzlichen Datumsangaben im Hinweis verarbeitet. Hinweistexte bleiben erhalten und gesondert prüfpflichtig; keine Ersatztermine erzeugt oder mit Einzelterminen verknüpft.
+- Ungültige führende Ausfalldaten und mehrdeutige Angaben bleiben gesperrt. Allgemeine Serienbemerkungen werden nicht automatisch als Terminregeln interpretiert.
+- Bei blockierter Normalisierung vollständig geparste Veranstaltungsdaten intern als `unresolved_course` erhalten. Keine Teilvorschau, keine Ausgabe der Inhalte im CLI-Bericht, keine Speicherung auf Datenträger.
+- Fiktive Tests, README, Roadmap und Quellenanalyse aktualisiert; Semesterbericht bleibt bei Schema 3.
+
+**Prüfung:** 238 lokale Tests erfolgreich. Abschließender Live-Lauf mit 62 HTTP-Anfragen: 54 Details geprüft, 51 Vorschauen (davon 18 mit fachlichen Prüfhinweisen), drei weiterhin blockierte Veranstaltungen mit insgesamt vier Serienbemerkungen. Alle drei ungeklärten Veranstaltungsdaten bleiben intern erhalten. Keine Rohseiten oder vertraulichen Werte gespeichert. `git diff --check` ohne Fehler. Vollständigkeitsnachweis, Speicherung und Webanzeige bleiben offen; kein Deployment im LXC.
+
+**Commit-Kurzbeschreibung:** Version 0.0.16 mit erhaltenen Verlegungshinweisen und ungeklärten Detaildaten ergänzen
+
 ## V0.0.15 – Mehrfache Ausfälle und klare Normalisierungsdiagnose
 
 **Datum:** 2026-10-20

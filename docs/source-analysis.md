@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.15`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.16`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -145,3 +145,9 @@ Die 21 bisherigen Prüffälle wurden aufgeschlüsselt: 19 technisch blockierte N
 
 
 **Live-Ergebnis V0.0.15:** 54 bekannte Details geprüft, 50 Vorschauen erzeugt; davon 17 mit fachlichen Prüfhinweisen. Die Zahl technisch blockierter Details sinkt von 19 auf vier. Abschließender Prüflauf: 62 HTTP-Anfragen. Nächster Schritt: die verbleibenden Bemerkungs-/Verlegungsfälle gezielt klären und den Vollständigkeitsnachweis der Quelle weiterführen. Prüfhinweise werden nicht allein wegen erfolgreicher Normalisierung entfernt.
+
+## Ergänzung V0.0.16 – Verlegungshinweise erhalten
+
+Explizite Ausfalldaten können jetzt auch dann normalisiert werden, wenn der zugehörige Hinweis weitere Datums- oder Zeitangaben enthält. Der Hinweis bleibt unverändert erhalten und wird als `replacement_reference_requires_review` markiert; daraus wird weder ein Ersatztermin noch eine Verknüpfung mit vorhandenen Terminen erzeugt. Allgemeine ungeklärte Serienbemerkungen bleiben gesperrt. Ihre vollständig geparsten Veranstaltungsdaten werden im internen Ergebnis als `unresolved_course` für die weitere Prüfung erhalten, ausschließlich im Arbeitsspeicher und außerhalb des CLI-Berichts. Vollständigkeit und Veröffentlichung bleiben gesperrt.
+
+**Live-Ergebnis V0.0.16:** 54 Details geprüft, 51 Vorschauen erzeugt, davon 18 mit fachlichen Prüfhinweisen. Drei Veranstaltungen mit insgesamt vier Serienbemerkungen bleiben technisch gesperrt; ihre geparsten Daten sind im internen Ergebnis erhalten. Ein Prüflauf mit 62 HTTP-Anfragen. Nächster Schritt: die Bedeutung dieser Serienbemerkungen gezielt klären; zusätzlich bleiben leere Zusatzansicht, Wochenenden und Vollständigkeit der Quelle zu prüfen.

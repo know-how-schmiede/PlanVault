@@ -68,6 +68,14 @@ def _identity(context: CourseContext) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def _has_date_reference(note: str | None) -> bool:
+    if not note:
+        return False
+    return bool(
+        re.search(r"(?<![\d.])\d{1,2}[./-]\d{1,2}[./-]\d{4}(?!\d)", note) or
+        re.search(r"(?<![\d.])\d{1,2}[./-]\d{1,2}(?!\d)(?:\.(?!\d)|(?=[^\d./-]|$))", note)
+    )
+
 def _cancellations(text: str | None) -> dict[date, str | None]:
     if not text:
         return {}
@@ -80,12 +88,8 @@ def _cancellations(text: str | None) -> dict[date, str | None]:
         for index, marker in enumerate(markers):
             end = markers[index + 1].start() if index + 1 < len(markers) else len(text)
             note = text[marker.end():end].strip()
-            # Raumkennungen mit drei Zahlenteilen sind keine Kurzdatumsangabe.
-            # Vollständige oder abgekürzte Datumsangaben bleiben ungeklärt.
-            if (len(note) > 500 or
-                    re.search(r"(?<![\d.])\d{1,2}[./-]\d{1,2}[./-]\d{4}(?!\d)", note) or
-                    re.search(r"(?<![\d.])\d{1,2}[./-]\d{1,2}(?!\d)(?:\.(?!\d)|(?=[^\d./-]|$))", note)):
-                raise NormalizationError("Zusätzliche Datumsangaben im Ausfallhinweis benötigen Prüfung.")
+            if len(note) > 500:
+                raise NormalizationError("Ausfallhinweis überschreitet die erlaubte Länge.")
             try:
                 day = datetime.strptime(marker[1], "%d.%m.%Y").date()
             except ValueError:
@@ -162,6 +166,8 @@ def normalize_course(
         cancelled = _cancellations(series.cancellation_text)
         if cancelled:
             review.add("cancellations_require_review")
+        if any(_has_date_reference(note) for note in cancelled.values()):
+            review.add("replacement_reference_requires_review")
         if rule != "weekly" and not (series.recurrence == "Einzel" and rule == "single"):
             review.add("special_recurrence_requires_verification")
         if not set(cancelled).issubset(days):
