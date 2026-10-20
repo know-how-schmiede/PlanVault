@@ -114,7 +114,13 @@ Zeitplanbeispiel: täglich 06:00, 12:00 und 18:00 Uhr in `Europe/Berlin` (nur Vo
 
 Archivdaten selbst zusätzlich unabhängig sichern (z. B. zweiter Server/NAS, konsistente DB-Sicherung, Wiederherstellungstest). Ein Archiv ist kein vollständiges Backup, solange es nur an einem Speicherort existiert.
 
+## Timeline
+
+Änderungen, Versionsvorschläge und Commit-Kurzbeschreibungen stehen in der [Timeline](docs/timeline.md).
+
 ## Meilensteine
+
+Die [Roadmap](docs/roadmap.md) beschreibt Umsetzungsschritte, Versionsziele und Abschlusskriterien.
 
 1. **M0 – Quellenanalyse:** Ablauf der Studiengangsuche, IDs, Sessions, Semester-/Wochenwechsel und erreichbare Datenformate dokumentieren; ggf. Test-Fixtures speichern.
 2. **M1 – Import-Prototyp:** Einen ausgewählten WI-Studiengang vollständig abrufen und valide, normalisierte JSON-Daten erzeugen; Rohantwort optional separat sichern.

@@ -1,16 +1,21 @@
 # Timeline
 
-## 2026-10-20 – Dokumentation und Projektanweisungen
+Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
-**Versionsvorschlag:** `V0.0.x` – Konzept / Entwicklungsstart; die dritte Stelle wird vom User gewählt. Noch keine Anwendungsversion festgelegt.
+## V0.0.1 – Konzept und Entwicklungsstart
+
+**Datum:** 2026-10-20
 
 **Änderungen:**
 
 - Vorhandenes Projektbanner in die README eingebunden.
 - Hinweise zur vertraulichen Quell-URL nach `docs/source-configuration.md` ausgelagert und in der README verlinkt.
-- Zentrale Versionspflege in `version.py`, Versionsanzeige im Webseiten-Footer und Versionsvorschläge anhand der Roadmap als verbindliche Anweisungen ergänzt.
-- Pflege dieser Timeline einschließlich Commit-Kurzbeschreibung bei jeder Änderung vorgeschrieben; die dritte Versionsstelle bleibt dem User vorbehalten.
+- Aktuelle Anwendungsversion zentral als `__version__ = "0.0.1"` in `version.py` hinterlegt; dritte Versionsstelle vom User festgelegt.
+- Projektanweisungen um zentrale Versionspflege, Versionsanzeige im Webseiten-Footer und Versionsvorschläge anhand der Roadmap ergänzt. Die dritte Versionsstelle bleibt dem User vorbehalten.
+- Timeline einschließlich Commit-Kurzbeschreibung eingeführt und in der README verlinkt.
+- Roadmap mit Projektgrundlagen, Meilensteinen M0 bis M5, Versionszielen und Abschlusskriterien erstellt und in der README verlinkt. Betrieb und Wiederherstellung als Voraussetzungen der MVP-Freigabe beschrieben.
+- Projektanweisungen zur Timeline angepasst: sämtliche Änderungen derselben Version in einem Eintrag zusammenfassen und dessen Prüfstatus sowie Commit-Kurzbeschreibung fortschreiben. Bisherige Einträge für V0.0.1 zusammengeführt.
 
-**Prüfung:** Dokumentationsänderungen und lokale Verweisziele geprüft; `git diff --check` ohne Fehler. Eine Webanwendung und ihre Footer-Anzeige sind noch nicht implementiert.
+**Prüfung:** Dokumentation mit README und Projektanweisungen abgeglichen; lokale Verweisziele sowie Versionswert geprüft; `git diff --check` ohne Fehler. Webanwendung und Footer-Anzeige sind noch nicht implementiert.
 
-**Commit-Kurzbeschreibung:** Projektbanner und Dokumentation ergänzen sowie Versions- und Timeline-Regeln festlegen
+**Commit-Kurzbeschreibung:** Projektgrundlagen mit Banner, Roadmap, Versionierung und Timeline dokumentieren
