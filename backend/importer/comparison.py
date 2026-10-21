@@ -77,7 +77,7 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
         validate_semester_details(semester, study_key, regulations_key, detail_budget)
     started = datetime.now(timezone.utc).isoformat()
     report = {
-        "schema_version": 2, "app_version": __version__, "run_id": str(uuid4()),
+        "schema_version": 3, "app_version": __version__, "run_id": str(uuid4()),
         "started_at": started, "status": "needs_review", "stage": "navigation",
         "period_start": start.isoformat(), "period_end": end.isoformat(),
         "identity_mode": "configured", "requested_weeks": selection,
@@ -112,6 +112,7 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
         observed = []
         week_targets = {}
         week_statuses = {}
+        day_notices = {}
 
         def collect(document, result):
             nonlocal week_refs
@@ -124,6 +125,7 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
             week = (result.iso_year, result.iso_week)
             week_targets[week] = {r.key for r in refs}
             week_statuses[week] = result.status
+            day_notices[week] = result.day_notices
             observed.append({"iso_year": result.iso_year, "iso_week": result.iso_week,
                              "status": result.status, "reference_count": len(refs)})
 
@@ -135,6 +137,7 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
         results = audit.results if audit else ()
         report["checked_weeks"] = [
             {"iso_year": r.iso_year, "iso_week": r.iso_week, "status": r.status,
+             "day_notices": [{"local_date": n.local_date, "kind": n.kind} for n in r.day_notices],
              "reference_count": next((w["reference_count"] for w in observed
                                       if (w["iso_year"], w["iso_week"]) == (r.iso_year, r.iso_week)), None)}
             for r in results
@@ -169,7 +172,7 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
                                                budget=detail_budget)
             report["stage"] = "weekly_presence"
             presence = compare_weekly_presence(references, sample, week_targets, week_statuses,
-                                               start=start, end=end)
+                                               start=start, end=end, day_notices=day_notices)
             report["checked_details"] = len(sample.details)
             report["normalization_summary"] = sample.normalization_summary()
             report["review_summary"] = sample.review_summary()

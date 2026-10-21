@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.27`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.28`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -345,3 +345,36 @@ Keine Vorschau- oder Archivdateien geschrieben, keine Rohdaten gespeichert,
 kein Deployment und kein eigener LXC-Lauf. Nächster Schritt ist die fachliche
 Einordnung der Abweichungen und der offenen Einführungsbemerkung anhand belastbarer
 Quellbelege. Aufruf und Grenzen: [Detailabgleich](view-comparison.md).
+
+
+## V0.0.28 – Abweichungen auf konkrete Tageshinweise eingrenzen
+
+Gezielte begrenzte Quellenprüfungen am 2026-10-21 bestätigen die vollständigen
+Tagesbezeichnungen „Weihnachtsferien“ und „Heilige Drei Könige“. Erste Prüfung:
+neun HTTP-Anfragen für die drei betroffenen Wochen; weitere gezielte Prüfungen
+mit jeweils sieben Anfragen grenzen die zwei unbekannten Hinweise am 4./5. Januar
+ein. Vermutete zusätzliche Ferien-/Brückentagsbezeichnungen und eng begrenzte
+Schreibvarianten wurden nicht bestätigt; sie werden nicht unterstützt. Keine
+unbekannten Freitexte oder Quellwerte gespeichert.
+
+Der anschließend implementierte Abgleich wurde vollständig mit 100 HTTP-Anfragen
+für die bekannte MT-Auswahl geprüft: 26 Wochen, 66 semestergeprüfte Details,
+65 normalisierbar und eines blockiert. 23 Vorschauen bleiben fachlich prüfpflichtig.
+Die 105 erwarteten, nicht sichtbaren Veranstaltungs-Wochen verteilen sich auf
+KW 52/2026 (23), KW 53/2026 (47) und KW 1/2027 (35). Keine entsprechende
+Abweichung in den übrigen Wochen.
+
+82 Abweichungen haben ausschließlich erwartete Termine auf Tagen mit bekannten
+Hinweiscodes: 23 in KW 52, 47 in KW 53, zwölf in KW 1. Weitere 23 Abweichungen
+in KW 1 betreffen die unbekannten Hinweise am 4. und 5. Januar. Es gibt in diesem
+Lauf weder Abweichungen ohne Hinweis am erwarteten Tag noch solche mit nur
+teilweiser Abdeckung durch bekannte Hinweiscodes. Allgemeine Tageshinweise dürfen
+nicht als Ausfall jedes Sondertermins ausgelegt werden. Der Code klassifiziert
+Kontext und verändert keine Terminerwartung, Vorschau oder Archivfreigabe.
+
+809 erwartete und 704 passende sichtbare Veranstaltungs-Wochen bleiben erhalten.
+Die genaue erwartete lokale Tagesmenge und passende Hinweiscodes stehen pro
+Abweichung im bereinigten Bericht; Titel, Lehrpersonen, Räume, Quellkennungen
+und unbekannte Hinweistexte fehlen dort. Kein Deployment oder eigener LXC-Lauf.
+Einzeltermine, unbekannte Hinweise, Einführungsfall und vollständige Semester-/
+Wochenendabdeckung bleiben fachlich zu prüfen. Siehe [Tageshinweisabgleich](view-comparison.md).

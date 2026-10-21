@@ -10,6 +10,7 @@ from backend.importer.coverage import Coverage, WeekResult, check_week_coverage
 from backend.importer.forms import FormNavigationError, SearchForm, read_search_form
 from backend.importer.http import SourceClient, SourceDocument, SourceFetchError
 from backend.importer.navigation import _page, _caption
+from backend.importer.notices import DayNotice, classify_day_notice
 
 
 _WEEK = re.compile(r"Woche:\s*(\d{1,2})\s+(\d{1,2}\.\d{1,2}\.\d{4})\s*-+\s*(\d{1,2}\.\d{1,2}\.\d{4})")
@@ -95,6 +96,7 @@ def inspect_week(document: SourceDocument, expected: WeekChoice) -> WeekResult:
     soup = _page(document)
     days = []
     notices = False
+    day_notices = []
     for header in soup.find_all("th"):
         text = _caption(header)
         if not text.startswith(_DAYS):
@@ -110,12 +112,14 @@ def inspect_week(document: SourceDocument, expected: WeekChoice) -> WeekResult:
             raise FormNavigationError("Tagesname und Datum stimmen nicht überein.")
         days.append(day)
         notices = notices or bool(match[3])
+        if match[3]:
+            day_notices.append(DayNotice(day.isoformat(), classify_day_notice(match[3])))
     expected_days = [expected.start + timedelta(days=offset) for offset in range(5)]
     # Bisher live beobachtet: genau Montag bis Freitag, kein Wochenendnachweis.
     if days != expected_days:
         raise FormNavigationError("Sichtbare Tagesdaten passen nicht zur angeforderten Woche.")
     status = "notes_require_review" if notices else ("ok" if soup.select(COURSE_BLOCK_SELECTOR) else "empty_unverified")
-    return WeekResult(*expected.key, status)
+    return WeekResult(*expected.key, status, tuple(day_notices))
 
 
 def audit_weeks(client: SourceClient, document: SourceDocument, *, start: date, end: date,

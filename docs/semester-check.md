@@ -255,3 +255,13 @@ Der Vorschauimport wird dadurch nicht verändert oder automatisch ausgeführt.
 Live wurden trotz gleicher globaler Zielmengen 105 erwartete Veranstaltungs-Wochen
 ohne sichtbaren Eintrag erkannt. Das sind fachliche Prüffälle, keine bestätigten
 Ausfälle. [Anleitung und Begrenzung](view-comparison.md).
+
+
+## V0.0.28 – Taggenauer Kontext im Abdeckungsbericht
+
+Der Abdeckungsbericht verwendet jetzt Schema 3 und ergänzt feste Tageshinweiscodes,
+beim Detailabgleich die erwarteten lokalen Tage sowie eine Kontextklassifikation
+jeder fehlenden Wochenpräsenz. Der bestehende Semesterprüfbefehl bleibt bei Schema 7.
+Es werden keine Ausfallregeln aus Hinweisen abgeleitet. Der Live-Test grenzt die
+105 Abweichungen auf drei Wochen ein: 82 mit bekannten Hinweisen auf allen
+erwarteten Tagen, 23 mit noch unbekannten Hinweisen. [Einordnung und Grenzen](view-comparison.md).

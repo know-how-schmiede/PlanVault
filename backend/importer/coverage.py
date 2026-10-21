@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 from datetime import date, timedelta
 
+from backend.importer.notices import DayNotice
+
 
 @dataclass(frozen=True)
 class WeekResult:
@@ -10,6 +12,7 @@ class WeekResult:
     iso_week: int
     # Nur der Adapter darf nach Strukturprüfung ok oder empty_confirmed melden.
     status: str
+    day_notices: tuple[DayNotice, ...] = ()
 
 
 @dataclass(frozen=True)

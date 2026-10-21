@@ -366,6 +366,9 @@ def source_coverage_check(query, title, start, end, weeks, all_weeks, week_budge
                        f"fehlende Wochenpräsenzen: {len(presence['missing_from_week_view'])}; "
                        f"ohne erwarteten Termin sichtbar: {len(presence['observed_without_expected_occurrence'])}; "
                        f"blockierte Details: {len(presence['blocked_details'])}.")
+            for assessment, count in presence["missing_notice_context_counts"].items():
+                if count:
+                    click.echo(f"Tageshinweis-Kontext {assessment}: {count} Abweichungen.")
         click.echo("Offene Punkte: " + ", ".join(report["blockers"]))
         click.echo("Keine Vorschau geändert; Semesterinhalt und Wochenenden bleiben ungeprüft.")
     raise click.exceptions.Exit(1)

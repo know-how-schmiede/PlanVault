@@ -2,6 +2,22 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.28 – Abweichungen anhand konkreter Tageshinweise einordnen
+
+**Datum:** 2026-10-21
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.28` gesetzt; Footer übernimmt sie.
+- Belegte vollständige Tagesbezeichnungen als feste Codes mit lokalem Datum erfassen. Unbekannte, negierte und erweiterte Texte bleiben ungeklärt; keine Freitexte im Bericht.
+- Erwartete Tage fehlender Wochenpräsenzen mit den tatsächlichen Hinweistagen vergleichen. Kontext je Abweichung und Kategorien je Woche/gesamt ergänzen; keine pauschale Regel aus einem Wochenhinweis ableiten.
+- Abdeckungsbericht auf Schema 3 erweitert. Alle Abweichungen und Prüfflags erhalten; keine automatische Terminänderung, Vorschauaktualisierung oder Archivfreigabe.
+- README, Abgleichsanleitung, Semesterprüfung, Quellenanalyse und Roadmap aktualisiert.
+
+**Prüfung:** 433 lokale Tests erfolgreich, einschließlich taggenauer Zuordnung, unbekannter/negierter/erweiterter Texte, unbekannter Evidenz, Ausfällen, doppelten Terminen, Typvalidierung und unverändert gesperrter Freigabe. Vollständige Suite auch mit fiktiver geerbter Betreiberkonfiguration und Update-Regression erfolgreich. Footer auf Startseite und Vorschau als V0.0.28 geprüft, alle drei Bash-Anleitungsblöcke auf Syntax geprüft; `git diff --check` ohne Fehler. Live: vollständiger Abgleich mit 100 seriellen HTTP-Anfragen, 26 Wochen und 66 Details. 105 fehlende Wochenpräsenzen nur in KW 52/2026 (23), KW 53/2026 (47), KW 1/2027 (35). 82 auf ausschließlich bekannt bezeichneten Tagen, 23 mit unbekannten Hinweisen am 4./5. Januar. Keine Abweichung ohne Tageshinweis in diesem Lauf. 65 normalisierbare Details, eines blockiert und 23 Vorschauen fachlich prüfpflichtig. Kein Deployment, eigener LXC-Lauf oder Archivfreigabe; M0/M1 bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.28 mit taggenauer Hinweiszuordnung und eingegrenzten Wochenabweichungen ergänzen
+
 ## V0.0.27 – Detailtermine gegen die Wochenpräsenz prüfen
 
 **Datum:** 2026-10-21
