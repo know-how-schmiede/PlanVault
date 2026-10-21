@@ -36,6 +36,7 @@ class DetailResult:
     status: str
     preview: CalendarPreview | None = field(repr=False)
     unresolved_course: CourseDetail | None = field(default=None, repr=False)
+    blocking_reason: str | None = None
 
     @property
     def requires_review(self) -> bool:
@@ -63,6 +64,20 @@ class DetailSample:
             "blocked_count": sum(d.preview is None for d in self.details),
             "review_preview_count": sum(d.preview is not None and d.requires_review for d in self.details),
         }
+
+    def review_summary(self):
+        """Nur feste Codes und laufbezogene Nummern; keine Quell- oder Freitexte."""
+        counts = {}
+        details = []
+        for index, detail in enumerate(self.details, 1):
+            reasons = ([detail.blocking_reason or "normalization_requires_review"]
+                       if detail.preview is None else sorted(set(detail.preview.review_reasons)))
+            for reason in reasons:
+                counts[reason] = counts.get(reason, 0) + 1
+            if reasons:
+                details.append({"detail_number": index, "blocked": detail.preview is None,
+                                "reasons": reasons})
+        return {"reason_counts": dict(sorted(counts.items())), "details": details}
 
 
 def merge_course_references(groups: tuple[tuple[CourseReference, ...], ...]) -> tuple[CourseReference, ...]:
@@ -148,6 +163,7 @@ def fetch_detail_sample(client: SourceClient, references: tuple[CourseReference,
         raise DetailImportError("Ungültige oder doppelte Detailauswahl.")
     details = []
     for reference in references[:limit]:
+        blocking_reason = None
         try:
             document = client.fetch(reference.location)
             course = parse_course_detail(document.html, expected_semester=semester)
@@ -159,9 +175,10 @@ def fetch_detail_sample(client: SourceClient, references: tuple[CourseReference,
                 source_key_verified=reference.identity_scope == "configured",
             ))
             status = "preview"
-        except NormalizationError:
+        except NormalizationError as error:
+            blocking_reason = error.code
             # Ein korrekt gelesenes Detail kann noch nicht interpretierte Sonderfälle enthalten.
             preview, status = None, "normalization_requires_review"
         details.append(DetailResult(reference.key, len(course.series), status, preview,
-                                    course if preview is None else None))
+                                    course if preview is None else None, blocking_reason))
     return DetailSample(len(references), sum(ref.block_count for ref in references), tuple(details))

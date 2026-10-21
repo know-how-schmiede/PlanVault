@@ -13,6 +13,10 @@ from backend.parser.course import CourseDetail
 class NormalizationError(ValueError):
     """Nicht eindeutig normalisierbare Daten; ausschließlich bereinigte Meldungen."""
 
+    def __init__(self, message, *, code="normalization_requires_review"):
+        super().__init__(message)
+        self.code = code
+
 
 @dataclass(frozen=True)
 class CourseContext:
@@ -92,7 +96,7 @@ def _cancellations(text: str | None) -> dict[date, str | None]:
     markers = list(re.finditer(r"(?<!\S)(\d{1,2}\.\d{1,2}\.\d{4}):", text))
     if markers:
         if markers[0].start() != 0 or len(markers) > 100 or len(text) > 10_000:
-            raise NormalizationError("Ausfallangaben benötigen eine manuelle Prüfung.")
+            raise NormalizationError("Ausfallangaben benötigen eine manuelle Prüfung.", code="unsupported_cancellation_format")
         result = {}
         for index, marker in enumerate(markers):
             end = markers[index + 1].start() if index + 1 < len(markers) else len(text)
@@ -108,7 +112,7 @@ def _cancellations(text: str | None) -> dict[date, str | None]:
             result[day] = note or None
         return result
     if not re.fullmatch(r"\d{1,2}\.\d{1,2}\.\d{4}(?:\s*[,;]\s*\d{1,2}\.\d{1,2}\.\d{4})*", text):
-        raise NormalizationError("Ausfallangaben benötigen eine manuelle Prüfung.")
+        raise NormalizationError("Ausfallangaben benötigen eine manuelle Prüfung.", code="unsupported_cancellation_format")
     try:
         return {datetime.strptime(part.strip(), "%d.%m.%Y").date(): None for part in re.split("[,;]", text)}
     except ValueError:
@@ -124,7 +128,7 @@ def _utc(day: date, clock, zone: ZoneInfo) -> datetime:
         if candidate.astimezone(zone).replace(tzinfo=None) == naive:
             candidates.add(candidate)
     if len(candidates) != 1:
-        raise NormalizationError("Lokale Uhrzeit ist durch Zeitumstellung mehrdeutig oder ungültig.")
+        raise NormalizationError("Lokale Uhrzeit ist durch Zeitumstellung mehrdeutig oder ungültig.", code="ambiguous_local_time")
     return candidates.pop()
 
 
@@ -157,8 +161,10 @@ def normalize_course(
     annotations = []
     for index, series in enumerate(course.series):
         rule = rules.get(series.recurrence)
-        if rule is None or series.execution_note:
-            raise NormalizationError("Rhythmus, Gruppierung oder Bemerkung benötigt Prüfung.")
+        if rule is None:
+            raise NormalizationError("Rhythmus benötigt Prüfung.", code="unsupported_recurrence")
+        if series.execution_note:
+            raise NormalizationError("Durchführung oder Gruppierung benötigt Prüfung.", code="unsupported_execution_note")
         if series.timezone != "Europe/Berlin" or series.start_time >= series.end_time:
             raise NormalizationError("Ungültige Zeitzone oder Tageszeiten.")
         span = (series.valid_until - series.valid_from).days
@@ -181,13 +187,13 @@ def normalize_course(
                 try:
                     effective_start, effective_end = (datetime.strptime(t, "%H:%M").time() for t in exam.groups())
                 except ValueError:
-                    raise NormalizationError("Ungültige Uhrzeit im Klausurhinweis.") from None
+                    raise NormalizationError("Ungültige Uhrzeit im Klausurhinweis.", code="invalid_exam_time") from None
                 if not series.start_time <= effective_start < effective_end <= series.end_time:
-                    raise NormalizationError("Klausurzeiten liegen nicht innerhalb des Tabellenzeitraums.")
+                    raise NormalizationError("Klausurzeiten liegen nicht innerhalb des Tabellenzeitraums.", code="exam_time_outside_series")
                 kind = "exam_time"
                 review.add("timing_note_requires_review")
             else:
-                raise NormalizationError("Serienbemerkung ist noch nicht als Hinweis verifiziert.")
+                raise NormalizationError("Serienbemerkung ist noch nicht als Hinweis verifiziert.", code="unsupported_series_note")
             annotations.append(SeriesAnnotation(
                 index, kind, series.note,
                 series.start_time.isoformat() if kind == "exam_time" else None,
@@ -209,7 +215,7 @@ def normalize_course(
         if rule != "weekly" and not (series.recurrence == "Einzel" and rule == "single"):
             review.add("special_recurrence_requires_verification")
         if not set(cancelled).issubset(days):
-            raise NormalizationError("Ausfalldatum gehört nicht zur Terminserie.")
+            raise NormalizationError("Ausfalldatum gehört nicht zur Terminserie.", code="cancellation_outside_series")
         cancellations.extend(CancelledDate(index, day.isoformat(), note) for day, note in sorted(cancelled.items()))
         zone = ZoneInfo(series.timezone)
         for day in sorted(days - set(cancelled)):

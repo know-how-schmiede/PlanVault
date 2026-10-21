@@ -18,7 +18,7 @@ from backend.importer.weeks import read_week_menu, inspect_week
 from backend.importer.details import collect_course_references, fetch_detail_sample, DetailImportError
 from backend.importer.run import ImportCheckInputError, run_import_check
 from backend.importer.identity import configured_identity, SourceIdentityError
-from backend.importer.semester import audit_semester_views, fetch_semester_details, validate_semester_details, weekday_coverage
+from backend.importer.semester import audit_semester_views, fetch_semester_details, validate_semester_details, weekday_coverage, completeness_review
 from version import __version__
 
 
@@ -234,11 +234,13 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
             raise FormNavigationError("Semester- und Studiengangsangaben benötigen --details.")
     except (SourceIdentityError, FormNavigationError, DetailImportError) as error:
         raise click.ClickException(str(error)) from None
-    report = {"schema_version": 5, "app_version": __version__, "status": "needs_review",
+    report = {"schema_version": 6, "app_version": __version__, "status": "needs_review",
               "views": [], "details_requested": details, "checked_details": 0,
               "normalization_review_count": 0, "known_details_checked": False,
               "normalization_summary": {"preview_count": 0, "blocked_count": 0, "review_preview_count": 0},
               "weekday_coverage": weekday_coverage(()),
+              "review_summary": {"reason_counts": {}, "details": []},
+              "completeness_review": completeness_review(()),
               "complete": False, "published": False}
     try:
         with SourceClient(current_app.config.get("LSF_BASE_URL", ""),
@@ -249,6 +251,7 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
                                          button_caption="Suche starten")
             views = audit_semester_views(client, plan, identity_policy=policy)
             report["weekday_coverage"] = weekday_coverage(views)
+            report["completeness_review"] = completeness_review(views)
             report["views"] = [
                 {"view": v.view, "status": v.status, "reference_count": v.reference_count,
                  "additional_count": v.additional_count,
@@ -262,6 +265,8 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
                 report["checked_details"] = len(sample.details)
                 report["normalization_review_count"] = sum(d.requires_review for d in sample.details)
                 report["normalization_summary"] = sample.normalization_summary()
+                report["review_summary"] = sample.review_summary()
+                report["completeness_review"] = completeness_review(views, sample)
                 report["known_details_checked"] = True
                 report["weekday_coverage"] = weekday_coverage(views, sample)
                 if save_preview:
@@ -282,6 +287,9 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
             summary = report["normalization_summary"]
             click.echo(f"Vorschauen: {summary['preview_count']}; blockiert: {summary['blocked_count']}; "
                        f"Vorschauen mit Prüfhinweisen: {summary['review_preview_count']}.")
+        for reason, count in report["review_summary"]["reason_counts"].items():
+            click.echo(f"Prüfgrund {reason}: {count} Details.")
+        click.echo("Offene Vollständigkeitsnachweise: " + ", ".join(report["completeness_review"]["blockers"]))
         coverage = report["weekday_coverage"]
         click.echo(f"Nicht beobachtete Wochentage (Mo=0): {coverage['unobserved_weekdays']}; "
                    f"Termine je Wochentag: {coverage['occurrences_by_weekday']}.")

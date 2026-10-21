@@ -154,3 +154,41 @@ ein vollständiger Live-Semesterlauf wurde für V0.0.20 nicht wiederholt.
 ## Optionale Web-Vorschau ab V0.0.21
 
 Nur mit --details, --save-preview und konfiguriertem PREVIEW_FILE schreibt der Prüflauf normalisierbare Termine separat als unvollständige Web-Vorschau. Ohne diese Option bleibt der Aufruf unverändert ohne Dateischreibzugriff. Einrichtung, Zugriff und Exitcode erläutert die [Vorschau-Anleitung](preview.md). Keine Archivfreigabe.
+
+
+## V0.0.23: Ursachen und offene Nachweise (Schema 6)
+
+Den bisherigen `source-semester-check --details ... --json`-Aufruf mit den bereits
+lokal eingerichteten Argumenten erneut ausführen. Keine zusätzlichen Abrufe werden
+für die Diagnose benötigt. Der Bericht enthält jetzt:
+
+- `review_summary.reason_counts`: Anzahl betroffener Details pro Ursache, einschließlich fachlicher Prüfhinweise erfolgreicher Vorschauen.
+- `review_summary.details`: laufbezogene `detail_number`, `blocked` und `reasons`. Die Nummer gilt nur innerhalb dieses Berichts und ist keine dauerhafte Veranstaltungskennung.
+- `completeness_review.blockers`: offene Nachweise für Semesteransichten, ungeprüfte Details, Normalisierungsblockaden und fachliche Hinweise. Studiengangszuordnung, Semesterumfang und Wochenendabdeckung bleiben bis zu eigenständiger Verifizierung offen.
+- `completeness_review.eligible_for_publication`: weiterhin `false`. Ein technisch vollständig geprüfter bekannter Detailbestand reicht nicht zur Freigabe.
+
+| Ursachencode | Nächste Prüfung |
+| --- | --- |
+| `unsupported_series_note` | Serienbemerkung lokal mit der Quelle vergleichen; erst nach Beleg eine eng begrenzte Regel ergänzen. |
+| `unsupported_execution_note` | Durchführung oder Gruppierung fachlich klären. |
+| `unsupported_recurrence` | Unbekannten Rhythmus anhand der Quelle verifizieren. |
+| `unsupported_cancellation_format` | Struktur der Ausfallangabe prüfen. |
+| `cancellation_outside_series` | Ausfalldatum und zugehörige Serie vergleichen. |
+| `ambiguous_local_time` | Termin während der Zeitumstellung prüfen. |
+| `invalid_exam_time` / `exam_time_outside_series` | Klausurhinweis und Tabellenzeiten vergleichen. |
+| `normalization_requires_review` | Andere ungültige oder bislang nicht eindeutig normalisierbare Angaben prüfen. |
+
+Pro blockiertem Detail wird die erste blockierende Ursache gemeldet. Nach deren
+Behebung können weitere Ursachen sichtbar werden. Erfolgreiche Vorschauen führen
+alle vorhandenen Prüfcodes auf; ein Detail kann deshalb mehrere Zähler erhöhen.
+Die Textausgabe nennt dieselben Ursachenzähler und offenen Vollständigkeitsnachweise.
+Ohne `--details` bleiben Ursachenzähler leer und `details_unchecked` bleibt offen.
+
+Berichte enthalten keine Bemerkungstexte, Titel, Lehrpersonen, Räume oder
+Quellkennungen. Ungeklärte Originaldaten bleiben ausschließlich im Arbeitsspeicher.
+Ein fehlgeschlagener Prüflauf liefert weiterhin keine erfolgreiche Teilstichprobe;
+Status und Exitcode sind zusammen mit der Diagnose zu beachten. Exitcode 1,
+`complete: false` und `published: false` bleiben unverändert.
+
+Lokal mit fiktiven Grenzfällen geprüft. Kein neuer Live-Import und keine Freigabe
+der dokumentierten Einführungsbemerkungen; deren Bedeutung bleibt ungeklärt.

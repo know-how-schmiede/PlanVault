@@ -119,3 +119,21 @@ def audit_semester_views(client, document, *, identity_policy: SourceIdentityPol
                                          len(refs), len(keys - known) if results else 0, refs, visible_days))
         known.update(keys)
     return tuple(results)
+
+
+def completeness_review(views, sample=None):
+    """Offene Nachweise explizit ausweisen, ohne Freigabe abzuleiten."""
+    blockers = {"study_context_unverified", "semester_extent_unverified",
+                "weekend_coverage_unverified"}
+    if tuple(v.view for v in views) != tuple(code for code, _ in VIEWS):
+        blockers.add("semester_views_missing")
+    if any(v.status != "observed" for v in views):
+        blockers.add("semester_view_empty_or_unverified")
+    if sample is None or sample.unchecked_count:
+        blockers.add("details_unchecked")
+    if sample is not None:
+        if any(d.preview is None for d in sample.details):
+            blockers.add("normalization_blocked")
+        if any(d.preview is not None and d.requires_review for d in sample.details):
+            blockers.add("detail_review_required")
+    return {"blockers": sorted(blockers), "eligible_for_publication": False}

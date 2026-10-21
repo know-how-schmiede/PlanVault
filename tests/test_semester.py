@@ -143,7 +143,7 @@ def test_cli_report_is_private_and_never_published(monkeypatch, fail):
     assert result.exit_code == 1
     report = json.loads(result.output)
     assert report["status"] == ("failed" if fail else "needs_review")
-    assert report["schema_version"] == 5
+    assert report["schema_version"] == 6
     assert report["weekday_coverage"]["unobserved_weekdays"] == list(range(7))
     assert report["weekday_coverage"]["blocked_details"] is None
     assert not report["weekday_coverage"]["weekend_coverage_verified"]

@@ -2,6 +2,22 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.23 – Ursachen für offene Importprüfungen
+
+**Datum:** 2026-10-21
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.23` gesetzt; gemeinsamer Footer übernimmt sie.
+- Normalisierungsfehler mit festen Ursachencodes versehen; unbekannte Rhythmen, Durchführung, Bemerkungen, Ausfall- und Zeitprobleme werden unterscheidbar.
+- Semesterbericht auf Schema 6 erweitert: bereinigte Ursachen je laufbezogener Detailnummer, aggregierte Prüfgründe und explizite offene Vollständigkeitsnachweise. Textausgabe zeigt Zähler und Nachweise.
+- Unbekannte Einführungsbemerkungen bleiben gesperrt. Keine neuen Interpretationsregeln ohne Quellbeleg, keine Archivfreigabe.
+- README, Semesterprüfung, Quellenanalyse und Roadmap aktualisiert.
+
+**Prüfung:** 306 lokale Tests erfolgreich, einschließlich neuer Regressionstests für Ursachencodes, bereinigte Detaildiagnose, CLI-Bericht und offene Vollständigkeitsnachweise. `git diff --check` ohne Fehler. Kein neuer Live-Import oder Deployment; M0/M1 bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.23 mit konkreter Importdiagnose und offenen Vollständigkeitsnachweisen ergänzen
+
 ## V0.0.22 – Wochenansicht für die Import-Vorschau
 
 **Datum:** 2026-10-20

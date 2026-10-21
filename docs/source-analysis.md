@@ -182,3 +182,15 @@ Der neue lokale Wochentagsabgleich im Semesterbericht zählt Vorschautermine nac
 lokalem Datum und macht nicht beobachtete Tage sowie Termine außerhalb sichtbarer
 Tagesüberschriften erkennbar. Das ist eine zusätzliche Diagnose, kein Live-Nachweis
 vollständiger Wochenenden. Einzelheiten stehen in der Semesterprüfungs-Anleitung.
+
+
+### V0.0.23 – Offene Importfälle nachvollziehbar ausweisen
+
+Die dokumentierten Einführungsbemerkungen sind weiterhin nicht als unverbindlicher
+Zusatztext verifiziert. Statt einer unbelegten Freigabe weist der Semesterbericht
+nun die erste konkrete Normalisierungsblockade pro Detail sowie alle fachlichen
+Prüfhinweise erfolgreicher Vorschauen aus. Die Diagnose trennt unbekannte Rhythmen,
+Durchführungsangaben, Serienbemerkungen, Ausfallformate und Zeitprobleme. Offene
+Vollständigkeitsnachweise bleiben separat sichtbar. Kein neuer Quellzugriff;
+die noch offenen Live-Fälle können mit dem bestehenden Semesterprüfbefehl gezielt
+ausgewertet werden. Siehe [Diagnosebeschreibung](semester-check.md).
