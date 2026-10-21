@@ -192,3 +192,18 @@ Status und Exitcode sind zusammen mit der Diagnose zu beachten. Exitcode 1,
 
 Lokal mit fiktiven Grenzfällen geprüft. Kein neuer Live-Import und keine Freigabe
 der dokumentierten Einführungsbemerkungen; deren Bedeutung bleibt ungeklärt.
+
+
+## Live-Nachprüfung V0.0.24
+
+Eine getrennte Untersuchung der WI-Prüfungsordnung 2020 erfasst 21 bekannte
+Detailziele. Der bisher blockierende reine Raumhinweis kann jetzt als
+prüfpflichtige Annotation normalisiert werden. Dieser Lauf ersetzt weder die
+frühere Untersuchung mit 66 Details noch eine Prüfung mit den lokal konfigurierten
+dauerhaften Kennungen. Nach der Erweiterung erzeugen alle 21 bekannten Details
+insgesamt 309 Vorschautermine; drei Details bleiben fachlich prüfpflichtig.
+Laufbezogene Quellkennungen erscheinen zusätzlich als
+`source_identity_unverified` in der Vollständigkeitsliste. Vollständigkeit und
+Archivfreigabe bleiben gesperrt.
+Die Untersuchung hat keine Vorschau-Datei aktualisiert. Konkrete Grenzen und
+Abrufzahlen stehen in der [Quellenanalyse](source-analysis.md).

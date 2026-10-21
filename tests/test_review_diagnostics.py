@@ -70,3 +70,14 @@ def test_missing_views_unchecked_and_blocked_details_stay_visible():
     assert {'semester_views_missing', 'semester_view_empty_or_unverified',
             'details_unchecked', 'normalization_blocked'} <= set(blockers)
     assert sample.review_summary()['reason_counts'] == {'normalization_requires_review': 1}
+
+
+@pytest.mark.parametrize("scope,unverified", [("run", True), ("configured", False)])
+def test_completeness_does_not_hide_unverified_source_identity(scope, unverified):
+    reference = CourseReference("DEMO", "https://example.invalid/detail", "Fiktiver Kurs", 1, scope)
+    views = tuple(SemesterViewResult(name, "observed", 1, 0, (reference,))
+                  for name in ("semester", "special_dates"))
+    result = completeness_review(views)
+    assert ("source_identity_unverified" in result["blockers"]) is unverified
+    assert not result["eligible_for_publication"]
+    assert "details_unchecked" in result["blockers"]

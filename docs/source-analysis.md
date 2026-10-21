@@ -194,3 +194,47 @@ Durchführungsangaben, Serienbemerkungen, Ausfallformate und Zeitprobleme. Offen
 Vollständigkeitsnachweise bleiben separat sichtbar. Kein neuer Quellzugriff;
 die noch offenen Live-Fälle können mit dem bestehenden Semesterprüfbefehl gezielt
 ausgewertet werden. Siehe [Diagnosebeschreibung](semester-check.md).
+
+
+## V0.0.24 – Begrenzte Live-Nachprüfung und Raumhinweis
+
+Am 2026-10-21 wurde die bereitgestellte Quelle erneut geprüft. Als ausdrücklich
+benannte Arbeitsannahme wurde die WI-Auswahl mit Prüfungsordnung 2020 verwendet;
+die sieben sichtbaren WI-Auswahlen wurden nicht insgesamt abgerufen. Dieser
+Bestand darf nicht mit dem früheren Lauf mit 66 Details gleichgesetzt werden.
+
+Die Semesteransicht enthält 67 Blöcke mit 21 unterschiedlichen Detailzielen,
+die Block-/Einzelterminansicht 48 Blöcke mit zwölf Zielen, alle bereits in der
+Semesteransicht vorhanden. 26 Wochen werden angeboten. Die erste Detailprüfung
+benötigte 29 HTTP-Anfragen und beobachtete auf allen 21 Detailseiten dieselbe
+Semesterbezeichnung für das Wintersemester 2026/27. 20 Vorschauen wurden erzeugt,
+eine war durch `unsupported_series_note` blockiert; zwei Vorschauen enthielten
+fachlich prüfpflichtige Ausfälle. Der Bestand wurde seriell mit einer Sekunde
+Mindestabstand, ohne Wiederholungen und ohne Rohdatenspeicherung abgerufen.
+
+Zwei anschließende gezielte Prüfungen mit jeweils acht HTTP-Anfragen grenzen
+die blockierte Bemerkung ein und bestätigen die vollständige Raumhinweisform.
+Ein vermeintlicher Datumsbezug war eine durch Punkte gegliederte Raumkennung.
+Der Hinweis weicht vom Tabellenraum ab. Die neue Regel erhält beide Angaben
+unverändert; der Widerspruch bleibt prüfpflichtig. Aus dem Hinweis wird keine
+Terminänderung abgeleitet. Siehe [Sonderfallregel](special-dates.md).
+
+Die Sitzungen verwendeten laufbezogene Linkzuordnung (`identity_mode: run`),
+keine konfigurierte dauerhafte Quellkennung. Es wurden keine bisherigen lokalen
+Kennungswerte rekonstruiert oder geraten. Die Prüfung lief direkt über die
+vorhandenen Adapter und Parser; sie ist kein erfolgreicher Nachweis des gesamten
+CLI-Ablaufs mit konfigurierter Kennung. Die Prüfkennungen waren ausschließlich
+laufbezogene Platzhalter und keine bestätigte Studiengangs-/Prüfungsordnungszuordnung.
+
+Abschließende Prüfung nach der Erweiterung: 29 HTTP-Anfragen, alle 21 bekannten
+Details erfolgreich gegen die erwartete Semesterbezeichnung geprüft, 21 Vorschauen,
+309 Termine, keine technisch blockierte Normalisierung. Drei Details bleiben
+fachlich prüfpflichtig: zwei wegen Ausfallangaben, eines wegen des Raumhinweises.
+Die Wochentagszählung ergibt 79/59/114/33/24/0/0 Termine (Montag bis Sonntag).
+Die fehlende dauerhafte Quellidentität wird zusätzlich als
+`source_identity_unverified` in der Vollständigkeitsliste ausgewiesen; diese
+Ergänzung wurde anschließend lokal getestet.
+
+Montag bis Freitag sind sichtbar; Wochenend- und Semester-Vollständigkeit bleiben
+unbewiesen. Kein Archivstand und keine Web-Vorschau wurden geschrieben. Die
+früher dokumentierten Einführungsbemerkungen anderer Auswahlen bleiben ungeklärt.

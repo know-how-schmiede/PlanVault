@@ -140,7 +140,8 @@ def test_invalid_week_and_reversed_interval():
     with pytest.raises(ValueError):
         check_week_coverage(date(2026, 2, 1), date(2026, 1, 1), [])
 
-@pytest.mark.parametrize("note,kind", [("Vorlesung", "teaching_format"), ("Labor X9.8.76", "room_hint")])
+@pytest.mark.parametrize("note,kind", [("Vorlesung", "teaching_format"), ("Labor X9.8.76", "room_hint"),
+                                          ("Raum X9.8.76", "room_hint")])
 def test_verified_series_labels_preserve_text_without_altering_events(course, context, note, kind):
     original = normalize_course(course, context)
     preview = normalize_course(changed(course, note=note), context)
@@ -211,3 +212,38 @@ def test_exam_time_not_applied_to_weekly_series_or_extended_text(course, context
     with pytest.raises(NormalizationError):
         normalize_course(changed(course, recurrence="Einzel", valid_until=date(2025, 10, 20),
                                  note=note + " Nur nach Absprache."), context)
+
+@pytest.mark.parametrize("note", [
+    "Raum X9.8.76 ab 12 Uhr", "Raum X9.8.76 am 20.10.2025",
+    "Raum X9.8.76 entfällt", "Raum X9.8.76 oder X9.8.77",
+    "Raum 20.10.2025", "Raum X9.8.76<script>",
+    "Raum X9.8.76\nPRIVATE", "Raum X9.8.76; Gruppe A",
+])
+def test_room_note_accepts_no_temporal_or_additional_instructions(course, context, note):
+    with pytest.raises(NormalizationError) as error:
+        normalize_course(changed(course, note=note), context)
+    assert error.value.code == "unsupported_series_note"
+
+
+def test_room_note_is_reviewed_even_when_matching_table_room(course, context):
+    from backend.importer.details import DetailResult, DetailSample
+    source = changed(course, note="Raum X9.8.76", room="X9.8.76")
+    original = normalize_course(changed(source, note=None), context)
+    preview = normalize_course(source, context)
+    assert preview.occurrences == original.occurrences
+    assert preview.series_annotations[0].text == "Raum X9.8.76"
+    detail = DetailResult("DEMO", 1, "preview", preview)
+    assert detail.requires_review
+    sample = DetailSample(1, 1, (detail,))
+    assert sample.normalization_summary() == {
+        "preview_count": 1, "blocked_count": 0, "review_preview_count": 1,
+    }
+    assert sample.review_summary()["reason_counts"]["room_note_requires_review"] == 1
+    assert "X9.8.76" not in json.dumps(sample.review_summary())
+    assert not preview.complete
+
+
+def test_room_note_does_not_bypass_execution_note_or_cancellation_validation(course, context):
+    for changes in ({"execution_note": "Gruppe A"}, {"cancellation_text": "21.10.2025"}):
+        with pytest.raises(NormalizationError):
+            normalize_course(changed(course, note="Raum X9.8.76", **changes), context)

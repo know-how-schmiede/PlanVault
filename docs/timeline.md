@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.24 – Live belegten Raumhinweis verarbeiten
+
+**Datum:** 2026-10-21
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.24` gesetzt; Footer übernimmt sie.
+- Einen weiteren Raumhinweis live verifiziert und eng begrenzt als `room_hint` unterstützt. Hinweistext und Serienindex bleiben erhalten, Tabellenraum und Termine unverändert; Raumwidersprüche bleiben prüfpflichtig.
+- Zusätzliche Termin-, Gruppen- oder Raumwechselanweisungen bleiben blockiert. Keine pauschale Freigabe unbekannter Bemerkungen oder Einführungsfälle.
+- Begrenzte Live-Prüfung einer WI-Prüfungsordnung mit 21 bekannten Details dokumentiert; keine Gleichsetzung mit dem früheren Bestand von 66 Details. Nur laufbezogene Identität, keine Archiv- oder Vorschauveröffentlichung.
+- Fehlende dauerhafte Quellidentität zusätzlich als `source_identity_unverified` in der Vollständigkeitsliste ausweisen.
+- README, Sonderfallbeschreibung, Quellenanalyse, Semesterprüfung und Roadmap aktualisiert.
+
+**Prüfung:** 319 lokale Tests erfolgreich, einschließlich unveränderter Termine und Tabellenräume, erhaltener fachlicher Prüfhinweise, abgelehnter Zusatzanweisungen und Quellidentitätsblocker. Abschließender Live-Lauf: 29 HTTP-Anfragen, 21 bekannte Details gegen das erwartete Semester geprüft, 21 Vorschauen mit 309 Terminen, keine technisch blockierten Details, drei fachlich prüfpflichtige Details. Nur laufbezogene Identität; Semesterumfang und Wochenenden ungeprüft. Footer auf Startseite und Vorschau als V0.0.24 geprüft; `git diff --check` ohne Fehler. Kein Deployment; M0/M1 bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.24 mit live belegtem Raumhinweis und begrenzter Importnachprüfung ergänzen
+
 ## V0.0.23 – Ursachen für offene Importprüfungen
 
 **Datum:** 2026-10-21

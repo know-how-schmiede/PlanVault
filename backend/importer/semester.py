@@ -129,6 +129,8 @@ def completeness_review(views, sample=None):
         blockers.add("semester_views_missing")
     if any(v.status != "observed" for v in views):
         blockers.add("semester_view_empty_or_unverified")
+    if any(r.identity_scope != "configured" for v in views for r in v.references):
+        blockers.add("source_identity_unverified")
     if sample is None or sample.unchecked_count:
         blockers.add("details_unchecked")
     if sample is not None:

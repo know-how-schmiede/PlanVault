@@ -130,3 +130,24 @@ die Vorschau ist kein freigegebener Archivstand.
 Die zweite untersuchte Veranstaltung mit Begrüßungs-/Einführungshinweisen bleibt
 ungeklärt. Ihr Inhalt wird nicht anhand einzelner Wörter als unbedenklich
 freigegeben. Die geparsten Daten bleiben intern für eine fachliche Prüfung erhalten.
+
+## V0.0.24 – Weiterer belegter Raumhinweis
+
+Ein gezielter Live-Test am 2026-10-21 bestätigt die vollständige Bemerkungsform
+`Raum` gefolgt von einer Raumkennung: genau ein Großbuchstabe, ein bis zwei
+Ziffern, Punkt, ein bis zwei Ziffern, Punkt, zwei Ziffern. Fiktives Beispiel:
+`Raum X9.8.76`. Das Format entspricht dem bereits unterstützten Laborraumhinweis.
+Die Zahlengruppen sind keine Datumsangabe. In der untersuchten Serie weicht der
+Hinweis vom vorhandenen Tabellenraum ab.
+
+Die Normalisierung erhält den vollständigen Text als `room_hint` mit Serienindex.
+Sie überschreibt weder das Raumfeld noch Datum oder Uhrzeiten und behält
+`notes_require_review` sowie `room_note_requires_review`. Auch bei übereinstimmenden
+Raumangaben bleibt die fachliche Prüfung erforderlich. Das Detail kann damit eine
+prüfpflichtige Vorschau liefern, ist aber kein freigegebener Archivbestand.
+
+Nur die vollständige Form wird erkannt. Ergänzungen mit Zeiten, Daten, Gruppen,
+Alternativräumen oder weiteren Anweisungen bleiben blockiert. Durchführungshinweise
+und fehlerhafte Ausfallangaben werden durch die Raumregel nicht freigegeben.
+Ungeklärte Begrüßungs-/Einführungsbemerkungen anderer Auswahlen bleiben offen.
+Die Web-Vorschau und bereinigte Berichte enthalten weiterhin keine Bemerkungstexte.

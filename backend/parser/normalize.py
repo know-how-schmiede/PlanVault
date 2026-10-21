@@ -180,7 +180,7 @@ def normalize_course(
             elif series.note == "Nachholtermin" and rule == "single" and series.recurrence == "Einzel":
                 kind = "makeup_label"
                 review.add("replacement_reference_requires_review")
-            elif re.fullmatch(r"Labor [A-Z]\d{1,2}\.\d{1,2}\.\d{2}", series.note):
+            elif re.fullmatch(r"(?:Labor|Raum) [A-Z]\d{1,2}\.\d{1,2}\.\d{2}", series.note):
                 kind = "room_hint"
                 review.add("room_note_requires_review")
             elif exam and rule == "single" and series.recurrence == "Einzel":
