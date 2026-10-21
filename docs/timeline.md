@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.26 – Veranstaltungsziele zwischen Wochen- und Semesteransichten abgleichen
+
+**Datum:** 2026-10-21
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.26` gesetzt; Footer übernimmt sie.
+- Separaten Befehl `source-coverage-check` mit unabhängiger Zeitraumvorgabe, expliziter Wochenwahl oder `--all-weeks` und begrenztem Wochenbudget ergänzt.
+- Konfigurierte Veranstaltungskennungen beider Semesteransichten und beobachteter Wochen in beiden Richtungen vergleichen. Bereinigter Bericht mit eigener Schema-Version 1, laufbezogenen Zielnummern, fehlenden/nicht verfügbaren Wochen und Prüfstatus.
+- Nur im neuen Abgleich trotz Tageshinweisen und ungeklärt leeren Wochen weiterprüfen. Abruf-, Struktur- oder Kennungsfehler stoppen und verhindern einen erfolgreichen Teilvergleich. Bestehende Importbefehle behalten ihr Verhalten.
+- Keine Detailabrufe oder Schreibzugriffe auf Vorschau-/Archivdaten; keine Semesterfreigabe aus übereinstimmenden Zielmengen ableiten.
+- Nutzer bestätigt bisherigen manuellen Import im LXC. Anleitung, README, Roadmap und Quellenanalyse aktualisiert.
+
+**Prüfung:** 370 lokale Tests erfolgreich, einschließlich bidirektionaler Unterschiede, gleicher Zielmengen ohne Freigabe, Jahreswechsel, nicht verfügbarer/ungeprüfter Wochen, Ferienhinweisen, Fehlerabbrüchen, Budgetprüfung und unveränderter Vorschau. Footer auf Startseite und Vorschau als V0.0.26 geprüft, beide Bash-Anleitungsblöcke auf Syntax geprüft; `git diff --check` ohne Fehler. Live: 34 HTTP-Anfragen, 26 angeforderte Wochen erreicht, 66 Ziele in Wochenbestand und vereinigten Semesteransichten, keine einseitigen Ziele. Zehn leere Wochen und drei Wochen mit Tageshinweisen bleiben prüfpflichtig. Kein Deployment, eigener LXC-Lauf oder Archivfreigabe; M0/M1 bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.26 mit begrenztem Wochen-Semester-Abgleich und geprüften Zielmengen ergänzen
+
 ## V0.0.25 – Ursprüngliche Auswahl bis zur Web-Vorschau prüfen
 
 **Datum:** 2026-10-21

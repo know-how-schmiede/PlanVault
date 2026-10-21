@@ -71,3 +71,13 @@ Gruppenzuordnungen benötigen weitere Nachweise. Die Zahl bekannter Blöcke sagt
 nichts über eindeutige Veranstaltungen oder vollständig gelesene Termine aus.
 `WeekAudit.complete` bleibt immer `False`; es wird kein Archivstand veröffentlicht.
 Die Website zeigt weiterhin die Startseite mit Versionsfooter.
+
+
+## Ergänzung V0.0.26 – Fortsetzung bei Prüfhinweisen im Ansichtsabgleich
+
+Der neue [Ansichtsabgleich](view-comparison.md) nutzt dieselbe strukturelle
+Wochenprüfung. Nur dort wird die Prüfung nach Tageshinweisen oder ungeklärt
+leeren Wochen fortgesetzt. Die Statuswerte bleiben unverändert prüfpflichtig.
+Auch Seiten mit Tageshinweisen können beobachtete Veranstaltungsziele beitragen.
+Struktur- und Abruffehler stoppen weiterhin sofort. Bestehende Wochen- und
+Importprüfbefehle behalten ihr bisheriges Abbruchverhalten.

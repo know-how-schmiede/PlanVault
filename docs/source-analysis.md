@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.25`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.26`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -279,3 +279,37 @@ keine vollständige Studiengangs-/Prüfungsordnungszuordnung.
 Die Wochentagszählung beträgt 187/251/248/202/54/0/0 (Montag bis Sonntag).
 Wochenendabdeckung, vollständiger Semesterumfang, dauerhafte Quellidentität und
 fachliche Hinweise bleiben offene Voraussetzungen. Keine Archivfreigabe.
+
+
+## V0.0.26 – Wochen- und Semesterziele live abgeglichen
+
+Die ursprüngliche MT-Auswahl (Prüfungsordnung 2024) wurde mit dem neuen
+Ansichtsabgleich für den ausdrücklich gewählten Zeitraum 2026-08-31 bis
+2027-02-28 geprüft. Die erwarteten ISO-Wochen berechnet der Aufrufer aus diesem
+Zeitraum; der Zeitraum selbst ist kein extern bestätigter Nachweis der fachlichen
+Semestergrenzen. Die Quelle bietet die 26 angeforderten Wochen an.
+
+Live am 2026-10-21: 34 HTTP-Anfragen, Semesteransicht mit 66 Zielen,
+Block-/Einzelterminansicht mit 33 Zielen und 26 strukturgeprüfte Wochenantworten.
+Vereinigter Wochenbestand und Semesterbestand enthalten dieselben 66
+Veranstaltungsziele. Keine Ziele nur in einem der beiden Bestände. Konfigurierte
+Veranstaltungskennungen verbinden Sitzungsvarianten; Quellkonfiguration und
+Quellkennungen bleiben außerhalb von Dokumentation und Bericht.
+
+13 Wochen haben Status `ok`, zehn sind `empty_unverified` (KW 36–40/2026,
+KW 4–8/2027), drei `notes_require_review` (KW 52–53/2026, KW 1/2027).
+Die drei Wochen mit Tageshinweisen enthalten 23, null und 13 Ziele.
+Kein Abruf-/Strukturfehler und keine fehlende angeforderte Woche.
+Tageshinweise werden nicht freigegeben; der neue Abgleich setzt die Untersuchung
+der folgenden Wochen fort. Auch eine strukturgeprüfte leere Woche bleibt ungeklärt.
+
+Der Live-Nachweis bestätigt nur die Übereinstimmung beobachteter Veranstaltungsziele.
+Er verifiziert keine Terminzeiten, Räume, Ausfälle, Wochenenden oder vollständigen
+Semestergrenzen und ersetzt nicht die Detailprüfung des Einführungsfalls.
+Keine Detailseiten abgerufen, keine Rohseiten gespeichert, keine Web-Vorschau
+geändert und kein Archivstand veröffentlicht. Die spätere Ergänzung des
+expliziten Berichtsfelds `comparison_scope` sowie die Zuordnung fehlerhafter
+Wochenblöcke sind lokal getestet. Der Nutzer bestätigt den bisherigen manuellen
+Import im LXC; der neue Abgleich wurde dort nicht von uns ausgeführt.
+
+Aufruf und Berichtsvertrag: [Ansichtsabgleich](view-comparison.md).

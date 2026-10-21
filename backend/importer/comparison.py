@@ -1,0 +1,162 @@
+"""Begrenzter Vergleich von Veranstaltungszielen, ohne Import oder Veröffentlichung."""
+
+from datetime import date, datetime, timezone
+from uuid import uuid4
+
+from backend.importer.coverage import check_week_coverage
+from backend.importer.details import collect_course_references, merge_course_references, DetailImportError
+from backend.importer.forms import FormNavigationError
+from backend.importer.http import SourceFetchError
+from backend.importer.identity import SourceIdentityPolicy
+from backend.importer.navigation import search_study, follow_named_result, submit_labeled_search, _page
+from backend.importer.semester import audit_semester_views
+from backend.importer.structure import COURSE_BLOCK_SELECTOR
+from backend.importer.weeks import read_week_menu, audit_weeks
+from version import __version__
+
+
+class ComparisonInputError(ValueError):
+    """Ungültiger Auftrag; ausschließlich bereinigte Meldungen."""
+
+
+def validate_comparison(query, title, start, end, requested, week_budget, identity_policy):
+    if not isinstance(identity_policy, SourceIdentityPolicy):
+        raise ComparisonInputError("Ansichtsabgleich benötigt eine konfigurierte Quellkennung.")
+    if (not isinstance(query, str) or not query.strip() or len(query) > 200 or
+            not isinstance(title, str) or not title.strip() or len(title) > 200):
+        raise ComparisonInputError("Ungültige Studiengangsauswahl.")
+    if (type(start) is not date or type(end) is not date or
+            not isinstance(week_budget, int) or isinstance(week_budget, bool) or
+            not 1 <= week_budget <= 54):
+        raise ComparisonInputError("Ungültiger Prüfzeitraum oder Wochenbudget.")
+    try:
+        expected = check_week_coverage(start, end, []).missing
+    except ValueError:
+        raise ComparisonInputError("Ungültiger Prüfzeitraum.") from None
+    selection = expected if requested is None else requested
+    if (not isinstance(selection, tuple) or not selection or len(selection) > week_budget or
+            any(not isinstance(key, tuple) or len(key) != 2 or
+                any(type(number) is not int for number in key) for key in selection)):
+        raise ComparisonInputError("Wochenauftrag ist leer, ungültig oder überschreitet das Budget.")
+    if len(set(selection)) != len(selection) or any(key not in expected for key in selection):
+        raise ComparisonInputError("Doppelte Wochen oder Wochen außerhalb des Prüfzeitraums.")
+    return expected, selection
+
+
+def compare_references(semester_references, week_references):
+    """Nur laufbezogene Nummern ausgeben; keine Quellkennungen oder Beschriftungen."""
+    merged = merge_course_references((semester_references, week_references))
+    if any(r.identity_scope != "configured" for r in merged):
+        raise DetailImportError("Ansichtsabgleich benötigt konfigurierte Veranstaltungskennungen.")
+    numbers = {r.key: index for index, r in enumerate(merged, 1)}
+    semester = {r.key for r in semester_references}
+    weeks = {r.key for r in week_references}
+    return {
+        "semester_reference_count": len(semester), "week_reference_count": len(weeks),
+        "shared_reference_count": len(semester & weeks),
+        "only_in_weeks": sorted(numbers[key] for key in weeks - semester),
+        "only_in_semester_views": sorted(numbers[key] for key in semester - weeks),
+        "reference_sets_equal": semester == weeks,
+    }
+
+
+def run_view_comparison(client, *, query, title, start, end, identity_policy,
+                        requested=None, week_budget=30):
+    """Alle erwarteten oder ausgewählte Wochen mit beiden Semesteransichten vergleichen.
+
+    Zeitraum und Budget kommen vom Aufrufer, nicht aus dem Quellmenü. Tageshinweise
+    bleiben prüfpflichtig; strukturgeprüfte Seiten können dennoch Ziele beitragen.
+    Abruf-/Strukturfehler brechen ab und liefern keinen erfolgreichen Teilvergleich.
+    """
+    expected, selection = validate_comparison(query, title, start, end, requested,
+                                               week_budget, identity_policy)
+    started = datetime.now(timezone.utc).isoformat()
+    report = {
+        "schema_version": 1, "app_version": __version__, "run_id": str(uuid4()),
+        "started_at": started, "status": "needs_review", "stage": "navigation",
+        "period_start": start.isoformat(), "period_end": end.isoformat(),
+        "identity_mode": "configured", "requested_weeks": selection,
+        "unavailable_weeks": [], "checked_weeks": [], "missing_weeks": expected,
+        "review_weeks": [], "failed_weeks": [], "views": [],
+        "all_requested_weeks_observed": False, "period_weeks_verified": False,
+        "comparison_evaluated": False, "comparison_scope": "observed_weeks", "comparison": None,
+        "weekend_coverage_verified": False, "complete": False, "published": False,
+    }
+    blockers = {"semester_extent_unverified", "study_context_unverified",
+                "weekend_coverage_unverified", "detail_content_unchecked"}
+    try:
+        results = search_study(client, query)
+        selected = follow_named_result(client, results, title=title)
+        plan = submit_labeled_search(client, selected, field_label="Studiengang",
+                                     button_caption="Suche starten")
+        menu = read_week_menu(plan)
+        available = {choice.key for choice in menu.choices}
+        report["unavailable_weeks"] = sorted(set(selection) - available)
+        if report["unavailable_weeks"]:
+            blockers.add("requested_weeks_unavailable")
+        report["stage"] = "semester_views"
+        views = audit_semester_views(client, plan, identity_policy=identity_policy)
+        report["views"] = [{"view": v.view, "status": v.status,
+                            "reference_count": v.reference_count} for v in views]
+        if any(v.status != "observed" for v in views):
+            blockers.add("semester_view_empty_or_unverified")
+        semester_refs = merge_course_references(tuple(v.references for v in views))
+        week_refs = ()
+        observed = []
+
+        def collect(document, result):
+            nonlocal week_refs
+            try:
+                refs = (collect_course_references(client, (document,), identity_policy=identity_policy)
+                        if _page(document).select(COURSE_BLOCK_SELECTOR) else ())
+                week_refs = merge_course_references((week_refs, refs))
+            except DetailImportError:
+                raise FormNavigationError("Veranstaltungsziele der Woche benötigen Prüfung.") from None
+            observed.append({"iso_year": result.iso_year, "iso_week": result.iso_week,
+                             "status": result.status, "reference_count": len(refs)})
+
+        report["stage"] = "weeks"
+        offered_selection = tuple(key for key in selection if key in available)
+        audit = (audit_weeks(client, plan, start=start, end=end, requested=offered_selection,
+                             on_observed_week=collect, continue_on_review=True)
+                 if offered_selection else None)
+        results = audit.results if audit else ()
+        report["checked_weeks"] = [
+            {"iso_year": r.iso_year, "iso_week": r.iso_week, "status": r.status,
+             "reference_count": next((w["reference_count"] for w in observed
+                                      if (w["iso_year"], w["iso_week"]) == (r.iso_year, r.iso_week)), None)}
+            for r in results
+        ]
+        coverage = check_week_coverage(start, end, results)
+        report["missing_weeks"] = coverage.missing
+        report["review_weeks"] = [(r.iso_year, r.iso_week) for r in results
+                                  if r.status not in {"ok", "failed"}]
+        report["failed_weeks"] = [(r.iso_year, r.iso_week) for r in results if r.status == "failed"]
+        report["all_requested_weeks_observed"] = set(selection) <= {
+            (r.iso_year, r.iso_week) for r in results if r.status != "failed"}
+        report["period_weeks_verified"] = coverage.weeks_complete
+        if report["review_weeks"]:
+            blockers.add("weeks_require_review")
+        if report["failed_weeks"]:
+            raise FormNavigationError("Wochenprüfung abgebrochen.")
+        report["stage"] = "comparison"
+        if observed:
+            report["comparison"] = compare_references(semester_refs, week_refs)
+            report["comparison_evaluated"] = True
+            if report["comparison"]["only_in_weeks"]:
+                blockers.add("references_missing_from_semester_views")
+            if report["comparison"]["only_in_semester_views"]:
+                blockers.add("semester_references_not_observed_in_weeks")
+        else:
+            blockers.add("no_week_inventory")
+        report["stage"] = "finished"
+    except (SourceFetchError, FormNavigationError, DetailImportError):
+        report["status"] = "failed"
+        blockers.add(report["stage"] + "_failed")
+        report["comparison_evaluated"] = False
+        report["comparison"] = None
+    if report["missing_weeks"]:
+        blockers.add("missing_weeks")
+    report["blockers"] = sorted(blockers)
+    report["finished_at"] = datetime.now(timezone.utc).isoformat()
+    return report

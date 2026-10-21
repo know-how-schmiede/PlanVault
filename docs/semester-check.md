@@ -230,3 +230,17 @@ Vorschauen mit 942 Terminen wurden temporär gespeichert und über Wochen-/Liste
 lokal ausgegeben. Ein Einführungsfall bleibt technisch blockiert, 23 Vorschauen
 fachlich prüfpflichtig. Nur laufbezogene Quellzuordnung, keine LXC-Aktualisierung.
 [Konkrete Einrichtung für den LXC](preview.md#web-vorschau-ab-v0025-mit-wiederverwendbarer-auswahl).
+
+
+## V0.0.26 – Ergänzender Ansichtsabgleich
+
+Der separate Befehl `source-coverage-check` vergleicht die vereinigten Ziele
+beider Semesteransichten mit ausgewählten oder allen Wochen eines ausdrücklich
+angegebenen Zeitraums. Der bestehende Semesterprüfbefehl und dessen Schema 7
+bleiben unverändert; der neue Abgleich hat einen eigenen Berichtsvertrag mit
+Schema 1. Er lädt keine Detailseiten und speichert keine Vorschau.
+
+Live für die bekannte MT-Auswahl: alle 26 angeforderten Wochen erreicht,
+66 Ziele in beiden Beständen, keine einseitigen Ziele. Leere Wochen und
+Tageshinweise bleiben prüfpflichtig; vollständiger Semesterinhalt und Wochenenden
+sind nicht bestätigt. [Anleitung und Grenzen](view-comparison.md).

@@ -4,7 +4,7 @@ WI-PlanArchiv wird schrittweise von der Konzeption zur zuverlässig betriebenen 
 
 ## Aktueller Stand
 
-Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.25`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Laut Nutzerprotokoll vom 2026-10-20 bestehen im Debian-13-LXC alle drei Tests; systemd-Einrichtung und lokale HTTP-Prüfung sind erfolgreich. Der User bestätigt nach erneutem Test den laufenden Server und Zugriff im internen Netz. Der erste Live-Quellzugriff für Studiengangsuche, Plan und Wochenwechsel ist verifiziert; ein automatisierter Datenimport ist noch nicht implementiert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Erstinstallation im Zielcontainer ist durch das Nutzerprotokoll bestätigt. Ein separates Update-Skript mit vorbereiteten Releases, Sicherung und Rückkehr zum alten Anwendungsstand liegt vor; der erfolgreiche Update-Praxistest ist durch den User bestätigt; ein absichtlich ausgelöster Fehler mit Rollback wurde im LXC noch nicht nachgewiesen. M0 ist in der [Quellenanalyse](source-analysis.md) begonnen: HTTP-Abruf, Wochenwechsel und zwei Detailseiten sind geprüft. Ein Detailparser mit fiktiver Testgrundlage liegt vor; Sonderfälle, Quellidentität und Semester-Vollständigkeit bleiben offen; M1 bis M5 bleiben offen.
+Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.26`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Laut Nutzerprotokoll vom 2026-10-20 bestehen im Debian-13-LXC alle drei Tests; systemd-Einrichtung und lokale HTTP-Prüfung sind erfolgreich. Der User bestätigt nach erneutem Test den laufenden Server und Zugriff im internen Netz. Der erste Live-Quellzugriff für Studiengangsuche, Plan und Wochenwechsel ist verifiziert; ein automatisierter Datenimport ist noch nicht implementiert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Erstinstallation im Zielcontainer ist durch das Nutzerprotokoll bestätigt. Ein separates Update-Skript mit vorbereiteten Releases, Sicherung und Rückkehr zum alten Anwendungsstand liegt vor; der erfolgreiche Update-Praxistest ist durch den User bestätigt; ein absichtlich ausgelöster Fehler mit Rollback wurde im LXC noch nicht nachgewiesen. M0 ist in der [Quellenanalyse](source-analysis.md) begonnen: HTTP-Abruf, Wochenwechsel und zwei Detailseiten sind geprüft. Ein Detailparser mit fiktiver Testgrundlage liegt vor; Sonderfälle, Quellidentität und Semester-Vollständigkeit bleiben offen; M1 bis M5 bleiben offen.
 
 Die neue Kalendervorschau erzeugt UTC-Termine und prüft Ausfälle; ein separater Wochenabgleich erkennt Lücken und Fehler. Sonderregeln und Quellzuordnung sind technisch vorbereitet, aber noch nicht live verifiziert. M0/M1 bleiben offen. Siehe [Entscheidung zur Kalendervorschau](decisions/002-kalendervorschau.md).
 
@@ -245,3 +245,18 @@ Der Bericht bestätigt die tatsächliche Speicherung; die Webseite zeigt den
 gewählten Studiengang. Die Anleitung beschreibt den noch auszuführenden Import
 im LXC. Eine dortige Datenaktualisierung oder Archivfreigabe ist nicht erfolgt.
 M0/M1 und die vollständige Semesterabdeckung bleiben offen.
+
+
+## Ergänzung V0.0.26 – Wochen- und Semesterziele vergleichen
+
+Der neue [Ansichtsabgleich](view-comparison.md) prüft konfigurierte Veranstaltungskennungen
+beider Semesteransichten gegen einen ausdrücklich gewählten Wochenzeitraum.
+Fehlende oder zusätzliche Ziele werden in beiden Richtungen ausgewiesen.
+Der Live-Lauf erreicht alle 26 Wochen des Prüfzeitraums und dieselben 66 Ziele
+in beiden Beständen. Zehn leere Wochen und drei Wochen mit Tageshinweisen bleiben
+prüfpflichtig; keine fachliche Semester- oder Wochenendfreigabe. Der Befehl
+schreibt keine Vorschau- oder Archivdaten. Nächste Schritte: ungeklärte leere
+Zeiträume und Semestergrenzen fachlich belegen, Einzeltermine und Sonderfälle
+gegen die Quelle absichern; anschließend sichere Archivspeicherung. M0/M1
+bleiben offen. Der Nutzer bestätigt den bisherigen manuellen Import im LXC;
+ein Ziel-LXC-Lauf des neuen Abgleichbefehls steht noch aus.

@@ -120,11 +120,15 @@ def inspect_week(document: SourceDocument, expected: WeekChoice) -> WeekResult:
 
 def audit_weeks(client: SourceClient, document: SourceDocument, *, start: date, end: date,
                 requested: tuple[tuple[int, int], ...],
-                on_week: Callable[[SourceDocument], None] | None = None) -> WeekAudit:
-    """Explizit ausgewählte Wochen sequenziell prüfen; beim ersten Fehler abbrechen.
+                on_week: Callable[[SourceDocument], None] | None = None,
+                on_observed_week: Callable[[SourceDocument, WeekResult], None] | None = None,
+                continue_on_review: bool = False) -> WeekAudit:
+    """Explizit ausgewählte Wochen sequenziell prüfen; Strukturfehler brechen ab.
 
     Der Zeitraum ist eine unabhängige Erwartung des Aufrufers. Nicht abgerufene
     Wochen bleiben fehlend, auch wenn sie im Auswahlmenü angeboten wurden.
+    Der optionale Ansichtsabgleich darf bei Tageshinweisen weiterprüfen, ohne deren
+    Status auf ok anzuheben. Struktur- und Abruffehler stoppen weiterhin sofort.
     """
     check_week_coverage(start, end, [])
     if not requested or len(requested) > 54 or len(set(requested)) != len(requested):
@@ -151,8 +155,10 @@ def audit_weeks(client: SourceClient, document: SourceDocument, *, start: date, 
                 raise FormNavigationError("Wochenangebot hat sich während der Prüfung geändert.")
             if result.status == "ok" and on_week is not None:
                 on_week(document)
+            if on_observed_week is not None:
+                on_observed_week(document, result)
             results.append(result)
-            if result.status != "ok":
+            if result.status != "ok" and not continue_on_review:
                 break
         except (FormNavigationError, SourceFetchError):
             results.append(WeekResult(*key, "failed"))

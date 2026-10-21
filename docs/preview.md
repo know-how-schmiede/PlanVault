@@ -227,3 +227,12 @@ Wochen- und Listenansicht lesen die neue Datei ohne weiteren Neustart. Ältere
 Vorschaudateien bleiben lesbar und zeigen, dass der Studiengang noch nicht
 hinterlegt ist. Zum Aktualisieren denselben Importblock erneut ausführen; parallele
 Vorschauimporte weiterhin vermeiden.
+
+
+## Ergänzung V0.0.26 – Abgleich ohne Vorschauänderung
+
+Der separate [Ansichtsabgleich](view-comparison.md) prüft Veranstaltungsziele aus
+Wochen- und Semesteransichten. Er verändert die hier angezeigten Termine nicht.
+Der bisherige manuelle Vorschauimport wurde vom Nutzer als erfolgreich bestätigt.
+Zum erneuten Einlesen weiterhin `source-semester-check --details --save-preview`
+mit der eingerichteten Auswahl verwenden.

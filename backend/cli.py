@@ -19,6 +19,7 @@ from backend.importer.details import collect_course_references, fetch_detail_sam
 from backend.importer.run import ImportCheckInputError, run_import_check
 from backend.importer.identity import configured_identity, SourceIdentityError
 from backend.importer.semester import audit_semester_views, fetch_semester_details, validate_semester_details, weekday_coverage, completeness_review
+from backend.importer.comparison import run_view_comparison, ComparisonInputError
 from version import __version__
 
 
@@ -307,6 +308,50 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
     raise click.exceptions.Exit(1)
 
 
+@click.command("source-coverage-check")
+@click.option("--query", envvar="LSF_STUDY_QUERY", required=True)
+@click.option("--title", envvar="LSF_STUDY_TITLE", required=True)
+@click.option("--start", required=True, type=click.DateTime(formats=["%Y-%m-%d"]))
+@click.option("--end", required=True, type=click.DateTime(formats=["%Y-%m-%d"]))
+@click.option("--week", "weeks", multiple=True, help="Ausgewählte ISO-Woche JJJJ-WNN; wiederholbar.")
+@click.option("--all-weeks", is_flag=True, help="Alle Wochen des ausdrücklich angegebenen Zeitraums prüfen.")
+@click.option("--week-budget", default=30, show_default=True, type=click.IntRange(1, 54))
+@click.option("--json", "json_output", is_flag=True)
+@with_appcontext
+def source_coverage_check(query, title, start, end, weeks, all_weeks, week_budget, json_output):
+    """Veranstaltungsziele der Wochen- und Semesteransichten vergleichen; keine Speicherung."""
+    if bool(weeks) == all_weeks:
+        raise click.ClickException("Entweder --week oder --all-weeks angeben.")
+    requested = []
+    for value in weeks:
+        match = re.fullmatch(r"(\d{4})-W(\d{2})", value)
+        if not match:
+            raise click.ClickException("ISO-Woche muss das Format JJJJ-WNN haben.")
+        requested.append((int(match[1]), int(match[2])))
+    try:
+        policy = _identity_policy()
+        with SourceClient(current_app.config.get("LSF_BASE_URL", ""), max_requests=100, retries=0) as client:
+            report = run_view_comparison(client, query=query, title=title,
+                                         start=start.date(), end=end.date(), identity_policy=policy,
+                                         requested=None if all_weeks else tuple(requested),
+                                         week_budget=week_budget)
+    except (SourceFetchError, SourceIdentityError, ComparisonInputError) as error:
+        raise click.ClickException(str(error)) from None
+    if json_output:
+        click.echo(json.dumps(report, ensure_ascii=False, indent=2))
+    else:
+        click.echo(f"Ansichtsabgleich: {report['status']}; Phase: {report['stage']}.")
+        click.echo(f"Wochen geprüft: {len(report['checked_weeks'])}; fehlend: {len(report['missing_weeks'])}; "
+                   f"prüfpflichtig: {len(report['review_weeks'])}; fehlgeschlagen: {len(report['failed_weeks'])}.")
+        comparison = report["comparison"]
+        if comparison is not None:
+            click.echo(f"Nur in Wochenansichten: {len(comparison['only_in_weeks'])}; "
+                       f"nur in Semesteransichten: {len(comparison['only_in_semester_views'])}.")
+        click.echo("Offene Punkte: " + ", ".join(report["blockers"]))
+        click.echo("Keine Vorschau geändert; Semesterinhalt und Wochenenden bleiben ungeprüft.")
+    raise click.exceptions.Exit(1)
+
+
 def register_cli(app):
     app.cli.add_command(source_check)
     app.cli.add_command(source_plan_check)
@@ -314,3 +359,4 @@ def register_cli(app):
     app.cli.add_command(source_details_check)
     app.cli.add_command(source_import_check)
     app.cli.add_command(source_semester_check)
+    app.cli.add_command(source_coverage_check)
