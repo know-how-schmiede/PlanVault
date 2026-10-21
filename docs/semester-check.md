@@ -207,3 +207,26 @@ Laufbezogene Quellkennungen erscheinen zusätzlich als
 Archivfreigabe bleiben gesperrt.
 Die Untersuchung hat keine Vorschau-Datei aktualisiert. Konkrete Grenzen und
 Abrufzahlen stehen in der [Quellenanalyse](source-analysis.md).
+
+
+## V0.0.25 – Wiederverwendbare Auswahl und Speicherstatus (Schema 7)
+
+`source-semester-check` unterstützt die Umgebungsvariablen `LSF_STUDY_QUERY`,
+`LSF_STUDY_TITLE`, `LSF_SEMESTER`, `LSF_STUDY_KEY` und `LSF_REGULATIONS_KEY` als
+Vorgaben für die entsprechenden Optionen. Explizite Optionen haben Vorrang.
+Die vertrauliche Laufzeitkonfiguration wird weiterhin vor dem CLI-Aufruf geladen;
+es gibt keine automatische Übernahme einer Datei und keinen voreingestellten
+Produktionsstudiengang. Fehlende Detailwerte werden vor dem Quellzugriff abgelehnt.
+
+Schema 7 ergänzt `preview_save` mit `requested`, `saved` und `event_count`.
+Nur ein erfolgreich abgeschlossener Dateiaustausch setzt `saved` auf true. Bei
+Fehlern oder ohne Speicherauftrag ist es false; dies sagt nichts über eine bereits
+vorhandene Vorschau-Datei aus. Die bestehenden Archivfelder und Exitcode 1 bleiben
+unverändert. Textausgabe und JSON unterscheiden nun zwischen abgeschlossener
+Detailprüfung und tatsächlich gespeicherter Web-Vorschau.
+
+Der ursprüngliche MT-Bestand wurde mit 66 Details erneut live geprüft. 65
+Vorschauen mit 942 Terminen wurden temporär gespeichert und über Wochen-/Listenansicht
+lokal ausgegeben. Ein Einführungsfall bleibt technisch blockiert, 23 Vorschauen
+fachlich prüfpflichtig. Nur laufbezogene Quellzuordnung, keine LXC-Aktualisierung.
+[Konkrete Einrichtung für den LXC](preview.md#web-vorschau-ab-v0025-mit-wiederverwendbarer-auswahl).

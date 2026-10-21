@@ -2,6 +2,23 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.25 – Ursprüngliche Auswahl bis zur Web-Vorschau prüfen
+
+**Datum:** 2026-10-21
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.25` gesetzt; Footer übernimmt sie.
+- Ursprüngliche Auswahl Management und Technik, Prüfungsordnung 2024, anhand der vorhandenen Quellenanalyse wieder zugeordnet und live geprüft.
+- Auswahlwerte für den Semesterprüfbefehl aus explizit exportierter lokaler Konfiguration übernehmbar; Optionen haben Vorrang. `.env.example` um leere Auswahlfelder ergänzt.
+- Bericht auf Schema 7 erweitert: `preview_save` bestätigt Speicherauftrag, tatsächliche Speicherung und Terminanzahl. Exitcode 1 und gesperrte Archivfreigabe bleiben unverändert.
+- Gewählte Studiengangs-/Prüfungsordnungsbeschriftung in neuen Vorschau-Dateien erhalten und sicher auf der Webseite anzeigen. Ältere Dateien bleiben lesbar.
+- LXC-Anleitung mit der belegten Auswahl und wiederholbarem Importaufruf ergänzt; README, Quellenanalyse, Semesterprüfung und Roadmap aktualisiert.
+
+**Prüfung:** 335 lokale Tests erfolgreich, einschließlich Import aus gespeicherten Auswahlwerten, Vorrang expliziter Optionen, Ablehnung fehlender Werte vor Netzwerkzugriff, Speicherbestätigung und Fehlererhalt, Altdateikompatibilität und HTML-Escaping. Footer auf Startseite und Vorschau als V0.0.25 geprüft, alle sieben Bash-Blöcke der Vorschauanleitung auf Syntax geprüft; `git diff --check` ohne Fehler. Live: 74 HTTP-Anfragen, 66 bekannte Details semestergeprüft, 65 Vorschauen mit 942 Terminen, ein technisch blockierter Einführungsfall, 23 fachlich prüfpflichtige Vorschauen. Temporäre Vorschau geschrieben, gelesen und beide Webansichten lokal geprüft, danach entfernt. Nur laufbezogene Quellidentität. Kein Browser-Livetest, Deployment oder Import in den LXC. M0/M1 bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.25 mit ursprünglicher Importauswahl, Speicherbestätigung und gekennzeichneter Web-Vorschau ergänzen
+
 ## V0.0.24 – Live belegten Raumhinweis verarbeiten
 
 **Datum:** 2026-10-21

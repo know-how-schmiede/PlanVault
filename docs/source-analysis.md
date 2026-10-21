@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.18`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.25`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -238,3 +238,44 @@ Ergänzung wurde anschließend lokal getestet.
 Montag bis Freitag sind sichtbar; Wochenend- und Semester-Vollständigkeit bleiben
 unbewiesen. Kein Archivstand und keine Web-Vorschau wurden geschrieben. Die
 früher dokumentierten Einführungsbemerkungen anderer Auswahlen bleiben ungeklärt.
+
+
+## V0.0.25 – Ursprüngliche MT-Auswahl und lokale Web-Vorschau
+
+Die frühere Auswahl war bereits in dieser Dokumentation festgehalten: Management
+und Technik, Prüfungsordnung 2024. Die Auswahl mit Prüfungsordnung 2020 aus V0.0.24
+war eine andere Untersuchung. Sie ersetzt den ursprünglichen Nachweis nicht.
+
+Am 2026-10-21 wurden beide Ansichten der ursprünglichen Auswahl erneut abgerufen:
+164 Blöcke und 66 unterschiedliche Detailziele in der Semesteransicht, 100 Blöcke
+und 33 Ziele in der Block-/Einzelterminansicht. Alle Ziele der Zusatzansicht sind
+bereits in der Semesteransicht vorhanden. Die Blockzahlen haben sich gegenüber
+dem früheren Lauf verändert; die Zahl der bekannten Detailziele bleibt 66.
+
+Alle 66 Details wurden seriell gegen die erwartete Semesterbezeichnung für das
+Wintersemester 2026/27 geprüft. Insgesamt 74 HTTP-Anfragen, eine Sekunde
+Mindestabstand, keine Wiederholungen. 65 Vorschauen mit 942 Terminen entstehen;
+ein Detail bleibt wegen `unsupported_series_note` blockiert und enthält weiterhin
+Einführungs-/Begrüßungsbemerkungen. Es wurde dafür keine neue Interpretationsregel
+eingeführt. 23 Vorschauen bleiben fachlich prüfpflichtig. Prüfgrundzähler:
+20 Details mit Ausfallprüfung, vier mit Bemerkungen, drei mit Ersatzterminbezug,
+eines mit Raumhinweis und eines mit Klausurzeitprüfung; Kategorien können sich
+überschneiden.
+
+Die normalisierbaren Termine wurden in einer temporären Vorschau-Datei gespeichert,
+wieder gelesen und über den lokalen Flask-Testclient in Wochen- und Listenansicht
+geprüft. Die Listenansicht enthält alle 942 gespeicherten Termine. Gewählter
+Studiengang und Warnhinweis sind sichtbar. Die Datei wurde anschließend entfernt;
+keine echten Termine, Quelladressen oder Rohseiten wurden ins Repository übernommen.
+Kein Browser-Livetest, kein LXC-Import und kein Deployment.
+
+Die Live-Nachprüfung nutzte die bestehenden Abrufadapter und Parser direkt mit
+laufbezogenen Linkkennungen (`identity_mode: run`), keine rekonstruierte dauerhafte
+Quellkonfiguration. Die CLI-Anbindung mit konfigurierter Quellkennung und
+exportierten Auswahlwerten ist separat mit fiktiven Daten getestet. Der neue
+Studiengangstext bezeichnet die gewählte Trefferbeschriftung; er bestätigt noch
+keine vollständige Studiengangs-/Prüfungsordnungszuordnung.
+
+Die Wochentagszählung beträgt 187/251/248/202/54/0/0 (Montag bis Sonntag).
+Wochenendabdeckung, vollständiger Semesterumfang, dauerhafte Quellidentität und
+fachliche Hinweise bleiben offene Voraussetzungen. Keine Archivfreigabe.

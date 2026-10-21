@@ -9,7 +9,7 @@ werden nicht in die Vorschau übernommen. Die Quelle bleibt für die Prüfung ma
 
 ## 1. Aktualisieren und Anzeige vorbereiten
 
-Zuerst V0.0.22 auf GitHub veröffentlichen und das [Update](install.md#vorhandene-installation-aktualisieren)
+Zuerst V0.0.25 auf GitHub veröffentlichen und das [Update](install.md#vorhandene-installation-aktualisieren)
 ausführen. Danach ist der Vorschau-Link sichtbar, zunächst ohne Termine.
 Ein Update allein lädt keine Hochschuldaten. Es werden auch keine Demo-Termine eingespielt.
 
@@ -124,3 +124,106 @@ die Einrichtung oben durchführen.
 
 Die Ansicht ist weiterhin unvollständig; sie bestätigt weder Semesterabdeckung noch
 Archivfreigabe. Alle Termine und Warnhinweise stammen aus derselben lokalen Vorschau.
+
+
+## Web-Vorschau ab V0.0.25 mit wiederverwendbarer Auswahl
+
+Die Auswahl aus der ursprünglichen Quellenanalyse ist **Wirtschaftsingenieurwesen /
+Management und Technik, Prüfungsordnung 2024**, Wintersemester 2026/27. Der
+erneute Live-Lauf erfasst 66 bekannte Details. Daraus entstehen 65 Vorschauen mit
+942 Terminen; ein Detail mit ungeklärten Einführungsbemerkungen bleibt blockiert.
+23 der erzeugten Vorschauen bleiben fachlich prüfpflichtig. Dies ist keine
+vollständige Semesterfreigabe.
+
+Der lokale Test hat Speichern, Laden und die Ausgabe über beide Webansichten
+geprüft. Die temporäre Datei wurde anschließend entfernt. Damit wurden weder die
+LXC-Vorschau aktualisiert noch ein Deployment oder eine Archivfreigabe durchgeführt.
+Ein Update allein lädt weiterhin keine Termine.
+
+### Einmalig im LXC einrichten
+
+Zuerst den Code von V0.0.25 auf GitHub veröffentlichen und das bestehende
+[Update](install.md#vorhandene-installation-aktualisieren) ausführen. In der
+Container-Konsole als root `/etc/wi-planarchiv/app.env` öffnen:
+
+```bash
+nano /etc/wi-planarchiv/app.env
+```
+
+Die folgenden Werte ergänzen oder vorhandene Einträge ändern, niemals doppelt
+anlegen. `LSF_BASE_URL`, `LSF_ID_PARAMETER` und `LSF_ID_NAMESPACE` aus der bisherigen
+lokalen Konfiguration beibehalten; vertrauliche Werte nicht veröffentlichen.
+
+```text
+PREVIEW_FILE=/var/lib/wi-planarchiv/import.preview.json
+LSF_STUDY_QUERY='Wirtschaftsingenieur'
+LSF_STUDY_TITLE='BWING MT | Wirtschaftsingenieurwesen / Management und Technik (PO-Version 2024)'
+LSF_SEMESTER='WiSe 2026/27'
+```
+
+Zusätzlich `LSF_STUDY_KEY` und `LSF_REGULATIONS_KEY` mit den **bisher für diese
+Auswahl verwendeten opaken Kennungen** belegen. Falls diese bisher nur als
+`--study-key` und `--regulations-key` eingegeben wurden, dieselben Werte übernehmen.
+Keine URL und keine Veranstaltungskennung eintragen. Falls für diese Auswahl
+noch keine lokalen Kennungen festgelegt wurden, können beispielsweise `WI-MT`
+und `PO-2024` gewählt und fortan beibehalten werden. Diese lokalen Namen ersetzen
+keinen fachlichen Nachweis der Quellzuordnung.
+
+Nach dem Speichern von `PREVIEW_FILE` den Dienst einmal neu starten, damit er den
+Dateipfad übernimmt:
+
+```bash
+systemctl restart wi-planarchiv
+```
+
+### Vorschautermine einlesen und später erneut aktualisieren
+
+Standardpfade und Dienstkonto der Installation verwenden; abweichende Werte lokal
+anpassen. Die Konfigurationsdatei muss vom Administrator gepflegt und vertrauenswürdig
+sein. Ihre Inhalte nicht ins Terminal ausgeben.
+
+```bash
+cd /opt/wi-planarchiv
+set -a
+. /etc/wi-planarchiv/app.env
+set +a
+runuser -u wi-planarchiv -- env PYTHONDONTWRITEBYTECODE=1 \
+  .venv/bin/python -m flask --app backend source-semester-check \
+  --details --detail-budget 80 --save-preview --json
+```
+
+Die fünf Auswahlwerte werden aus der exportierten Umgebung übernommen. Explizite
+Optionen wie `--title` haben Vorrang. Alle fünf Werte bleiben lokal; die Anwendung
+lädt `.env` oder `app.env` nicht selbst. Auch eine reine Ansichtsprüfung ohne
+`--details` bleibt mit hinterlegten Detailwerten möglich.
+
+Im JSON-Bericht (Schema 7) den neuen Abschnitt `preview_save` kontrollieren:
+
+```json
+"preview_save": {
+  "requested": true,
+  "saved": true,
+  "event_count": 942
+}
+```
+
+942 ist die Zahl des Live-Nachweises, kein fest vorgeschriebener Sollwert für
+spätere Läufe. `saved: true` bestätigt den abgeschlossenen Dateiaustausch. Bei
+`false` wurde durch diesen Lauf keine neue Vorschau gespeichert; eine ältere
+Datei kann weiterhin vorhanden sein. Ohne `--save-preview` ist `requested` false.
+Die Textausgabe meldet den Speicherstatus ebenfalls. Dateipfade und Auswahlwerte
+erscheinen nicht im bereinigten Bericht.
+
+Der Befehl endet weiterhin mit **Exitcode 1**, auch nach erfolgreichem Speichern:
+`needs_review`, `complete: false` und `published: false` betreffen die fehlende
+Archivfreigabe. `preview_save.saved` betrifft ausschließlich die ausdrücklich
+aktivierte unvollständige Web-Vorschau. Bei `status: failed` Fehlerursache prüfen;
+fehlgeschlagene oder leere Importe ersetzen die bisherige Datei nicht.
+
+Anschließend `/vorschau` öffnen und **Studiengang, Prüfungsordnung, Semester und
+Erstellungszeitpunkt** kontrollieren. Der neue Studiengangstext stammt aus der
+gewählten Trefferbeschriftung; er bestätigt noch keine vollständige Quellzuordnung.
+Wochen- und Listenansicht lesen die neue Datei ohne weiteren Neustart. Ältere
+Vorschaudateien bleiben lesbar und zeigen, dass der Studiengang noch nicht
+hinterlegt ist. Zum Aktualisieren denselben Importblock erneut ausführen; parallele
+Vorschauimporte weiterhin vermeiden.

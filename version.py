@@ -1,3 +1,3 @@
 """Zentrale Anwendungsversion von WI-PlanArchiv."""
 
-__version__ = "0.0.24"
+__version__ = "0.0.25"

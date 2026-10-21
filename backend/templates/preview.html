@@ -13,6 +13,7 @@
 {% if preview %}
 <section aria-labelledby="preview-heading">
   <h2 id="preview-heading">{{ preview.semester }}</h2>
+  {% if preview.study_title %}<p>Studiengang: {{ preview.study_title }}</p>{% else %}<p>Studiengang: in dieser Vorschau noch nicht hinterlegt.</p>{% endif %}
   <p>Vorschau erstellt: {{ preview.created_label }} (Europe/Berlin). Kein automatischer Live-Abgleich.</p>
   <p>{{ preview.checked_details }} Veranstaltungsdetails geprüft; {{ preview.blocked_details }} blockiert und nicht in dieser Vorschau enthalten.</p>
   <nav class="preview-navigation" aria-label="Vorschauansicht">

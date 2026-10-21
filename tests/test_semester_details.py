@@ -101,7 +101,7 @@ def test_cli_details_and_failure_are_sanitized(session, monkeypatch, failure):
     assert report["checked_details"] == (0 if failure else 12)
     assert report["normalization_summary"]["preview_count"] == (0 if failure else 12)
     assert report["normalization_summary"]["blocked_count"] == 0
-    assert report["schema_version"] == 6
+    assert report["schema_version"] == 7
     assert report["review_summary"]["reason_counts"].get("study_context_requires_verification", 0) == (0 if failure else 12)
     assert "semester_extent_unverified" in report["completeness_review"]["blockers"]
     assert not report["completeness_review"]["eligible_for_publication"]

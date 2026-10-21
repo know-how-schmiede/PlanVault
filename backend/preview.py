@@ -17,6 +17,9 @@ def validate_preview(data):
     for name in ("semester", "created_at"):
         if not isinstance(data.get(name), str) or len(data[name]) > 200:
             raise ValueError("Invalid metadata")
+    if "study_title" in data and (not isinstance(data["study_title"], str) or
+                                  not data["study_title"].strip() or len(data["study_title"]) > 200):
+        raise ValueError("Invalid study title")
     stamp = datetime.fromisoformat(data["created_at"])
     if stamp.tzinfo is None:
         raise ValueError("Missing timezone")
@@ -42,7 +45,7 @@ def validate_preview(data):
     return data
 
 
-def save_preview_file(filename, sample, semester):
+def save_preview_file(filename, sample, semester, *, study_title=None):
     """Replace only after a complete bounded fetch; preserve old preview on failure."""
     temporary = None
     try:
@@ -61,6 +64,9 @@ def save_preview_file(filename, sample, semester):
                                  "checked_details": len(sample.details),
                                  "blocked_details": sum(d.preview is None for d in sample.details),
                                  "events": sorted(events, key=lambda e: (e["start"], e["title"]))})
+        if study_title is not None:
+            data["study_title"] = study_title
+            validate_preview(data)
         payload = json.dumps(data, ensure_ascii=False).encode("utf-8")
         if len(payload) > LIMIT:
             raise ValueError("Too large")
@@ -73,6 +79,7 @@ def save_preview_file(filename, sample, semester):
             stream.flush()
             os.fsync(stream.fileno())
         os.replace(temporary, target)
+        return len(events)
     except (OSError, ValueError, TypeError, KeyError):
         raise DetailImportError("Vorschau nicht gespeichert; bisherigen Stand beibehalten. Datenpfad und Rechte prüfen.") from None
     finally:

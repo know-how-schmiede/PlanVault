@@ -208,14 +208,14 @@ def source_import_check(query, title, semester, study_key, regulations_key, star
 
 
 @click.command("source-semester-check")
-@click.option("--query", required=True)
-@click.option("--title", required=True)
+@click.option("--query", envvar="LSF_STUDY_QUERY", required=True)
+@click.option("--title", envvar="LSF_STUDY_TITLE", required=True)
 @click.option("--json", "json_output", is_flag=True)
 @click.option("--details", is_flag=True, help="Alle bekannten Detailziele innerhalb des Budgets prüfen.")
 @click.option("--save-preview", is_flag=True, help="Unvollständige Web-Vorschau lokal speichern; benötigt --details und PREVIEW_FILE.")
-@click.option("--semester", default=None)
-@click.option("--study-key", default=None)
-@click.option("--regulations-key", default=None)
+@click.option("--semester", envvar="LSF_SEMESTER", default=None)
+@click.option("--study-key", envvar="LSF_STUDY_KEY", default=None)
+@click.option("--regulations-key", envvar="LSF_REGULATIONS_KEY", default=None)
 @click.option("--detail-budget", default=60, show_default=True, type=click.IntRange(1, 100))
 @with_appcontext
 def source_semester_check(query, title, json_output, details, semester, study_key, regulations_key, detail_budget, save_preview=False):
@@ -230,17 +230,21 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
             raise FormNavigationError("Ungültige Studiengangsauswahl.")
         if details:
             validate_semester_details(semester, study_key, regulations_key, detail_budget)
-        elif any(value is not None for value in (semester, study_key, regulations_key)):
+        elif any(value is not None and click.get_current_context().get_parameter_source(name)
+                 != click.core.ParameterSource.ENVIRONMENT
+                 for name, value in (("semester", semester), ("study_key", study_key),
+                                     ("regulations_key", regulations_key))):
             raise FormNavigationError("Semester- und Studiengangsangaben benötigen --details.")
     except (SourceIdentityError, FormNavigationError, DetailImportError) as error:
         raise click.ClickException(str(error)) from None
-    report = {"schema_version": 6, "app_version": __version__, "status": "needs_review",
+    report = {"schema_version": 7, "app_version": __version__, "status": "needs_review",
               "views": [], "details_requested": details, "checked_details": 0,
               "normalization_review_count": 0, "known_details_checked": False,
               "normalization_summary": {"preview_count": 0, "blocked_count": 0, "review_preview_count": 0},
               "weekday_coverage": weekday_coverage(()),
               "review_summary": {"reason_counts": {}, "details": []},
               "completeness_review": completeness_review(()),
+              "preview_save": {"requested": save_preview, "saved": False, "event_count": 0},
               "complete": False, "published": False}
     try:
         with SourceClient(current_app.config.get("LSF_BASE_URL", ""),
@@ -271,7 +275,9 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
                 report["weekday_coverage"] = weekday_coverage(views, sample)
                 if save_preview:
                     from backend.preview import save_preview_file
-                    save_preview_file(current_app.config["PREVIEW_FILE"], sample, semester)
+                    count = save_preview_file(current_app.config["PREVIEW_FILE"], sample, semester,
+                                              study_title=title)
+                    report["preview_save"].update(saved=True, event_count=count)
     except (SourceFetchError, FormNavigationError, DetailImportError):
         report["status"] = "failed"
     if json_output:
@@ -287,6 +293,10 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
             summary = report["normalization_summary"]
             click.echo(f"Vorschauen: {summary['preview_count']}; blockiert: {summary['blocked_count']}; "
                        f"Vorschauen mit Prüfhinweisen: {summary['review_preview_count']}.")
+        if save_preview:
+            saved = report["preview_save"]
+            click.echo(f"Web-Vorschau gespeichert: {saved['event_count']} Termine."
+                       if saved["saved"] else "Web-Vorschau nicht gespeichert.")
         for reason, count in report["review_summary"]["reason_counts"].items():
             click.echo(f"Prüfgrund {reason}: {count} Details.")
         click.echo("Offene Vollständigkeitsnachweise: " + ", ".join(report["completeness_review"]["blockers"]))
