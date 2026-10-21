@@ -7,8 +7,11 @@ from datetime import date
 NOTICE_LABELS = {
     'Weihnachtsferien': 'christmas_break',
     'Heilige Drei Könige': 'epiphany',
+    'unbenannt': 'unnamed',
 }
-KNOWN_NOTICE_KINDS = frozenset(NOTICE_LABELS.values())
+NOTICE_KINDS = frozenset(NOTICE_LABELS.values()) | {'unclassified'}
+# Eine erkannte fehlende Bezeichnung ist keine bekannte fachliche Bedeutung.
+KNOWN_NOTICE_KINDS = NOTICE_KINDS - {'unnamed', 'unclassified'}
 
 
 @dataclass(frozen=True)
@@ -22,7 +25,7 @@ class DayNotice:
         except (ValueError, TypeError):
             raise ValueError('Ungültiger Tageshinweis.') from None
         if (day.isoformat() != self.local_date or not isinstance(self.kind, str) or
-                self.kind not in KNOWN_NOTICE_KINDS | {'unclassified'}):
+                self.kind not in NOTICE_KINDS):
             raise ValueError('Ungültiger Tageshinweis.')
 
 

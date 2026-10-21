@@ -265,3 +265,13 @@ jeder fehlenden Wochenpräsenz. Der bestehende Semesterprüfbefehl bleibt bei Sc
 Es werden keine Ausfallregeln aus Hinweisen abgeleitet. Der Live-Test grenzt die
 105 Abweichungen auf drei Wochen ein: 82 mit bekannten Hinweisen auf allen
 erwarteten Tagen, 23 mit noch unbekannten Hinweisen. [Einordnung und Grenzen](view-comparison.md).
+
+
+## V0.0.29 – Unbenannte Tageshinweise als eigener Prüffall
+
+Der Abdeckungsbericht verwendet Schema 4, unterscheidet `unnamed` von
+`unclassified` und benennt ungeklärte Quelltage separat. Die 23 bislang unbekannten
+Hinweiskontexte betreffen ausdrücklich unbenannte Quellenbezeichnungen. Die
+unabhängige offizielle Kalendereinordnung ist dokumentiert, wird aber nicht als
+automatische Ausfallregel verwendet. Der Semesterprüfbefehl und dessen
+Vorschauimport bleiben unverändert. [Beleg und Berichtsänderung](view-comparison.md).

@@ -369,6 +369,8 @@ def source_coverage_check(query, title, start, end, weeks, all_weeks, week_budge
             for assessment, count in presence["missing_notice_context_counts"].items():
                 if count:
                     click.echo(f"Tageshinweis-Kontext {assessment}: {count} Abweichungen.")
+        if any(n["kind"] == "unnamed" for n in report["unresolved_day_notices"]):
+            click.echo("Die Quelle enthält unbenannte Tageshinweise; deren Bedeutung muss geklärt werden.")
         click.echo("Offene Punkte: " + ", ".join(report["blockers"]))
         click.echo("Keine Vorschau geändert; Semesterinhalt und Wochenenden bleiben ungeprüft.")
     raise click.exceptions.Exit(1)

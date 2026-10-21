@@ -2,6 +2,22 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.29 – Unbenannte Quellenhinweise und unabhängige Kalenderreferenz klären
+
+**Datum:** 2026-10-21
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.29` gesetzt; Footer übernimmt sie.
+- Exakte Quellenbezeichnung `unbenannt` als `unnamed` von anderen unbekannten Hinweisen trennen. Erkannte fehlende Bezeichnungen bleiben fachlich ungeklärt.
+- Abdeckungsbericht auf Schema 4 erweitern: ungeklärte Tage separat ausweisen, feste Prüfcodes und eigene Kontextkategorie für unbenannte erwartete Tage ergänzen. Textausgabe erklärt die fehlende Quellenbezeichnung.
+- Aktuell verlinkte offizielle Semesterterminliste einschließlich PDF-Inhalt unabhängig prüfen und als fachliche Referenz dokumentieren. Kein automatisches Laden oder Überschreiben der Planquelle, keine neue Ausfallregel.
+- README, Abgleichsleitfaden, Semesterprüfung, Quellenanalyse und Roadmap aktualisiert.
+
+**Prüfung:** 443 lokale Tests erfolgreich, einschließlich eigener Fehlerklasse, nicht bekannter Bedeutung unbenannter Texte, Teilabdeckung, unveränderter Sperren und sicherer JSON-/Textausgabe; vollständige Suite auch unter geerbter fiktiver Betreiberkonfiguration mit Update-Regression erfolgreich. Footer auf Startseite und Vorschau als V0.0.29 geprüft, alle drei Bash-Anleitungsblöcke auf Syntax geprüft; `git diff --check` ohne Fehler. Live: 100 HTTP-Anfragen, 26 Wochen, 66 semestergeprüfte Details, 65 normalisierbar, eines blockiert und 23 Vorschauen fachlich prüfpflichtig. 105 Abweichungen bleiben erhalten: 82 mit spezifisch bekannten Hinweisen, 23 mit unbenannten Quelltagen; keine anderen unbekannten Tageshinweise. Offizielle Kalenderreferenz unabhängig geprüft. Kein Deployment, eigener LXC-Lauf, Vorschauupdate oder Archivfreigabe; M0/M1 bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.29 mit getrennten unbenannten Quelltagen und belegter Kalenderreferenz ergänzen
+
 ## V0.0.28 – Abweichungen anhand konkreter Tageshinweise einordnen
 
 **Datum:** 2026-10-21

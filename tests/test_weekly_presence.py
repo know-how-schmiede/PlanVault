@@ -179,7 +179,7 @@ def test_details_are_deduplicated_across_views_and_weeks(detail_workflow):
     report = run_details()
     assert len(calls) == report['checked_details'] == 4
     assert len(set(calls)) == 4
-    assert report['schema_version'] == 3 and report['weekly_presence']['evaluated']
+    assert report['schema_version'] == 4 and report['weekly_presence']['evaluated']
     assert report['normalization_summary']['preview_count'] == 4
     assert 'occurrence_fields_unverified' in report['blockers']
     assert 'detail_content_unchecked' not in report['blockers']

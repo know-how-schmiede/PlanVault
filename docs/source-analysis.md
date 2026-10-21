@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.28`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.29`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -378,3 +378,33 @@ Abweichung im bereinigten Bericht; Titel, Lehrpersonen, Räume, Quellkennungen
 und unbekannte Hinweistexte fehlen dort. Kein Deployment oder eigener LXC-Lauf.
 Einzeltermine, unbekannte Hinweise, Einführungsfall und vollständige Semester-/
 Wochenendabdeckung bleiben fachlich zu prüfen. Siehe [Tageshinweisabgleich](view-comparison.md).
+
+
+## V0.0.29 – Quellenbezeichnung fehlt; Kalenderreferenz unabhängig prüfen
+
+Die gezielte Nachprüfung am 2026-10-21 zeigt auf beiden bislang unbekannten
+Tagesüberschriften, 4. und 5. Januar 2027, exakt den Text `unbenannt`. Eine
+fehlende fachliche Bezeichnung wird jetzt als eigener fester Code `unnamed`
+erhalten. Sie gilt nicht als fachlich bekannter Hinweis und erhält eine eigene
+Kategorie im Wochenpräsenzbericht. Andere unbekannte Texte bleiben `unclassified`.
+Der Bericht nennt beobachtete ungeklärte Tage auch ohne Detailabruf separat.
+
+Die aktuelle offizielle Semesterterminseite verlinkt eine neuere Terminliste
+für Wintersemester 2026/27 (Stand 19.05.2026). Sie ordnet beide Tage dem
+vorlesungsfreien Weihnachtszeitraum bis 06.01.2027 zu. Der PDF-Inhalt wurde
+zusätzlich geprüft. Quelle und Einordnung sind im
+[Abgleichsleitfaden](view-comparison.md#unabhängige-kalenderreferenz) verlinkt.
+Das ist ein unabhängiger Beleg zum allgemeinen Kalender, kein Ersatz der fehlenden
+Quellenbezeichnung oder Nachweis für jeden einzelnen Veranstaltungstyp.
+
+Die Anwendung enthält keine hardcodierte semesterbezogene Ausfallregel und
+lädt die öffentliche Terminliste nicht automatisch. Einzeltermine, Vorschau
+und Archive werden nicht aufgrund dieser Recherche geändert. Eine spätere
+allgemeine Unterbrechungsregel muss ausdrücklich mögliche Sondertermine
+berücksichtigen. Der vollständige erneute Live-Lauf benötigt 100 serielle HTTP-Anfragen und prüft
+26 Wochen sowie 66 Details gegen das erwartete Semester. 65 Details bleiben
+normalisierbar, eines blockiert, 23 Vorschauen fachlich prüfpflichtig. 809 erwartete
+Veranstaltungs-Wochen, 704 passend sichtbar, 105 Abweichungen bleiben erhalten.
+82 betreffen spezifisch bekannte Tageshinweise; 23 sind jetzt ausdrücklich
+unbenannten Quelltagen zugeordnet. Keine anderen unbekannten Tageshinweise und
+keine zusätzliche sichtbare Präsenz. Kein Deployment oder eigener LXC-Lauf.

@@ -22,7 +22,8 @@ def compare(days, notices, *, cancelled=()):
 
 
 @pytest.mark.parametrize('text,kind', [('Weihnachtsferien', 'christmas_break'),
-                                      ('Heilige Drei Könige', 'epiphany')])
+                                      ('Heilige Drei Könige', 'epiphany'),
+                                      ('unbenannt', 'unnamed')])
 def test_exact_verified_labels_become_codes_and_status_stays_review(text, kind):
     document = doc(html(notice=' ' + text))
     result = inspect_week(document, read_week_menu(document).choices[0])
@@ -125,7 +126,7 @@ def test_notice_codes_flow_from_week_parser_to_detail_diagnosis(workflow, monkey
         report = run_view_comparison(client, query='Fiktiv', title='Fiktives Studium', start=START,
                                      end=END, identity_policy=POLICY, details=True, semester='DEMO-Semester',
                                      study_key='STUDY', regulations_key='PO')
-    assert report['schema_version'] == 3
+    assert report['schema_version'] == 4
     assert len(report['checked_weeks'][0]['day_notices']) == 5
     presence = report['weekly_presence']
     assert len(presence['missing_from_week_view']) == 2
@@ -136,3 +137,64 @@ def test_notice_codes_flow_from_week_parser_to_detail_diagnosis(workflow, monkey
     text = json.dumps(report)
     for private in ('Weihnachtsferien', 'FIKTIVER', 'PRIVATE', 'example.invalid', 'DEMO-RAUM'):
         assert private not in text
+
+
+
+def test_unnamed_label_is_not_a_known_calendar_meaning():
+    from backend.importer.notices import KNOWN_NOTICE_KINDS
+    assert classify_day_notice('unbenannt') == 'unnamed'
+    assert 'unnamed' not in KNOWN_NOTICE_KINDS
+    result = compare([START], {W0: (DayNotice('2026-12-28', 'unnamed'),)})
+    row = result['missing_from_week_view'][0]
+    assert row['notice_assessment'] == 'unnamed_notice_on_expected_date'
+    assert row['expected_day_notices'] == [{'local_date': '2026-12-28', 'kind': 'unnamed'}]
+    assert result['missing_notice_context_counts']['unnamed_notice_on_expected_date'] == 1
+    assert result['missing_notice_context_counts']['all_expected_dates_with_known_notice'] == 0
+    assert not result['comparable_pairs_match'] and not result['complete']
+
+
+@pytest.mark.parametrize('label', ['Unbenannt', 'unbenannt Ferien', 'nicht unbenannt', 'unbenannt außer Labor'])
+def test_only_exact_unnamed_label_is_recognized(label):
+    assert classify_day_notice(label) == 'unclassified'
+
+
+def test_known_and_unnamed_days_remain_only_partially_classified():
+    from datetime import timedelta
+    result = compare([START, START+timedelta(days=1)],
+                     {W0: (DayNotice('2026-12-28', 'christmas_break'),
+                            DayNotice('2026-12-29', 'unnamed'))})
+    row = result['missing_from_week_view'][0]
+    assert row['notice_assessment'] == 'some_expected_dates_with_known_notice'
+    assert [n['kind'] for n in row['expected_day_notices']] == ['christmas_break', 'unnamed']
+    assert not result['comparable_pairs_match'] and not result['complete']
+
+
+@pytest.mark.parametrize('label,kind,blocker', [
+    ('unbenannt', 'unnamed', 'unnamed_day_notices_require_review'),
+    ('PRIVATE unbekannt', 'unclassified', 'unclassified_day_notices_require_review'),
+])
+def test_unresolved_source_days_are_reported_without_detail_fetch(workflow, label, kind, blocker):
+    workflow['notices'][1] = ' ' + label
+    with SourceClient('https://example.invalid/start') as client:
+        report = run_view_comparison(client, query='Fiktiv', title='Fiktives Studium', start=START,
+                                     end=END, identity_policy=POLICY)
+    assert report['schema_version'] == 4 and report['weekly_presence'] is None
+    assert report['unresolved_day_notices'] == [
+        {'local_date': f'2027-01-0{n}', 'kind': kind} for n in range(4, 9)]
+    assert blocker in report['blockers'] and 'weeks_require_review' in report['blockers']
+    assert not report['complete'] and not report['published']
+    text = json.dumps(report)
+    assert label not in text and 'PRIVATE' not in text
+
+
+def test_cli_explains_unnamed_source_days_in_text(workflow):
+    from backend import create_app
+    workflow['notices'][1] = ' unbenannt'
+    app = create_app({'TESTING': True, 'LSF_BASE_URL': 'https://example.invalid/start',
+                      'LSF_ID_PARAMETER': 'record', 'LSF_ID_NAMESPACE': 'demo'})
+    result = app.test_cli_runner().invoke(args=['source-coverage-check', '--query', 'Fiktiv',
+                                              '--title', 'Fiktives Studium', '--start', '2026-12-28',
+                                              '--end', '2027-01-10', '--all-weeks'])
+    assert result.exit_code == 1
+    assert 'unbenannte Tageshinweise' in result.output
+    assert 'unnamed_day_notices_require_review' in result.output

@@ -9,7 +9,8 @@ from backend.importer.notices import DayNotice, KNOWN_NOTICE_KINDS
 
 NOTICE_ASSESSMENTS = (
     'all_expected_dates_with_known_notice', 'some_expected_dates_with_known_notice',
-    'unclassified_notice_on_expected_date', 'no_notice_on_expected_dates',
+    'unnamed_notice_on_expected_date', 'unclassified_notice_on_expected_date',
+    'no_notice_on_expected_dates',
     'day_notice_evidence_unavailable',
 )
 
@@ -23,6 +24,8 @@ def assess_notice_context(expected_dates, notices):
         assessment = 'all_expected_dates_with_known_notice'
     elif known:
         assessment = 'some_expected_dates_with_known_notice'
+    elif any(n.kind == 'unnamed' for n in matching):
+        assessment = 'unnamed_notice_on_expected_date'
     elif matching:
         assessment = 'unclassified_notice_on_expected_date'
     else:

@@ -77,12 +77,12 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
         validate_semester_details(semester, study_key, regulations_key, detail_budget)
     started = datetime.now(timezone.utc).isoformat()
     report = {
-        "schema_version": 3, "app_version": __version__, "run_id": str(uuid4()),
+        "schema_version": 4, "app_version": __version__, "run_id": str(uuid4()),
         "started_at": started, "status": "needs_review", "stage": "navigation",
         "period_start": start.isoformat(), "period_end": end.isoformat(),
         "identity_mode": "configured", "requested_weeks": selection,
         "unavailable_weeks": [], "checked_weeks": [], "missing_weeks": expected,
-        "review_weeks": [], "failed_weeks": [], "views": [],
+        "review_weeks": [], "failed_weeks": [], "views": [], "unresolved_day_notices": [],
         "all_requested_weeks_observed": False, "period_weeks_verified": False,
         "comparison_evaluated": False, "comparison_scope": "observed_weeks", "comparison": None,
         "details_requested": details, "checked_details": 0,
@@ -142,6 +142,15 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
                                       if (w["iso_year"], w["iso_week"]) == (r.iso_year, r.iso_week)), None)}
             for r in results
         ]
+        report["unresolved_day_notices"] = [
+            {"local_date": notice.local_date, "kind": notice.kind}
+            for result in results for notice in result.day_notices
+            if notice.kind in {"unnamed", "unclassified"}
+        ]
+        if any(n["kind"] == "unnamed" for n in report["unresolved_day_notices"]):
+            blockers.add("unnamed_day_notices_require_review")
+        if any(n["kind"] == "unclassified" for n in report["unresolved_day_notices"]):
+            blockers.add("unclassified_day_notices_require_review")
         coverage = check_week_coverage(start, end, results)
         report["missing_weeks"] = coverage.missing
         report["review_weeks"] = [(r.iso_year, r.iso_week) for r in results

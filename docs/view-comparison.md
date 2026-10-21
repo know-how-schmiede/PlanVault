@@ -8,7 +8,7 @@ Web-Vorschau bleibt unverändert.
 
 ## Im LXC ausführen
 
-Zuerst V0.0.28 auf GitHub veröffentlichen und das bestehende
+Zuerst V0.0.29 auf GitHub veröffentlichen und das bestehende
 [Update](install.md#vorhandene-installation-aktualisieren) ausführen. Ein Neustart
 allein aktualisiert den Anwendungscode nicht. Die bekannte lokale Konfiguration
 für Quelladresse und Veranstaltungskennung wird weiterhin benötigt; siehe
@@ -76,7 +76,7 @@ Zeitraum bestätigt. Abruf-, Struktur-, Kennungs- oder Zuordnungsfehler stoppen
 hingegen weitere Wochenabrufe. Es gibt danach keinen erfolgreichen Teilvergleich.
 Das bisherige Verhalten der anderen Wochen- und Importprüfbefehle bleibt bestehen.
 
-## Bereinigter Bericht (eigener Vertrag, ab V0.0.28 Schema 3)
+## Bereinigter Bericht (eigener Vertrag, ab V0.0.29 Schema 4)
 
 | Feld | Bedeutung |
 | --- | --- |
@@ -334,3 +334,69 @@ Verbindlichkeit der allgemeinen Unterbrechungen einschließlich möglicher
 Sondertermine lokal an der Quelle klären. Die vorhandene Webseite bleibt
 unverändert. Keine Rohdaten gespeichert, kein Deployment oder eigener LXC-Lauf,
 keine Archivfreigabe.
+
+
+## V0.0.29 – Unbenannte Quelltage von unbekannten Hinweisen trennen
+
+Die bisher nicht eingeordneten Überschriften am 4. und 5. Januar 2027 enthalten
+in der Planquelle exakt **`unbenannt`**. Es fehlt somit eine fachliche Bezeichnung;
+die Erkennung soll daraus keine Ferienbezeichnung erfinden.
+
+Der Abdeckungsbericht verwendet jetzt **Schema 4**. Der bisherige Aufruf mit
+`--details` bleibt gültig, zusätzliche Konfiguration ist nicht nötig. Der
+Semesterprüfbericht für den Vorschauimport bleibt bei Schema 7.
+
+| Feld / Code | Bedeutung |
+| --- | --- |
+| `day_notices[].kind: unnamed` | Die Quelle zeigt exakt `unbenannt`. Die Bezeichnung fehlt. |
+| `day_notices[].kind: unclassified` | Ein anderer, bislang nicht eingeordneter Hinweis liegt vor. |
+| `unresolved_day_notices` | Datum und Code aller beobachteten unbenannten oder unbekannten Tageshinweise; auch ohne Detailabruf verfügbar. |
+| `unnamed_day_notices_require_review` | Mindestens eine beobachtete Quellenbezeichnung fehlt. |
+| `unclassified_day_notices_require_review` | Mindestens ein beobachteter Hinweis ist anderweitig ungeklärt. |
+| `unnamed_notice_on_expected_date` | Bei einer fehlenden Wochenpräsenz trägt mindestens ein erwarteter Tag `unnamed`, keiner einen fachlich bekannten Code. |
+
+`unnamed` gehört ausdrücklich **nicht** zu den fachlich bekannten Tagescodes.
+Die Kategorie wird sowohl in den Gesamtsummen unter
+`weekly_presence.missing_notice_context_counts` als auch je Woche ausgewiesen.
+Wenn weitere erwartete Tage derselben Veranstaltung einen bekannten Code haben,
+bleibt die Einordnung nur `some_expected_dates_with_known_notice`; die einzelnen
+Tagescodes bleiben sichtbar. Andere unbekannte Hinweise werden nicht stillschweigend
+zu `unnamed` umbenannt. Negierte oder erweiterte Texte und andere Schreibweisen
+bleiben `unclassified`.
+
+Auch nach dieser Einordnung bleiben `weekly_presence_mismatch`, die offenen
+Tageshinweise, Exitcode 1 und `complete: false` bestehen. Der Bericht kennzeichnet
+fehlende Quellenqualität; eine erkannte fehlende Bezeichnung ist keine erkannte
+Ausfallregel. Die Textausgabe nennt diesen Umstand ausdrücklich.
+
+### Unabhängige Kalenderreferenz
+
+Die am 2026-10-21 von der offiziellen
+[Semesterterminseite](https://www.hs-pforzheim.de/hochschule/die_hochschule/semestertermine)
+verlinkte [Terminliste für Wintersemester 2026/27, Stand 19.05.2026](https://www.hs-pforzheim.de/fileadmin/user_upload/uploads_redakteur/Die_Hochschule/Die_Hochschule/aktuelle_Semestertermine/1NEU_Wintersemester2026_27.pdf)
+nennt 23.12.2026 bis 06.01.2027 als vorlesungsfreien Weihnachtszeitraum. Beide
+unbenannten Tage liegen darin. Das ist eine unabhängige fachliche Einordnung;
+die fehlende Beschriftung der Planquelle wird dadurch nicht korrigiert.
+Die aktuell verlinkte Fassung wurde einschließlich PDF-Inhalt geprüft,
+statt ungeprüft einen älteren Suchtreffer zu verwenden.
+
+Diese Referenz ist dokumentierte Recherche, keine fest eingebaute oder automatisch
+geladene Kalenderkonfiguration. Sie ersetzt keine Prüfung veranstaltungsspezifischer
+Ausnahmen. Die Anwendung überschreibt weder Quellhinweise noch Termine anhand der
+Terminliste. Ohne eine explizite und getestete Ausnahmeregel darf aus einer
+allgemeinen Unterbrechung insbesondere kein pauschaler Ausfall von Sonderterminen
+abgeleitet werden.
+
+### Prüfnachweis
+
+Live am 2026-10-21: 100 serielle HTTP-Anfragen, 26 Wochen und 66 semestergeprüfte
+Details. 65 Details normalisierbar, eines blockiert; 23 Vorschauen fachlich
+prüfpflichtig. Die 105 fehlenden Wochenpräsenzen bleiben bestehen: 82 mit
+spezifisch bekannten Tageshinweisen, 23 nun mit `unnamed_notice_on_expected_date`.
+Keine anderen unbekannten Tageshinweise, keine zusätzliche sichtbare Präsenz.
+`unresolved_day_notices` enthält genau 2027-01-04 und 2027-01-05 mit `unnamed`.
+443 lokale Tests erfolgreich, auch unter geerbter fiktiver Betreiberkonfiguration.
+Footer und die drei Bash-Anleitungsblöcke geprüft.
+Die vorhandene Web-Vorschau wird durch den Abgleich nicht aktualisiert. Der
+Einführungsfall, mögliche Sondertermine, Wochenenden und die vollständige
+Archivfreigabe bleiben weiterhin offen.
