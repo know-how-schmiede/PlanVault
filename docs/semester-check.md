@@ -275,3 +275,5 @@ Hinweiskontexte betreffen ausdrücklich unbenannte Quellenbezeichnungen. Die
 unabhängige offizielle Kalendereinordnung ist dokumentiert, wird aber nicht als
 automatische Ausfallregel verwendet. Der Semesterprüfbefehl und dessen
 Vorschauimport bleiben unverändert. [Beleg und Berichtsänderung](view-comparison.md).
+
+Ab V0.0.30 steht zusätzlich ein [vollständiger Kalenderimport mit sicherer Archivfreigabe](calendar-import.md) bereit. Die hier beschriebene Vorschau bleibt davon unabhängig und unvollständig.

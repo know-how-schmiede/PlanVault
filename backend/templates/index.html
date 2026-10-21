@@ -6,16 +6,17 @@
 {% block content %}
 <section aria-labelledby="status-heading">
   <h2 id="status-heading">Entwicklung gestartet</h2>
-  <p>Es sind noch keine Vorlesungspläne archiviert. Eine unvollständige Import-Vorschau ist jetzt verfügbar; ein geprüfter Archivstand folgt später.</p>
-  <p>Letzte erfolgreiche Sicherung: noch keine.</p>
+  <p>Manuelle Kalenderimporte können nach vollständiger Prüfung als Archivstand freigegeben werden. Die separate Import-Vorschau bleibt für ungeprüfte Daten verfügbar.</p>
+  {% if not config.ARCHIVE_DATABASE %}<p>Letzte erfolgreiche Sicherung: noch keine.</p>{% endif %}
+  <p>Den Zeitpunkt der letzten erfolgreichen Sicherung und den Status des letzten Versuchs zeigt das <a href="{{ url_for('web.archive') }}">Kalenderarchiv</a>.</p>
 </section>
 <section aria-labelledby="preview-heading"><h2 id="preview-heading">Erste Termine ansehen</h2><p>Die Import-Vorschau zeigt lokal eingelesene Termine als Wochen- oder Listenansicht mit Kalenderwochenfilter. Sie ist ausdrücklich unvollständig.</p><p><a href="{{ url_for('web.preview') }}">Import-Vorschau öffnen</a></p></section>
 <section aria-labelledby="next-steps-heading">
   <h2 id="next-steps-heading">Nächste Schritte</h2>
   <ol class="next-steps">
-    <li><strong>Import vervollständigen.</strong> Offene Veranstaltungshinweise klären und den gesamten Semesterumfang einschließlich Wochenenden prüfen.</li>
-    <li><strong>Pläne sicher speichern.</strong> Geprüfte Archivstände sichern und den letzten gültigen Stand bei Fehlern schützen.</li>
-    <li><strong>Stundenpläne anzeigen.</strong> Die vorhandene Vorschau mit geprüften Archivständen und dem Zeitpunkt der letzten erfolgreichen Sicherung verbinden.</li>
+    <li><strong>Import fachlich prüfen.</strong> Veranstaltungshinweise, Semesterzuordnung, Gruppen und Wochenendbestand anhand des lokalen Prüfpakets bestätigen.</li>
+    <li><strong>Archivstand freigeben.</strong> Einen vollständig geprüften Import im lokalen Archiv veröffentlichen.</li>
+    <li><strong>Archiv sichern.</strong> Die Datenbank sichern und die Wiederherstellung im Zielsystem prüfen.</li>
   </ol>
 </section>
 {% endblock %}

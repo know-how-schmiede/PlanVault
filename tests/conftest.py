@@ -10,5 +10,5 @@ def isolate_runtime_environment(monkeypatch):
     # runuser kann exportierte Betreiberwerte vom Update-Aufruf übernehmen.
     # Vor jeder Test-Fixture entfernen; Tests setzen eigene Werte mit monkeypatch.
     for name in tuple(os.environ):
-        if name.startswith('LSF_') or name == 'PREVIEW_FILE':
+        if name.startswith('LSF_') or name in {'PREVIEW_FILE', 'ARCHIVE_DATABASE'}:
             monkeypatch.delenv(name)

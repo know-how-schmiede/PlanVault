@@ -132,6 +132,17 @@ def _utc(day: date, clock, zone: ZoneInfo) -> datetime:
     return candidates.pop()
 
 
+def _welcome_label(note):
+    if note == "Einführungen studentischer Initiativen":
+        return True
+    speakers = re.fullmatch(
+        r"Begrüßung ([A-ZÄÖÜ][a-zäöüß]+(?:-[A-ZÄÖÜ][a-zäöüß]+)*"
+        r"(?:/[A-ZÄÖÜ][a-zäöüß]+(?:-[A-ZÄÖÜ][a-zäöüß]+)*)*)", note)
+    reserved = {"entfällt", "verschoben", "abgesagt", "ausfall", "montag", "dienstag",
+                "mittwoch", "donnerstag", "freitag", "samstag", "sonntag", "online", "raum"}
+    return bool(speakers and not (set(re.split(r"[-/]", speakers[1].lower())) & reserved))
+
+
 def normalize_course(
     course: CourseDetail, context: CourseContext, *,
     recurrence_rules: dict[str, str] | None = None,
@@ -177,6 +188,9 @@ def normalize_course(
             exam = re.fullmatch(r"Die Klausur beginnt um (\d{1,2}:\d{2}) Uhr und endet um (\d{1,2}:\d{2}) Uhr\.", series.note)
             if series.note == "Vorlesung":
                 kind = "teaching_format"
+            elif _welcome_label(series.note):
+                kind = "welcome_label"
+                review.add("welcome_note_requires_review")
             elif series.note == "Nachholtermin" and rule == "single" and series.recurrence == "Einzel":
                 kind = "makeup_label"
                 review.add("replacement_reference_requires_review")

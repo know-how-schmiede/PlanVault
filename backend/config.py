@@ -9,6 +9,7 @@ def load_config():
         "LSF_ID_PARAMETER": os.environ.get("LSF_ID_PARAMETER", ""),
         "LSF_ID_NAMESPACE": os.environ.get("LSF_ID_NAMESPACE", ""),
         "TIMEZONE": "Europe/Berlin",
+        "ARCHIVE_DATABASE": os.environ.get("ARCHIVE_DATABASE", ""),
         "PREVIEW_FILE": os.environ.get("PREVIEW_FILE", ""),
         "MAX_CONTENT_LENGTH": 1024 * 1024,
     }

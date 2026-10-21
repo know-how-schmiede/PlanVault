@@ -2,6 +2,26 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.30 – Kalenderimport mit Fachprüfung und sicherem SQLite-Archiv
+
+**Datum:** 2026-10-21
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.30` gesetzt; gemeinsamer Footer übernimmt sie.
+- Vollständigen manuellen Semesterimport mit unabhängiger lokaler Regeldatei, expliziten Ferienbelegen und Erhalt sichtbarer Sondertermine implementiert. Unbenannte Hinweistage nur innerhalb belegter Regeln einordenbar.
+- Datierte Planblöcke einschließlich verbundener Tabellenzellen auswerten; Einzeltermine als Multimenge gegen Datum, Uhrzeit, Raumcode und Veranstaltungsart vergleichen. Eindeutige Raumbezeichnungen und explizite Klausurzeitangaben berücksichtigen.
+- Beschreibende Begrüßungs-/Initiativenhinweise normalisieren und als prüfpflichtige Annotation erhalten; für weitere geprüfte Beschreibungen exakt an komplette Serien gebundene lokale Regeln unterstützen.
+- Originalserien, Blockangaben und sämtliche Ausnahmen in einem geschützten lokalen Prüfpaket bereitstellen. Harte Fehler bleiben gesperrt; fachliche Einzelbestätigungen binden den vollständigen unveränderten Importinhalt.
+- SQLite-Schema 1 mit Importläufen, unveränderlichen Snapshots, letzter gültiger Sicherung je Importbereich und transaktionaler Freigabe ergänzt. Fehler und leere/unvollständige Importe erhalten den gültigen Stand; identische Inhalte erzeugen keine zusätzliche Version. Prozesssperre verhindert parallele Importe.
+- Lokale Archivansicht unter `/archiv` mit Wochen-/Listenansicht, allen Semesterwochen, historischer Snapshot-Auswahl per URL, Veranstaltungsart, Gruppenangaben sowie getrennten Sicherungs-/Versuchsstatus ergänzt. Normale Seitenaufrufe bleiben ohne Quellzugriff und ohne Datenbankanlage.
+- CLI für Import, Prüfpaket, Freigabe, Historie, konsistente SQLite-Sicherung und Wiederherstellung in neue Dateien ergänzt. Unbekannte Datenbankschemata bleiben unverändert.
+- Betreiberkonfiguration `ARCHIVE_DATABASE`, Testumgebungsisolation und Datenschutz für lokale Prüfpakete ergänzt. README, Importanleitung, Installationshinweise, Quellenanalyse, Roadmap und Diagnoseverweise aktualisiert.
+
+**Prüfung:** 504 lokale Tests erfolgreich, auch vollständig unter geerbter fiktiver Betreiberkonfiguration; dabei wurde der konfigurierte Betreiber-Archivpfad nicht geöffnet oder angelegt. Geprüft sind insbesondere Feldabweichungen und Duplikate, Ferien-/Sondertermine, unveränderte Originalhinweise, gebundene Einzelbestätigungen, Manipulationen, Prozesssperre, Transaktionsrollback, Schutz des letzten gültigen Stands, Inhaltsdeduplizierung, Fremd-/Zukunftsschemata, Backup/Restore und rein lokale HTML-Ausgabe mit Escaping. Footer auf Startseite, Vorschau und Archiv als V0.0.30 geprüft; acht Bash-Anleitungsblöcke auf Syntax geprüft; vertrauliche Quellenmerkmale aus Repository und neuen Dateien ausgeschlossen; `git diff --check` ohne Fehler. Abschließender Live-Lauf: 100 serielle HTTP-Anfragen, 26 Wochen, 66 normalisierbare Details, 824 beobachtete und 824 taggenau abgeglichene übernommene Termine, 120 separat protokollierte Ferienausnahmen, keine harten Befunde. 29 fachliche Einzelbestätigungen bleiben offen; kein pauschaler Wochenendnachweis. Keine realen Veranstaltungsdaten im Repository, kein Deployment oder eigener LXC-Restore und keine reale Archivveröffentlichung.
+
+**Commit-Kurzbeschreibung:** Version 0.0.30 mit vollständigem Kalenderimport, gebundener Fachprüfung und sicherem SQLite-Archiv umsetzen
+
 ## V0.0.29 – Unbenannte Quellenhinweise und unabhängige Kalenderreferenz klären
 
 **Datum:** 2026-10-21

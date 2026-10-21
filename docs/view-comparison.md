@@ -400,3 +400,7 @@ Footer und die drei Bash-Anleitungsblöcke geprüft.
 Die vorhandene Web-Vorschau wird durch den Abgleich nicht aktualisiert. Der
 Einführungsfall, mögliche Sondertermine, Wochenenden und die vollständige
 Archivfreigabe bleiben weiterhin offen.
+
+## Ab V0.0.30: vollständiger Import statt Präsenzdiagnose
+
+Der hier beschriebene Befehl bleibt eine Diagnose ohne Speicherung und ohne Freigabe. Für explizite Ferienregeln, Einzelterminabgleich einschließlich Zeiten und Raum, eine gebundene Fachprüfung und sichere SQLite-Archivierung den neuen [Kalenderimport](calendar-import.md) verwenden. Seine Freigabe ist von der bisherigen konservativen Abdeckungsdiagnose getrennt.

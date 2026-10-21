@@ -37,6 +37,7 @@ class DetailResult:
     preview: CalendarPreview | None = field(repr=False)
     unresolved_course: CourseDetail | None = field(default=None, repr=False)
     blocking_reason: str | None = None
+    source_course: CourseDetail | None = field(default=None, repr=False)
 
     @property
     def requires_review(self) -> bool:
@@ -180,5 +181,5 @@ def fetch_detail_sample(client: SourceClient, references: tuple[CourseReference,
             # Ein korrekt gelesenes Detail kann noch nicht interpretierte Sonderfälle enthalten.
             preview, status = None, "normalization_requires_review"
         details.append(DetailResult(reference.key, len(course.series), status, preview,
-                                    course if preview is None else None, blocking_reason))
+                                    course if preview is None else None, blocking_reason, course))
     return DetailSample(len(references), sum(ref.block_count for ref in references), tuple(details))

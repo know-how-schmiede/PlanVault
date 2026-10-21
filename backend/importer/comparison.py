@@ -63,7 +63,8 @@ def compare_references(semester_references, week_references):
 
 def run_view_comparison(client, *, query, title, start, end, identity_policy,
                         requested=None, week_budget=30, details=False, semester=None,
-                        study_key=None, regulations_key=None, detail_budget=80):
+                        study_key=None, regulations_key=None, detail_budget=80,
+                        on_observed_week=None, on_details=None):
     """Alle erwarteten oder ausgewählte Wochen mit beiden Semesteransichten vergleichen.
 
     Zeitraum und Budget kommen vom Aufrufer, nicht aus dem Quellmenü. Tageshinweise
@@ -116,6 +117,8 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
 
         def collect(document, result):
             nonlocal week_refs
+            if on_observed_week is not None:
+                on_observed_week(document, result)
             try:
                 refs = (collect_course_references(client, (document,), identity_policy=identity_policy)
                         if _page(document).select(COURSE_BLOCK_SELECTOR) else ())
@@ -179,6 +182,8 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
             sample = fetch_comparison_details(client, references, semester=semester,
                                                study_key=study_key, regulations_key=regulations_key,
                                                budget=detail_budget)
+            if on_details is not None:
+                on_details(references, sample)
             report["stage"] = "weekly_presence"
             presence = compare_weekly_presence(references, sample, week_targets, week_statuses,
                                                start=start, end=end, day_notices=day_notices)

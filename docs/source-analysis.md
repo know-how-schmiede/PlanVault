@@ -408,3 +408,13 @@ Veranstaltungs-Wochen, 704 passend sichtbar, 105 Abweichungen bleiben erhalten.
 82 betreffen spezifisch bekannte Tageshinweise; 23 sind jetzt ausdrücklich
 unbenannten Quelltagen zugeordnet. Keine anderen unbekannten Tageshinweise und
 keine zusätzliche sichtbare Präsenz. Kein Deployment oder eigener LXC-Lauf.
+
+## V0.0.30 – vollständiger Kalenderabgleich
+
+Der neue [Kalenderimport](calendar-import.md) wurde mit dem bekannten, ausdrücklich gewählten Studiengang und seiner Prüfungsordnung live geprüft. Prüfzeitraum: offizieller Semesterumfang 01.09.2026–28.02.2027; die Randwoche wird vollständig abgerufen, Termine außerhalb des Semesters werden nicht stillschweigend übernommen. Die explizite Laufzeitregel verwendet den zuvor unabhängig geprüften Weihnachtszeitraum 23.12.2026–06.01.2027 und einen benannten Beleg. Keine Regel wurde in Anwendungscode festgeschrieben.
+
+Ein abschließender Lauf mit 100 seriellen HTTP-Anfragen erfasste 26 Wochen, 66 Details und 824 beobachtete Terminblöcke. Alle 66 Details sind jetzt normalisierbar. Rein beschreibende Begrüßungs-/Initiativenhinweise werden als Annotation erhalten und bleiben fachlich prüfpflichtig; keine personenbezogenen Originalhinweise werden hier dokumentiert. 824 übernommene Termine stimmen taggenau bei Anfang, Ende, Raum und Veranstaltungsart mit der Wochenansicht überein. 120 fehlende wiederkehrende Einzelvorkommen im ausdrücklich belegten freien Zeitraum werden separat protokolliert; sichtbare Sondertermine bleiben erhalten. Die 120 datierten Ausnahmen sind eine andere Zählgröße als die früheren 105 fehlenden Veranstaltungspräsenzen pro Woche.
+
+Die Wochenansicht ergänzt bei Räumen eine beschreibende Bezeichnung vor dem Detail-Raumcode. Eine eindeutige Zuordnung auf einen im betreffenden Detail vorhandenen Code wird erkannt. Ein Raumcode mit eigenem Bindestrichzusatz wird dabei erhalten. Der Multimengenvergleich hat sechs zuvor unerkannte Formatabweichungen eines solchen Raumcodes sichtbar gemacht und nach Klärung korrekt zugeordnet. Es verbleiben keine harten Importbefunde.
+
+29 fachliche Bestätigungen sind offen: 24 Veranstaltungsprüfungen, eine Prüfung der Raumbezeichnungen, Wochenendbestand, Gruppen/Lehrpersonen, Semester-/Studiengangskontext sowie die Ferienregel. Diese Daten sind damit noch kein fachlich freigegebener Stand. Die Quelle zeigt weiterhin fünf Wochentage; ein unabhängiger Wochenendnachweis wurde nicht vorgetäuscht. Kein reales Prüfpaket, keine Rohseiten oder Veranstaltungsdaten wurden im Repository abgelegt; kein realer Archivstand veröffentlicht, kein LXC-Deployment.

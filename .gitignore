@@ -229,3 +229,11 @@ __marimo__/
 backups/
 browser-profiles/
 *.preview.json
+
+# Lokale fachliche Prüfpakete und SQLite-Nebendateien
+*.review.json
+*.sqlite-journal
+*.sqlite3-journal
+*.db-journal
+*.db.lock
+*.sqlite.lock

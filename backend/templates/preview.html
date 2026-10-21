@@ -1,26 +1,35 @@
 {% extends "base.html" %}
 {% block introduction %}
-<h1>Import-Vorschau</h1>
-<p>Bereits eingelesene Termine ansehen und den Import prüfen.</p>
+<h1>{{ "Kalenderarchiv" if archived else "Import-Vorschau" }}</h1>
+<p>{{ "Geprüfte, lokal gespeicherte Kalenderstände ansehen." if archived else "Bereits eingelesene Termine ansehen und den Import prüfen." }}</p>
 {% endblock %}
 {% block content %}
 <p><a href="{{ url_for('web.index') }}">Zur Startseite</a></p>
+{% if archived %}
+<section aria-labelledby="archive-status"><h2 id="archive-status">{{ 'Freigegebener Archivstand' if preview else 'Kein lesbarer Archivstand' }}</h2>
+{% if preview %}<p>Ausgewählter Archivstand: {{ preview.snapshot_id }} · gespeichert am {{ preview.created_at_label }}.</p>
+<p>Letzte erfolgreiche Sicherung: {{ preview.last_success_at_label }} (Europe/Berlin).</p>
+<p>Letzter Importversuch: {{ {'failed':'fehlgeschlagen', 'running':'läuft', 'provisional':'Prüfung offen', 'published':'freigegeben', 'unchanged':'unverändert'}.get(preview.last_attempt_status, 'unbekannt') }} · {{ preview.last_attempt_at_label }} (Europe/Berlin). Kein automatischer Live-Abgleich.</p>
+{% else %}<p>Letzte erfolgreiche Sicherung: hier nicht verfügbar.</p>{% endif %}</section>
+{% else %}
 <section class="preview-warning" aria-labelledby="preview-warning">
   <h2 id="preview-warning">Unvollständig · kein freigegebener Archivstand</h2>
   <p>Termine können fehlen oder noch prüfpflichtig sein. Semesterumfang und Wochenenden sind nicht vollständig bestätigt. Diese Vorschau ersetzt keinen verbindlichen Vorlesungsplan.</p>
-  <p>Letzte erfolgreiche Sicherung: noch keine.</p>
+  {% if config.ARCHIVE_DATABASE %}<p>Letzte erfolgreiche Sicherung: im <a href="{{ url_for('web.archive') }}">Kalenderarchiv</a> ansehen.</p>{% else %}<p>Letzte erfolgreiche Sicherung: noch keine.</p>{% endif %}
 </section>
+{% endif %}
 {% if preview %}
 <section aria-labelledby="preview-heading">
   <h2 id="preview-heading">{{ preview.semester }}</h2>
   {% if preview.study_title %}<p>Studiengang: {{ preview.study_title }}</p>{% else %}<p>Studiengang: in dieser Vorschau noch nicht hinterlegt.</p>{% endif %}
-  <p>Vorschau erstellt: {{ preview.created_label }} (Europe/Berlin). Kein automatischer Live-Abgleich.</p>
-  <p>{{ preview.checked_details }} Veranstaltungsdetails geprüft; {{ preview.blocked_details }} blockiert und nicht in dieser Vorschau enthalten.</p>
+  {% if not archived %}<p>Vorschau erstellt: {{ preview.created_label }} (Europe/Berlin). Kein automatischer Live-Abgleich.</p>
+  <p>{{ preview.checked_details }} Veranstaltungsdetails geprüft; {{ preview.blocked_details }} blockiert und nicht in dieser Vorschau enthalten.</p>{% endif %}
   <nav class="preview-navigation" aria-label="Vorschauansicht">
-    <a href="{{ url_for('web.preview', view='week', week=selected) }}" {% if mode == 'week' %}aria-current="page"{% endif %}>Wochenansicht</a>
-    <a href="{{ url_for('web.preview', view='list', week=selected) }}" {% if mode == 'list' %}aria-current="page"{% endif %}>Listenansicht</a>
+    <a href="{{ url_for(calendar_endpoint, snapshot=preview.snapshot_id if archived else none, view='week', week=selected) }}" {% if mode == 'week' %}aria-current="page"{% endif %}>Wochenansicht</a>
+    <a href="{{ url_for(calendar_endpoint, snapshot=preview.snapshot_id if archived else none, view='list', week=selected) }}" {% if mode == 'list' %}aria-current="page"{% endif %}>Listenansicht</a>
   </nav>
   <form method="get" class="preview-filter">
+    {% if archived %}<input type="hidden" name="snapshot" value="{{ preview.snapshot_id }}">{% endif %}
     <input type="hidden" name="view" value="{{ mode }}">
     <label for="week">Kalenderwoche</label>
     <select name="week" id="week">
@@ -31,14 +40,14 @@
   </form>
   {% if selected %}
   <nav class="preview-navigation" aria-label="Erfasste Kalenderwochen">
-    {% if previous %}<a rel="prev" href="{{ url_for('web.preview', view=mode, week=previous) }}">Vorherige erfasste Woche ({{ previous }})</a>{% endif %}
-    {% if following %}<a rel="next" href="{{ url_for('web.preview', view=mode, week=following) }}">Nächste erfasste Woche ({{ following }})</a>{% endif %}
+    {% if previous %}<a rel="prev" href="{{ url_for(calendar_endpoint, snapshot=preview.snapshot_id if archived else none, view=mode, week=previous) }}">Vorherige erfasste Woche ({{ previous }})</a>{% endif %}
+    {% if following %}<a rel="next" href="{{ url_for(calendar_endpoint, snapshot=preview.snapshot_id if archived else none, view=mode, week=following) }}">Nächste erfasste Woche ({{ following }})</a>{% endif %}
   </nav>
   {% endif %}
-  <p>{{ events|length }} Termine angezeigt. Fehlende Termine sind kein Nachweis für freie Zeiten.</p>
+  <p>{{ events|length }} Termine angezeigt. {% if archived %}Stand des freigegebenen Imports; spätere Quellenänderungen sind nicht enthalten.{% else %}Fehlende Termine sind kein Nachweis für freie Zeiten.{% endif %}</p>
   {% if mode == 'week' %}
   <h3>{{ selected }} · {{ days[0].date }} bis {{ days[-1].date }}</h3>
-  <p>Alle Zeiten in Europe/Berlin. Die Navigation überspringt Wochen ohne erfasste Termine; deren Vollständigkeit ist nicht bestätigt.</p>
+  <p>Alle Zeiten in Europe/Berlin. {% if archived %}Die Navigation umfasst alle Wochen des geprüften Semesters.{% else %}Die Navigation überspringt Wochen ohne erfasste Termine; deren Vollständigkeit ist nicht bestätigt.{% endif %}</p>
   <div class="preview-week">
     {% for day in days %}
     <section class="preview-day" aria-labelledby="day-{{ loop.index }}">
@@ -47,11 +56,13 @@
       <article class="week-event">
         <p class="event-time">{{ event.time }}</p>
         <h5>{{ event.title }}</h5>
+        {% if event.group %}<p>Gruppe / Durchführung: {{ event.group }}</p>{% endif %}
+        {% if event.event_type %}<p>Art: {{ event.event_type }}</p>{% endif %}
         <p>Raum: {{ event.room or 'nicht angegeben' }}</p>
         <p>Lehrperson: {{ event.instructor or 'nicht angegeben' }}</p>
         {% if event.review %}<p class="review-label">Fachliche Prüfung offen</p>{% endif %}
       </article>
-      {% else %}<p class="day-empty">Keine erfassten Termine. Abdeckung ungeprüft.</p>{% endfor %}
+      {% else %}<p class="day-empty">{{ "Keine Termine in diesem Archivstand." if archived else "Keine erfassten Termine. Abdeckung ungeprüft." }}</p>{% endfor %}
     </section>
     {% endfor %}
   </div>
@@ -61,7 +72,9 @@
     <li>
       <p class="event-time">{{ event.day }} · {{ event.time }}</p>
       <h3>{{ event.title }}</h3>
-      <p>Raum: {{ event.room or 'nicht angegeben' }}<br>Lehrperson: {{ event.instructor or 'nicht angegeben' }}</p>
+      {% if event.group %}<p>Gruppe / Durchführung: {{ event.group }}</p>{% endif %}
+        {% if event.event_type %}<p>Art: {{ event.event_type }}</p>{% endif %}
+        <p>Raum: {{ event.room or 'nicht angegeben' }}<br>Lehrperson: {{ event.instructor or 'nicht angegeben' }}</p>
       {% if event.review %}<p class="review-label">Fachliche Prüfung offen – Hinweise im Quellsystem prüfen.</p>{% endif %}
     </li>
     {% endfor %}
@@ -70,9 +83,9 @@
 </section>
 {% else %}
 <section aria-labelledby="empty-heading">
-  <h2 id="empty-heading">Noch keine lesbare Import-Vorschau</h2>
-  {% if status == 'invalid' %}<p>Die lokale Vorschau konnte nicht gelesen werden. Bitte die Konfiguration und einen neuen manuellen Import prüfen.</p>
-  {% else %}<p>Nach Einrichtung und manuellem Import werden hier die bereits eingelesenen Termine angezeigt. Es werden keine Beispieldaten als echte Vorlesungen dargestellt.</p>{% endif %}
+  <h2 id="empty-heading">{{ "Noch kein lesbares Kalenderarchiv" if archived else "Noch keine lesbare Import-Vorschau" }}</h2>
+  {% if status == 'invalid' %}<p>Der lokale Kalenderstand konnte nicht gelesen werden. Bitte die Konfiguration und einen neuen manuellen Import prüfen.</p>
+  {% else %}<p>Nach Einrichtung, manuellem Import und gegebenenfalls Archivfreigabe werden hier die eingelesenen Termine angezeigt. Es werden keine Beispieldaten als echte Vorlesungen dargestellt.</p>{% endif %}
 </section>
 {% endif %}
 {% endblock %}

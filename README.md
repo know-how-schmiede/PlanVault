@@ -1,5 +1,7 @@
 # WI-PlanArchiv
 
+Neu in **V0.0.30**: vollständiger manueller [Kalenderimport mit Archivfreigabe](docs/calendar-import.md), explizite Ferienregeln mit Sonderterminausnahmen, taggenauer Zeit-/Raumabgleich, Begrüßungshinweise, gebundene Fachprüfung, SQLite-Archiv mit Historie und Schutz des letzten gültigen Stands sowie Sicherung/Wiederherstellung. Unter `/archiv` erscheinen ausschließlich freigegebene lokale Kalenderstände. Live geprüft: 26 Wochen, 66 Details, 824 abgeglichene Termine; keine harten Befunde. 29 fachliche Einzelbestätigungen und der Betriebsdurchlauf im LXC stehen aus.
+
 ![WI-PlanArchiv – Vorlesungsplanung sichern. Immer verfügbar.](images/WI-PlanArchiv_%20Vorlesungsplanung%20sichern.png)
 
 **Vorlesungsplanung sichern. Immer verfügbar.**

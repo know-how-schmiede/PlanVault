@@ -227,3 +227,9 @@ wie beim ersten Versuch wählen. Vorbereitete Releases und Sicherungsverzeichnis
 aus dem abgebrochenen Lauf nicht ungeprüft löschen. Nach der Erfolgsmeldung den
 Versionsfooter kontrollieren; ein erfolgreicher erneuter LXC-Lauf ist noch nicht
 bestätigt.
+
+## Kalenderarchiv ab V0.0.30
+
+Bestehende Installationen behalten ihre Konfiguration beim Update. Für den neuen manuellen Import `ARCHIVE_DATABASE=/var/lib/wi-planarchiv/archive.sqlite` in der externen `app.env` ergänzen und das Schreibrecht des Dienstkontos im Datenverzeichnis prüfen. Der Dateipfad wird nicht automatisch durch einen Websiteaufruf angelegt. Anschließend den Dienst neu starten. Vollständige Befehle für Semesterregeln, Import, Prüfpaket, Freigabe sowie SQLite-Sicherung und Wiederherstellung stehen in [Kalenderimport und Archiv](calendar-import.md). Ein Update allein veröffentlicht keinen Kalenderstand.
+
+Die Tests isolieren neben den bisherigen Quell-/Vorschauwerten auch `ARCHIVE_DATABASE` von einer exportierten Betreiberumgebung; das konfigurierte Produktionsarchiv wird beim Update nicht geöffnet. V0.0.30 wurde lokal und an der Quelle geprüft; Update, Freigabe und Restore im LXC wurden hier nicht ausgeführt.

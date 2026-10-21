@@ -18,6 +18,8 @@ def create_app(test_config=None):
     from backend.cli import register_cli
 
     register_cli(app)
+    from backend.archive_cli import register_archive_cli
+    register_archive_cli(app)
 
     @app.context_processor
     def application_version():
