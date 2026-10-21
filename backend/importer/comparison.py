@@ -9,9 +9,10 @@ from backend.importer.forms import FormNavigationError
 from backend.importer.http import SourceFetchError
 from backend.importer.identity import SourceIdentityPolicy
 from backend.importer.navigation import search_study, follow_named_result, submit_labeled_search, _page
-from backend.importer.semester import audit_semester_views
+from backend.importer.semester import audit_semester_views, validate_semester_details
 from backend.importer.structure import COURSE_BLOCK_SELECTOR
 from backend.importer.weeks import read_week_menu, audit_weeks
+from backend.importer.presence import fetch_comparison_details, compare_weekly_presence
 from version import __version__
 
 
@@ -61,18 +62,22 @@ def compare_references(semester_references, week_references):
 
 
 def run_view_comparison(client, *, query, title, start, end, identity_policy,
-                        requested=None, week_budget=30):
+                        requested=None, week_budget=30, details=False, semester=None,
+                        study_key=None, regulations_key=None, detail_budget=80):
     """Alle erwarteten oder ausgewählte Wochen mit beiden Semesteransichten vergleichen.
 
     Zeitraum und Budget kommen vom Aufrufer, nicht aus dem Quellmenü. Tageshinweise
     bleiben prüfpflichtig; strukturgeprüfte Seiten können dennoch Ziele beitragen.
-    Abruf-/Strukturfehler brechen ab und liefern keinen erfolgreichen Teilvergleich.
+    Mit details zusätzlich bekannte Detailziele einmalig lesen und Wochenpräsenz
+    vergleichen. Abruf-/Strukturfehler liefern keinen erfolgreichen Teilvergleich.
     """
     expected, selection = validate_comparison(query, title, start, end, requested,
                                                week_budget, identity_policy)
+    if details:
+        validate_semester_details(semester, study_key, regulations_key, detail_budget)
     started = datetime.now(timezone.utc).isoformat()
     report = {
-        "schema_version": 1, "app_version": __version__, "run_id": str(uuid4()),
+        "schema_version": 2, "app_version": __version__, "run_id": str(uuid4()),
         "started_at": started, "status": "needs_review", "stage": "navigation",
         "period_start": start.isoformat(), "period_end": end.isoformat(),
         "identity_mode": "configured", "requested_weeks": selection,
@@ -80,6 +85,8 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
         "review_weeks": [], "failed_weeks": [], "views": [],
         "all_requested_weeks_observed": False, "period_weeks_verified": False,
         "comparison_evaluated": False, "comparison_scope": "observed_weeks", "comparison": None,
+        "details_requested": details, "checked_details": 0,
+        "normalization_summary": None, "review_summary": None, "weekly_presence": None,
         "weekend_coverage_verified": False, "complete": False, "published": False,
     }
     blockers = {"semester_extent_unverified", "study_context_unverified",
@@ -103,6 +110,8 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
         semester_refs = merge_course_references(tuple(v.references for v in views))
         week_refs = ()
         observed = []
+        week_targets = {}
+        week_statuses = {}
 
         def collect(document, result):
             nonlocal week_refs
@@ -112,6 +121,9 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
                 week_refs = merge_course_references((week_refs, refs))
             except DetailImportError:
                 raise FormNavigationError("Veranstaltungsziele der Woche benötigen Prüfung.") from None
+            week = (result.iso_year, result.iso_week)
+            week_targets[week] = {r.key for r in refs}
+            week_statuses[week] = result.status
             observed.append({"iso_year": result.iso_year, "iso_week": result.iso_week,
                              "status": result.status, "reference_count": len(refs)})
 
@@ -149,12 +161,41 @@ def run_view_comparison(client, *, query, title, start, end, identity_policy,
                 blockers.add("semester_references_not_observed_in_weeks")
         else:
             blockers.add("no_week_inventory")
+        if details and observed:
+            report["stage"] = "details"
+            references = merge_course_references((semester_refs, week_refs))
+            sample = fetch_comparison_details(client, references, semester=semester,
+                                               study_key=study_key, regulations_key=regulations_key,
+                                               budget=detail_budget)
+            report["stage"] = "weekly_presence"
+            presence = compare_weekly_presence(references, sample, week_targets, week_statuses,
+                                               start=start, end=end)
+            report["checked_details"] = len(sample.details)
+            report["normalization_summary"] = sample.normalization_summary()
+            report["review_summary"] = sample.review_summary()
+            report["weekly_presence"] = presence
+            blockers.discard("detail_content_unchecked")
+            blockers.add("occurrence_fields_unverified")
+            if presence["blocked_details"]:
+                blockers.add("normalization_blocked")
+            if presence["review_details"]:
+                blockers.add("detail_review_required")
+            if presence["missing_from_week_view"] or presence["observed_without_expected_occurrence"]:
+                blockers.add("weekly_presence_mismatch")
+            if not presence["evaluated"]:
+                blockers.add("weekly_presence_not_evaluated")
+            if presence["partial_boundary_weeks"]:
+                blockers.add("partial_boundary_weeks_not_compared")
         report["stage"] = "finished"
     except (SourceFetchError, FormNavigationError, DetailImportError):
         report["status"] = "failed"
         blockers.add(report["stage"] + "_failed")
         report["comparison_evaluated"] = False
         report["comparison"] = None
+        report["checked_details"] = 0
+        report["normalization_summary"] = None
+        report["review_summary"] = None
+        report["weekly_presence"] = None
     if report["missing_weeks"]:
         blockers.add("missing_weeks")
     report["blockers"] = sorted(blockers)

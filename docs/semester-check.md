@@ -244,3 +244,14 @@ Live für die bekannte MT-Auswahl: alle 26 angeforderten Wochen erreicht,
 66 Ziele in beiden Beständen, keine einseitigen Ziele. Leere Wochen und
 Tageshinweise bleiben prüfpflichtig; vollständiger Semesterinhalt und Wochenenden
 sind nicht bestätigt. [Anleitung und Grenzen](view-comparison.md).
+
+
+## V0.0.27 – Optionaler Detailabgleich im Abdeckungsbefehl
+
+`source-coverage-check --details` prüft bekannte Detailziele gegen das erwartete
+Semester und vergleicht normalisierte Wochenpräsenzen. Der Abdeckungsbericht
+verwendet dafür Schema 2; der bestehende `source-semester-check` bleibt bei Schema 7.
+Der Vorschauimport wird dadurch nicht verändert oder automatisch ausgeführt.
+Live wurden trotz gleicher globaler Zielmengen 105 erwartete Veranstaltungs-Wochen
+ohne sichtbaren Eintrag erkannt. Das sind fachliche Prüffälle, keine bestätigten
+Ausfälle. [Anleitung und Begrenzung](view-comparison.md).

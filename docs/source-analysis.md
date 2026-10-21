@@ -4,7 +4,7 @@
 
 Die Anwendung und das Update wurden vom Projektverantwortlichen erfolgreich getestet; der Server ist im internen Netz erreichbar. Dies bestätigt den Anwendungsbetrieb, noch nicht den Zugriff auf die LSF-Datenquelle.
 
-Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.26`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
+Am 2026-10-20 wurden Einstieg, Studiengangsauswahl, Plananzeige und zwei Wochenwechsel per HTTP erfolgreich geprüft. Die vertrauliche Einstiegsadresse wurde vom User bereitgestellt und ausschließlich im Arbeitsspeicher verwendet. Rohseiten und Sitzungsdaten wurden nicht gespeichert. Anschließend wurden eine reguläre Veranstaltung und eine Laborveranstaltung mit dem ersten Detailparser erfolgreich geprüft (eine bzw. zwei Terminserien). Eine vollständig fiktiv befüllte Testdatei bildet die beobachtete Tabellenstruktur nach. Die aktuelle Anwendungsversion lautet `V0.0.27`. M0 ist begonnen, aber noch nicht vollständig abgeschlossen.
 
 ## Geprüfte Auswahl und Rahmenbedingungen
 
@@ -313,3 +313,35 @@ Wochenblöcke sind lokal getestet. Der Nutzer bestätigt den bisherigen manuelle
 Import im LXC; der neue Abgleich wurde dort nicht von uns ausgeführt.
 
 Aufruf und Berichtsvertrag: [Ansichtsabgleich](view-comparison.md).
+
+
+## V0.0.27 – Detailerwartungen gegen Wochenpräsenzen prüfen
+
+Die optionale Detailerweiterung des Ansichtsabgleichs wurde am 2026-10-21 für
+die bekannte MT-Auswahl (Prüfungsordnung 2024) und den gewählten Zeitraum
+2026-08-31 bis 2027-02-28 live ausgeführt. 100 serielle HTTP-Anfragen erreichen
+26 Wochen und 66 semestergeprüfte Details, ohne Wiederholungen und mit einer
+Sekunde Mindestabstand. Das harte Abruflimit wurde nicht erhöht.
+
+Die globalen Zielmengen enthalten weiterhin dieselben 66 Veranstaltungen.
+65 Details sind normalisierbar, ein Einführungsfall bleibt blockiert, 23 Vorschauen
+fachlich prüfpflichtig. Aus den normalisierten lokalen Montag-bis-Freitag-Terminen
+ergeben sich 809 Kombinationen aus Veranstaltung und voller beobachteter Woche.
+704 passende Kombinationen sind sichtbar, 105 erwartete Kombinationen fehlen in
+der jeweiligen Wochenansicht. Keine sichtbare Kombination ohne erwarteten Termin.
+Die ausgegebenen Beispiele liegen in Wochen mit Tageshinweisen; damit ist weder
+die Ursache aller Abweichungen noch eine pauschale Ferienregel nachgewiesen.
+Es wurden keine Termine aufgrund dieser Abweichungen ergänzt oder entfernt.
+
+Keine normalisierten Wochenendtermine, keine unvollständigen Randwochen und keine
+nicht beobachteten Erwartungswochen in diesem Lauf. Der blockierte Detailbestand
+und Wochenenden bleiben ausdrücklich außerhalb einer Vollständigkeitsbehauptung.
+Die Prüfung vergleicht Präsenz je Veranstaltung/Woche, keine einzelnen Tage,
+Uhrzeiten, Räume oder alle Gruppen. Ein passender Eintrag kann mehrere Termine
+nicht einzeln bestätigen. Die zusätzlichen Wochenzähler sowie strengere Eingabe-
+und Fehlerprüfungen sind lokal getestet; kein weiterer umfangreicher Live-Lauf.
+
+Keine Vorschau- oder Archivdateien geschrieben, keine Rohdaten gespeichert,
+kein Deployment und kein eigener LXC-Lauf. Nächster Schritt ist die fachliche
+Einordnung der Abweichungen und der offenen Einführungsbemerkung anhand belastbarer
+Quellbelege. Aufruf und Grenzen: [Detailabgleich](view-comparison.md).

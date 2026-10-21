@@ -2,6 +2,22 @@
 
 Alle Änderungen einer Version werden in einem gemeinsamen Eintrag zusammengefasst. Neue Versionen stehen oben.
 
+## V0.0.27 – Detailtermine gegen die Wochenpräsenz prüfen
+
+**Datum:** 2026-10-21
+
+**Änderungen:**
+
+- Zentrale Version auf Userwunsch auf `0.0.27` gesetzt; Footer übernimmt sie.
+- Ansichtsabgleich um optionales `--details`, erwartetes Semester, opake Studiengangs-/Prüfungsordnungskennungen und ausdrückliches Detailbudget erweitert. Ziele aller Ansichten einmalig prüfen; bei Budgetüberschreitung vor dem ersten Detailabruf abbrechen.
+- Normalisierte Veranstaltungspräsenzen je voller beobachteter Woche vergleichen. Fehlende und unerwartete Präsenzen, reine Ausfall-/Wochenendfälle, blockierte Details und ausgeschlossene Wochen getrennt ausweisen; Zähler je Woche ergänzen.
+- Abdeckungsbericht auf Schema 2 erweitert, feste Prüfcodes und laufbezogene Nummern ohne Quelldaten. Detailabruf-/Parserfehler verwerfen erfolgreiche Teilvergleiche. Keine Uhrzeit-/Raumfreigabe und keine Änderung der Vorschau oder des Archivs.
+- README, Abgleichsanleitung, Semesterprüfung, Quellenanalyse und Roadmap aktualisiert.
+
+**Prüfung:** 403 lokale Tests erfolgreich, auch mit fiktiv geerbter Betreiberkonfiguration und eingeschlossener Update-Regression. Grenzfälle zu falscher Woche trotz gleicher Zielmengen, lokalen ISO-Wochen, Ausfällen, Wochenenden, Randwochen, blockierten Details und Fehlererhalt geprüft. Footer auf Startseite und Vorschau als V0.0.27 geprüft, alle drei Bash-Anleitungsblöcke auf Syntax geprüft; `git diff --check` ohne Fehler. Live: 100 HTTP-Anfragen, 26 Wochen, 66 semestergeprüfte Details, 65 normalisierbar und eines blockiert. 809 erwartete Veranstaltungs-Wochen, 704 passende sichtbare Präsenzen und 105 fachlich ungeklärte Abweichungen. Keine sichtbare Präsenz ohne erwarteten Termin; 23 Vorschauen fachlich prüfpflichtig. Kein Deployment, eigener LXC-Lauf, Vorschauupdate oder Archivfreigabe. M0/M1 bleiben offen.
+
+**Commit-Kurzbeschreibung:** Version 0.0.27 mit Detailprüfung und begrenztem Wochenpräsenzabgleich ergänzen
+
 ## V0.0.26 – Veranstaltungsziele zwischen Wochen- und Semesteransichten abgleichen
 
 **Datum:** 2026-10-21

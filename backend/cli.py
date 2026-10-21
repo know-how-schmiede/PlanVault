@@ -316,12 +316,23 @@ def source_semester_check(query, title, json_output, details, semester, study_ke
 @click.option("--week", "weeks", multiple=True, help="Ausgewählte ISO-Woche JJJJ-WNN; wiederholbar.")
 @click.option("--all-weeks", is_flag=True, help="Alle Wochen des ausdrücklich angegebenen Zeitraums prüfen.")
 @click.option("--week-budget", default=30, show_default=True, type=click.IntRange(1, 54))
+@click.option("--details", is_flag=True, help="Detailseiten zusätzlich gegen die Wochenpräsenz prüfen.")
+@click.option("--semester", envvar="LSF_SEMESTER", default=None)
+@click.option("--study-key", envvar="LSF_STUDY_KEY", default=None)
+@click.option("--regulations-key", envvar="LSF_REGULATIONS_KEY", default=None)
+@click.option("--detail-budget", default=80, show_default=True, type=click.IntRange(1, 100))
 @click.option("--json", "json_output", is_flag=True)
 @with_appcontext
-def source_coverage_check(query, title, start, end, weeks, all_weeks, week_budget, json_output):
+def source_coverage_check(query, title, start, end, weeks, all_weeks, week_budget, json_output,
+                          details, semester, study_key, regulations_key, detail_budget):
     """Veranstaltungsziele der Wochen- und Semesteransichten vergleichen; keine Speicherung."""
     if bool(weeks) == all_weeks:
         raise click.ClickException("Entweder --week oder --all-weeks angeben.")
+    if not details and any(value is not None and click.get_current_context().get_parameter_source(name)
+                           != click.core.ParameterSource.ENVIRONMENT
+                           for name, value in (("semester", semester), ("study_key", study_key),
+                                               ("regulations_key", regulations_key))):
+        raise click.ClickException("Semester- und Studiengangsangaben benötigen --details.")
     requested = []
     for value in weeks:
         match = re.fullmatch(r"(\d{4})-W(\d{2})", value)
@@ -334,8 +345,10 @@ def source_coverage_check(query, title, start, end, weeks, all_weeks, week_budge
             report = run_view_comparison(client, query=query, title=title,
                                          start=start.date(), end=end.date(), identity_policy=policy,
                                          requested=None if all_weeks else tuple(requested),
-                                         week_budget=week_budget)
-    except (SourceFetchError, SourceIdentityError, ComparisonInputError) as error:
+                                         week_budget=week_budget, details=details, semester=semester,
+                                         study_key=study_key, regulations_key=regulations_key,
+                                         detail_budget=detail_budget)
+    except (SourceFetchError, SourceIdentityError, ComparisonInputError, DetailImportError) as error:
         raise click.ClickException(str(error)) from None
     if json_output:
         click.echo(json.dumps(report, ensure_ascii=False, indent=2))
@@ -347,6 +360,12 @@ def source_coverage_check(query, title, start, end, weeks, all_weeks, week_budge
         if comparison is not None:
             click.echo(f"Nur in Wochenansichten: {len(comparison['only_in_weeks'])}; "
                        f"nur in Semesteransichten: {len(comparison['only_in_semester_views'])}.")
+        presence = report["weekly_presence"]
+        if presence is not None:
+            click.echo(f"Details geprüft: {report['checked_details']}; "
+                       f"fehlende Wochenpräsenzen: {len(presence['missing_from_week_view'])}; "
+                       f"ohne erwarteten Termin sichtbar: {len(presence['observed_without_expected_occurrence'])}; "
+                       f"blockierte Details: {len(presence['blocked_details'])}.")
         click.echo("Offene Punkte: " + ", ".join(report["blockers"]))
         click.echo("Keine Vorschau geändert; Semesterinhalt und Wochenenden bleiben ungeprüft.")
     raise click.exceptions.Exit(1)

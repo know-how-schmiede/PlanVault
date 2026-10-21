@@ -1,13 +1,14 @@
-# Wochen- und Semesteransichten abgleichen – V0.0.26
+# Wochen- und Semesteransichten abgleichen – ab V0.0.26
 
 `source-coverage-check` vergleicht die Veranstaltungsziele beider Semesteransichten
-mit den Zielen ausdrücklich gewählter Wochen. Der Befehl liest keine Detailseiten
-und schreibt weder Archivdaten noch eine Vorschau-Datei. Eine vorhandene
+mit den Zielen ausdrücklich gewählter Wochen. Ohne `--details` liest er keine
+Detailseiten. Ab V0.0.27 ist zusätzlich ein Wochenpräsenzabgleich mit Detailseiten
+möglich (siehe unten). Er schreibt weder Archivdaten noch eine Vorschau-Datei. Eine vorhandene
 Web-Vorschau bleibt unverändert.
 
 ## Im LXC ausführen
 
-Zuerst V0.0.26 auf GitHub veröffentlichen und das bestehende
+Zuerst V0.0.27 auf GitHub veröffentlichen und das bestehende
 [Update](install.md#vorhandene-installation-aktualisieren) ausführen. Ein Neustart
 allein aktualisiert den Anwendungscode nicht. Die bekannte lokale Konfiguration
 für Quelladresse und Veranstaltungskennung wird weiterhin benötigt; siehe
@@ -75,7 +76,7 @@ Zeitraum bestätigt. Abruf-, Struktur-, Kennungs- oder Zuordnungsfehler stoppen
 hingegen weitere Wochenabrufe. Es gibt danach keinen erfolgreichen Teilvergleich.
 Das bisherige Verhalten der anderen Wochen- und Importprüfbefehle bleibt bestehen.
 
-## Bereinigter Bericht (eigener Vertrag, Schema 1)
+## Bereinigter Bericht (eigener Vertrag, ab V0.0.27 Schema 2)
 
 | Feld | Bedeutung |
 | --- | --- |
@@ -106,9 +107,10 @@ Quellkennungen und Formularparameter werden nicht ausgegeben.
 Bei `status: failed` ist `comparison` null und `comparison_evaluated` false.
 Bei einem technisch durchgelaufenen Abgleich bleibt der Status `needs_review`.
 `complete`, `published` und `weekend_coverage_verified` bleiben immer false;
-der Befehl endet mit **Exitcode 1**. Der Abgleich prüft weder sämtliche
-Einzeltermine, deren Uhrzeiten und Räume noch Semesterangaben auf Detailseiten.
-Er veröffentlicht und aktualisiert keine Daten auf der Webseite.
+der Befehl endet mit **Exitcode 1**. Im Standardmodus werden keine Detailseiten
+oder Einzeltermine geprüft. Auch mit `--details` werden keine Uhrzeiten und Räume
+mit den Wochenansichten verglichen. Er veröffentlicht und aktualisiert keine Daten
+auf der Webseite.
 
 ## Live-Nachweis vom 2026-10-21
 
@@ -132,3 +134,113 @@ Raumwidersprüche, Wochenenden und die fachlichen Semestergrenzen sind damit
 nicht gelöst. Keine Detailabrufe, Rohdatenspeicherung, Vorschauaktualisierung
 oder Archivfreigabe. Der Live-Test erfolgte aus der Entwicklungsumgebung;
 ein eigener Lauf im Ziel-LXC steht für diesen Befehl noch aus.
+
+
+## V0.0.27 – Detailseiten gegen die Wochenpräsenz prüfen
+
+Ein Veranstaltungsziel kann über das Semester hinweg in beiden Ansichten
+vorkommen und trotzdem in einer bestimmten Woche fehlen. Mit `--details` liest
+der Abgleich deshalb zusätzlich alle bekannten Ziele aus beiden Semesteransichten
+und den beobachteten Wochen einmalig. Jede Detailseite muss zur ausdrücklich
+erwarteten Semesterbezeichnung passen. Eine abweichende Semesterbezeichnung,
+Abruf- oder Parserfehler verwerfen den gesamten Vergleich dieses Laufs.
+
+### Aufruf im LXC
+
+Nach Veröffentlichung und Update auf V0.0.27 die lokale Konfiguration wie oben
+laden und im Installationsverzeichnis als root ausführen:
+
+```bash
+runuser -u wi-planarchiv -- env PYTHONDONTWRITEBYTECODE=1 \
+  .venv/bin/python -m flask --app backend source-coverage-check \
+  --query "Wirtschaftsingenieur" \
+  --title "BWING MT | Wirtschaftsingenieurwesen / Management und Technik (PO-Version 2024)" \
+  --start 2026-08-31 --end 2027-02-28 \
+  --all-weeks --week-budget 30 \
+  --details --semester "WiSe 2026/27" \
+  --study-key "WI-MT" --regulations-key "PO-2024" \
+  --detail-budget 80 --json
+```
+
+Falls bisher andere opake Studiengangs-/Prüfungsordnungskennungen verwendet wurden,
+diese beibehalten. Die fünf Auswahloptionen können wie beim Vorschauimport aus
+der exportierten lokalen Konfiguration übernommen werden; explizite Optionen haben
+Vorrang. Detailparameter ohne `--details` werden nur als Umgebungs-Vorgaben ignoriert,
+als ausdrücklich übergebene Optionen dagegen abgelehnt.
+
+`--detail-budget` erlaubt 1 bis 100 Ziele, Standard 80. Überschreitet der vereinigte
+Bestand das Budget, bricht der Lauf vor dem ersten Detailabruf ab. Es wird nicht
+stillschweigend nur ein Teilbestand geprüft. Das harte HTTP-Limit bleibt bei
+**100 Anfragen für den gesamten Lauf**, einschließlich Navigation und
+Weiterleitungen. Der vollständige Live-Lauf benötigte genau 100 Anfragen; bereits
+eine zusätzliche Weiterleitung oder ein weiterer Datensatz kann zum Abbruch
+führen. Für einen kleineren Prüfauftrag `--all-weeks` durch beispielsweise
+`--week 2026-W43 --week 2026-W44` ersetzen. Das Detailbudget und HTTP-Limit bleiben
+dabei wirksam; alle bekannten Ziele der Semesteransichten werden dennoch geprüft.
+
+### Was genau verglichen wird
+
+Verglichen wird **eine Veranstaltung pro vollständiger beobachteter Woche**.
+Mehrere Termine oder Gruppen derselben Veranstaltung innerhalb einer Woche werden
+für diese Prüfung zusammengefasst. Ein passender Wocheneintrag bestätigt deshalb
+weder die einzelnen Tage noch Uhrzeiten, Räume oder alle Gruppen. Als erwartete
+Präsenz gilt mindestens ein normalisierter Termin von Montag bis Freitag.
+Die Zuordnung verwendet das lokale Datum in Europe/Berlin einschließlich korrektem
+ISO-Jahr, nicht das UTC-Datum.
+
+- Nicht beobachtete Wochen werden nicht als Wochen ohne Termine behandelt.
+- Unvollständige Randwochen des Prüfzeitraums werden separat ausgewiesen und nicht verglichen: Ein sichtbarer Eintrag könnte außerhalb des gewählten Datumsintervalls liegen.
+- Samstag-/Sonntagstermine werden gezählt und vom Vergleich der bisher nur Montag bis Freitag darstellenden Wochenansicht ausgenommen. Wochenenden bleiben ungeprüft.
+- Blockierte Details werden mit laufbezogener Nummer ausgewiesen, ohne aus ihnen einen leeren Terminbestand abzuleiten.
+- Explizite Ausfälle entfernen die entsprechenden erwarteten Termine. Ein dennoch sichtbarer Wocheneintrag mit ausschließlich Ausfallangaben wird separat gemeldet, nicht automatisch als zusätzlicher Termin gewertet.
+- Offene Bemerkungen, Raum-/Verlegungshinweise und Tageshinweise bleiben prüfpflichtig. Eine Abweichung ist ein Prüfauftrag, kein bestätigter Ausfall und kein Anlass zur automatischen Terminänderung.
+
+### Zusätzliche Felder im Schema 2
+
+| Feld | Bedeutung |
+| --- | --- |
+| `details_requested` / `checked_details` | Detailauftrag und Anzahl vollständig abgearbeiteter Details. |
+| `normalization_summary` / `review_summary` | Vorschauen, Blockaden und feste Prüfcodes; keine Freitexte. |
+| `weekly_presence.scope` | Immer `course_presence_per_full_observed_week`. |
+| `weekly_presence.evaluated` | Mindestens eine volle Woche und ein normalisierbares Detail konnten verglichen werden. |
+| `weekly_presence.weeks` | Zähler je verglichener Woche mit unverändertem Wochenstatus. |
+| `weekly_presence.expected_course_weeks` | Erwartete Kombinationen aus Veranstaltung und Woche für normalisierbare Details. |
+| `weekly_presence.observed_course_weeks` | Sichtbare Kombinationen für diese Details und Vergleichswochen. |
+| `weekly_presence.matched_course_weeks` | In beiden Mengen vorhandene Kombinationen. |
+| `weekly_presence.missing_from_week_view` | Erwartete, aber nicht sichtbare Kombinationen mit Detailnummer, ISO-Woche und Prüfstatus. |
+| `weekly_presence.observed_without_expected_occurrence` | Sichtbare Kombinationen ohne erwarteten Montag-bis-Freitag-Termin, getrennt von Ausfall-/Wochenendfällen. |
+| `weekly_presence.observed_cancellation_only` / `observed_weekend_only` | Sichtbare Kombinationen mit ausschließlich Ausfall- beziehungsweise Wochenendbezug. |
+| `weekly_presence.blocked_details` / `review_details` | Blockierte beziehungsweise fachlich prüfpflichtige normalisierte Details. |
+| `weekly_presence.partial_boundary_weeks` / `unobserved_expected_weeks` | Ausgeschlossene Randwochen beziehungsweise nicht beobachtete Wochen mit erwarteten Terminen. |
+| `weekly_presence.weekend_occurrence_count` | Normalisierte Samstag-/Sonntagstermine innerhalb des Prüfzeitraums. Kein Vollständigkeitsnachweis. |
+| `weekly_presence.comparable_pairs_match` | Übereinstimmung der vergleichbaren Kombinationen; bei nicht ausgewertetem Vergleich null. Keine Gesamtfreigabe. |
+
+Die Detailnummern beziehen sich auf denselben vereinigten Zielbestand wie
+`comparison`, nicht auf einen früheren Bericht. Blockierte Details können trotz
+Übereinstimmung der vergleichbaren Kombinationen weiterhin fehlen. Ohne
+`--details` bleiben die neuen Detail-/Präsenzberichte null. Bei einem
+Detailabruf-/Parserfehler werden auch der vorherige Zielvergleich und die
+Detailzähler verworfen; `status` ist `failed`, der Präsenzbericht null.
+
+### Live-Ergebnis V0.0.27
+
+Am 2026-10-21 wurden 26 Wochen und alle 66 bekannten Details der MT-Auswahl mit
+konfigurierter Quellkennung geprüft: **100 HTTP-Anfragen**, keine Wiederholungen,
+weiterhin eine Sekunde Mindestabstand. 65 Details lassen sich normalisieren,
+eines bleibt durch die ungeklärte Einführungsbemerkung blockiert; 23 Vorschauen
+bleiben fachlich prüfpflichtig. Die Zielmengen stimmen weiterhin überein.
+
+Die Detailnormalisierung erwartet 809 Veranstaltungs-Wochen. 704 Kombinationen
+sind in den Wochenansichten sichtbar und passen zu den Erwartungen.
+**105 erwartete Wochenpräsenzen sind dort nicht sichtbar.** Keine sichtbare
+Kombination ohne erwarteten Termin. Keine normalisierten Wochenendtermine;
+daraus folgt keine vollständige Wochenendabdeckung. Es gibt im gewählten Zeitraum
+keine unvollständigen Randwochen oder nicht beobachteten Erwartungswochen.
+
+Die ausgegebenen Beispiele für Abweichungen betreffen Wochen mit Tageshinweisen.
+Die Ursache aller 105 Abweichungen ist damit nicht belegt. Insbesondere dürfen
+Ferienregeln nicht aus einer bloßen Wochenüberschrift abgeleitet oder fehlende
+Einträge automatisch als Ausfall behandelt werden. Die zusätzliche Aufschlüsselung
+je Woche und die strengere Abweisung doppelter Detailauswahl wurden nach dem
+Live-Lauf lokal getestet. Keine Vorschau-Datei geändert, keine Rohdaten gespeichert,
+kein Deployment oder eigener LXC-Lauf, keine Archivfreigabe.

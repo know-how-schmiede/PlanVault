@@ -4,7 +4,7 @@ WI-PlanArchiv wird schrittweise von der Konzeption zur zuverlässig betriebenen 
 
 ## Aktueller Stand
 
-Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.26`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Laut Nutzerprotokoll vom 2026-10-20 bestehen im Debian-13-LXC alle drei Tests; systemd-Einrichtung und lokale HTTP-Prüfung sind erfolgreich. Der User bestätigt nach erneutem Test den laufenden Server und Zugriff im internen Netz. Der erste Live-Quellzugriff für Studiengangsuche, Plan und Wochenwechsel ist verifiziert; ein automatisierter Datenimport ist noch nicht implementiert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Erstinstallation im Zielcontainer ist durch das Nutzerprotokoll bestätigt. Ein separates Update-Skript mit vorbereiteten Releases, Sicherung und Rückkehr zum alten Anwendungsstand liegt vor; der erfolgreiche Update-Praxistest ist durch den User bestätigt; ein absichtlich ausgelöster Fehler mit Rollback wurde im LXC noch nicht nachgewiesen. M0 ist in der [Quellenanalyse](source-analysis.md) begonnen: HTTP-Abruf, Wochenwechsel und zwei Detailseiten sind geprüft. Ein Detailparser mit fiktiver Testgrundlage liegt vor; Sonderfälle, Quellidentität und Semester-Vollständigkeit bleiben offen; M1 bis M5 bleiben offen.
+Konzept / Entwicklungsstart. Die aktuelle Version ist in [version.py](../version.py) festgehalten und lautet `V0.0.27`. Das Flask-Grundgerüst mit Startseite, Umgebungs-Konfiguration und zentraler Version im Footer ist implementiert. Laut Nutzerprotokoll vom 2026-10-20 bestehen im Debian-13-LXC alle drei Tests; systemd-Einrichtung und lokale HTTP-Prüfung sind erfolgreich. Der User bestätigt nach erneutem Test den laufenden Server und Zugriff im internen Netz. Der erste Live-Quellzugriff für Studiengangsuche, Plan und Wochenwechsel ist verifiziert; ein automatisierter Datenimport ist noch nicht implementiert. Ein interaktives Installationsskript für Debian-13-LXC mit automatischem Git-Bezug und systemd und eine [Installationsanleitung](install.md) liegen vor; die Erstinstallation im Zielcontainer ist durch das Nutzerprotokoll bestätigt. Ein separates Update-Skript mit vorbereiteten Releases, Sicherung und Rückkehr zum alten Anwendungsstand liegt vor; der erfolgreiche Update-Praxistest ist durch den User bestätigt; ein absichtlich ausgelöster Fehler mit Rollback wurde im LXC noch nicht nachgewiesen. M0 ist in der [Quellenanalyse](source-analysis.md) begonnen: HTTP-Abruf, Wochenwechsel und zwei Detailseiten sind geprüft. Ein Detailparser mit fiktiver Testgrundlage liegt vor; Sonderfälle, Quellidentität und Semester-Vollständigkeit bleiben offen; M1 bis M5 bleiben offen.
 
 Die neue Kalendervorschau erzeugt UTC-Termine und prüft Ausfälle; ein separater Wochenabgleich erkennt Lücken und Fehler. Sonderregeln und Quellzuordnung sind technisch vorbereitet, aber noch nicht live verifiziert. M0/M1 bleiben offen. Siehe [Entscheidung zur Kalendervorschau](decisions/002-kalendervorschau.md).
 
@@ -268,3 +268,16 @@ der Importshell. Die gemeinsame Test-Fixture isoliert nun die Laufzeitkonfigurat
 372 lokale Tests bestehen auch mit fiktiver geerbter Betreiberkonfiguration.
 Ein erneuter erfolgreicher Update-Lauf im Ziel-LXC ist noch nicht bestätigt;
 [Fehlerhilfe](install.md#update-nach-einem-manuellen-import-geerbte-testkonfiguration).
+
+
+## Ergänzung V0.0.27 – Wochenpräsenz anhand der Details prüfen
+
+Der [Ansichtsabgleich](view-comparison.md) kann mit `--details` die normalisierten
+Erwartungen je Veranstaltung und voller beobachteter Woche vergleichen. Ausfälle,
+blockierte Details, Wochenenden und Randwochen bleiben getrennt; keine automatische
+Freigabe oder Terminänderung. Live: 26 Wochen, 66 bekannte Details, 65 normalisierbar,
+809 erwartete und 704 passende sichtbare Veranstaltungs-Wochen. 105 Abweichungen
+und der blockierte Einführungsfall bleiben zu klären. Nächster fachlicher Schritt:
+diese Abweichungen je Woche gegen Tageshinweise und tatsächliche Ferien-/Ausfallregeln
+prüfen, anschließend einzelne Terminangaben absichern. M0/M1 bleiben offen;
+Archivspeicherung und Vollständigkeitsfreigabe sind noch nicht erreicht.
