@@ -50,3 +50,10 @@ Die Eingabeprüfung der Installations- und Update-Skripte entfernt jetzt Leerzei
 
 
 Ab V0.0.18 benötigen Installations- und Update-Skript kein `curl`. Der Schnellstart verwendet `wget` nur zum Download; die Anwendung selbst kommt weiterhin über Git. Lokale HTTP-Prüfungen nutzen Python 3 ohne Proxy, mit Timeout und Größenlimit; das Update prüft zusätzlich die exakte Versionsnummer. Ein nicht erfolgreicher Download wird nicht gestartet. Die bestehende Update-Sicherung und Rückkehr zum alten Code bleiben erhalten. Der User hat das erfolgreiche Update auf dem Server nach V0.0.18 bestätigt. Eine erneute Erstinstallation der curl-freien Fassung wurde nicht separat bestätigt.
+
+
+Scheitern die Update-Tests nach einem manuellen Import, können exportierte
+LSF-Werte die fiktiven Testdaten beeinflussen. V0.0.26 enthält dafür eine
+Testisolierung. Ein sofortiger erneuter Aufruf ohne geerbte Betreiberwerte ist
+in der [Fehlerhilfe](../docs/install.md#update-nach-einem-manuellen-import-geerbte-testkonfiguration)
+beschrieben; Tests werden dabei nicht übersprungen.

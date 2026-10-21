@@ -191,3 +191,39 @@ Der User bestätigt den funktionierenden Stand nach V0.0.19. V0.0.20 ist erst na
 ## Import-Vorschau aktivieren
 
 Ab V0.0.21 führt ein Link auf der Startseite zur unvollständigen Terminliste. Damit echte Termine erscheinen, die [Vorschau-Anleitung](preview.md) zur Konfiguration und zum manuellen Import befolgen. Das Update allein importiert keine Daten.
+
+
+## Update nach einem manuellen Import: geerbte Testkonfiguration
+
+Wenn nach dem Laden von `/etc/wi-planarchiv/app.env` ein Update in derselben
+Shell gestartet wird, kann `runuser` exportierte `LSF_*`- und `PREVIEW_FILE`-Werte
+an die Tests weiterreichen. Im gemeldeten V0.0.26-Lauf scheiterten dadurch
+`test_cli_sample_summary_has_no_source_data` und
+`test_cli_json_remains_parseable_with_nonzero_exit`: Die fiktiven Links sollten
+unerwartet eine Betreiberkennung enthalten. Der Abbruch erfolgte während der
+Tests vor dem Stoppen und Ersetzen der bisherigen Installation.
+
+Innerhalb V0.0.26 entfernt die gemeinsame Test-Fixture jetzt geerbte Quell-,
+Auswahl- und Vorschauwerte vor jedem Test. Tests setzen ihre eigenen fiktiven Werte.
+Die normale Anwendung und ihre Konfigurationsdatei bleiben unverändert. Die
+Korrektur muss zunächst auf GitHub veröffentlicht sein, damit ein neu bezogener
+Stand diese Testisolierung enthält. Kein Test wird übersprungen.
+
+Als sofortiger Ausweg kann der **bereits erfolgreich heruntergeladene und
+angesehene** Updater aus dem gemeldeten Lauf als root im Container mit bereinigter
+Prozessumgebung erneut gestartet werden:
+
+```bash
+env -u LSF_BASE_URL -u LSF_ID_PARAMETER -u LSF_ID_NAMESPACE \
+  -u LSF_STUDY_QUERY -u LSF_STUDY_TITLE -u LSF_SEMESTER \
+  -u LSF_STUDY_KEY -u LSF_REGULATIONS_KEY -u PREVIEW_FILE \
+  bash /root/update-wi-planarchiv.sh
+```
+
+Das entfernt die Werte nur aus der Umgebung dieses Updater-Aufrufs. Die
+Konfigurationsdatei, Vorschautermine und die über systemd geladenen Dienstwerte
+bleiben erhalten. Die regulären Tests laufen vollständig weiter. Branch und Port
+wie beim ersten Versuch wählen. Vorbereitete Releases und Sicherungsverzeichnisse
+aus dem abgebrochenen Lauf nicht ungeprüft löschen. Nach der Erfolgsmeldung den
+Versionsfooter kontrollieren; ein erfolgreicher erneuter LXC-Lauf ist noch nicht
+bestätigt.

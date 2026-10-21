@@ -12,6 +12,8 @@ WI-PlanArchiv ist eine eigenständige, interne Webanwendung zur automatisierten 
 
 Der neue [Ansichtsabgleich](docs/view-comparison.md) vergleicht die Veranstaltungsziele ausgewählter Wochen mit beiden Semesteransichten. Zeitraum und Abrufbudget sind ausdrücklich vorzugeben; Unterschiede in beide Richtungen und nicht geprüfte oder prüfpflichtige Wochen werden gemeldet. Der Live-Test der bekannten MT-Auswahl erreicht alle 26 Wochen und dieselben 66 Ziele in beiden Beständen. Zehn leere Wochen und drei Wochen mit Tageshinweisen bleiben prüfpflichtig. Der Befehl lädt keine Detailseiten und ändert weder die Web-Vorschau noch Archivdaten.
 
+Eine Update-Korrektur innerhalb V0.0.26 isoliert Tests außerdem von zuvor exportierten LSF- und Vorschauwerten. Dadurch beeinflusst eine Importshell die fiktiven Testdaten nicht mehr. [Fehlerhilfe für den erneuten Update-Aufruf](docs/install.md#update-nach-einem-manuellen-import-geerbte-testkonfiguration).
+
 ## Neu in V0.0.25
 
 Die ursprüngliche Auswahl „Management und Technik“, Prüfungsordnung 2024, wurde erneut live geprüft: 66 bekannte Details, 65 Vorschauen mit 942 Terminen und ein weiterhin blockiertes Detail. Der normalisierbare Anteil wurde lokal bis zur Wochen-/Listenansicht geprüft. Der LXC wurde dabei nicht aktualisiert.

@@ -260,3 +260,11 @@ Zeiträume und Semestergrenzen fachlich belegen, Einzeltermine und Sonderfälle
 gegen die Quelle absichern; anschließend sichere Archivspeicherung. M0/M1
 bleiben offen. Der Nutzer bestätigt den bisherigen manuellen Import im LXC;
 ein Ziel-LXC-Lauf des neuen Abgleichbefehls steht noch aus.
+
+
+Innerhalb V0.0.26 wurde ein vom Nutzer gemeldeter Update-Abbruch vor der
+Umschaltung untersucht: zwei Tests übernahmen exportierte Betreiberwerte aus
+der Importshell. Die gemeinsame Test-Fixture isoliert nun die Laufzeitkonfiguration.
+372 lokale Tests bestehen auch mit fiktiver geerbter Betreiberkonfiguration.
+Ein erneuter erfolgreicher Update-Lauf im Ziel-LXC ist noch nicht bestätigt;
+[Fehlerhilfe](install.md#update-nach-einem-manuellen-import-geerbte-testkonfiguration).
